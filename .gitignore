@@ -24,6 +24,9 @@ yarn-error.log
 /.zed
 /.ai
 /.github
+/.claude
+/.cursor
+/.agents
 /AGENTS.md
 /CLAUDE.md
 /boost.json
