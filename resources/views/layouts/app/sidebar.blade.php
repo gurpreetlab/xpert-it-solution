@@ -12,8 +12,14 @@
 
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Platform')" class="grid">
+                    <!-- Dashboard -->
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        Dashboard
+                    </flux:sidebar.item>
+
+                    <!-- Categories -->
+                    <flux:sidebar.item icon="square-3-stack-3d" :href="route('dashboard.categories.index')" :current="request()->routeIs('dashboard.categories.index')" wire:navigate>
+                        Categories
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
