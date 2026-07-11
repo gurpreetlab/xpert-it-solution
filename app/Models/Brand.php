@@ -7,6 +7,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -49,5 +50,13 @@ class Brand extends Model
                 return Str::upper(Str::substr($this->name, 0, 2));
             },
         );
+    }
+
+    /**
+     * Get the products that belong to this brand.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 }

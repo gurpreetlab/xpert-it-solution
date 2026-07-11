@@ -6,6 +6,7 @@ use App\Concerns\HasSlug;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(["name"])]
@@ -29,5 +30,13 @@ class Category extends Model
         return $query->when($search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%");
         });
+    }
+
+    /**
+     * Get the products that belong to this category.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 }
