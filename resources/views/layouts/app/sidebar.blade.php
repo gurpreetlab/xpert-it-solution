@@ -21,6 +21,11 @@
                     <flux:sidebar.item icon="square-3-stack-3d" :href="route('dashboard.categories.index')" :current="request()->routeIs('dashboard.categories.index')" wire:navigate>
                         Categories
                     </flux:sidebar.item>
+
+                    <!-- Brands -->
+                    <flux:sidebar.item icon="book-open-text" :href="route('dashboard.brands.index')" :current="request()->routeIs('dashboard.brands.index')" wire:navigate>
+                        Brands
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

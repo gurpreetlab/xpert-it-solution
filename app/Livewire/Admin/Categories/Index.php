@@ -4,8 +4,10 @@ namespace App\Livewire\Admin\Categories;
 
 use App\Models\Category;
 use Flux\Flux;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -98,11 +100,17 @@ class Index extends Component
         Flux::toast('Category deleted successfully!');
     }
 
-    private function categories()
+    #[Computed]
+    private function categories(): LengthAwarePaginator
     {
         return Category::search($this->search)
             ->latest()
             ->paginate(10);
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
     }
 
     /**
