@@ -27,8 +27,6 @@ class ProductSeeder extends Seeder
                 }
             }
         }
-
-        $this->refreshCounts();
     }
 
     /**
@@ -81,17 +79,6 @@ class ProductSeeder extends Seeder
                 'sort_order' => $sortOrder++,
             ]);
         }
-    }
-
-    private function refreshCounts(): void
-    {
-        Category::all()->each(function (Category $category) {
-            $category->forceFill(['products_count' => $category->products()->count()])->saveQuietly();
-        });
-
-        Brand::all()->each(function (Brand $brand) {
-            $brand->forceFill(['products_count' => $brand->products()->count()])->saveQuietly();
-        });
     }
 
     private function catalog(): array
