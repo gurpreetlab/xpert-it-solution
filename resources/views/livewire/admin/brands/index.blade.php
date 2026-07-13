@@ -28,13 +28,7 @@
             @forelse($brands as $brand)
                 <flux:table.row :key="$brand->id">
                     <flux:table.cell class="whitespace-nowrap">
-                        @if($brand->logo)
-                        <img src='{{ asset("storage/{$brand->logo}") }}' alt="{{ $brand->name }}" class="mx-2 size-8 rounded object-contain ring-1 ring-zinc-200 dark:ring-zinc-700">
-                        @else
-                            <div class="mx-2 inline-flex size-8 items-center justify-center rounded bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-bold uppercase tracking-wide" title="{{ $brand->name }}" >
-                                {{ $brand->initials }}
-                            </div>
-                        @endif
+                        <flux:avatar :src="$brand->logo ? asset('storage/' . $brand->logo) : null" name="{{ $brand->name }}" />
                     </flux:table.cell>
 
                     <flux:table.cell class="whitespace-nowrap">{{ $brand->name }}</flux:table.cell>

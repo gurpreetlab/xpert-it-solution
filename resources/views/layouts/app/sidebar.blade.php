@@ -26,6 +26,11 @@
                     <flux:sidebar.item icon="book-open-text" :href="route('dashboard.brands.index')" :current="request()->routeIs('dashboard.brands.index')" wire:navigate>
                         Brands
                     </flux:sidebar.item>
+
+                    <!-- Products -->
+                    <flux:sidebar.item icon="shopping-bag" :href="route('dashboard.products.index')" :current="request()->routeIs('dashboard.products.index', 'dashboard.products.show', 'dashboard.products.create', 'dashboard.products.edit')" wire:navigate>
+                        Products
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
