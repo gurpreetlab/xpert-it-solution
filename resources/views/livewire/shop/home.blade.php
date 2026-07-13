@@ -92,7 +92,7 @@
                                 id="hero-search-input"
                             />
                         </div>
-                        <flux:button wire:click="$scrollTo('#products')" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium px-5 rounded-lg text-sm transition">
+                        <flux:button href="#products" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium px-5 rounded-lg text-sm transition">
                             Browse Store
                         </flux:button>
                     </div>
