@@ -30,10 +30,6 @@
                             <flux:button href="{{ route('dashboard') }}" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium">
                                 Dashboard
                             </flux:button>
-                        @else
-                            <flux:button href="{{ route('dashboard') }}" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium">
-                                Dashboard
-                            </flux:button>
                         @endrole
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf

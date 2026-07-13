@@ -35,7 +35,7 @@
 
                     <flux:table.cell class="whitespace-nowrap">{{ $brand->slug }}</flux:table.cell>
 
-                    <flux:table.cell class="py-0">{{ $brand->product_count ?? 0 }}</flux:table.cell>
+                    <flux:table.cell class="py-0">{{ $brand->products_count ?? 0 }}</flux:table.cell>
 
                     <flux:table.cell>{{ $brand->created_at->format('d-m-Y') }}</flux:table.cell>
 
