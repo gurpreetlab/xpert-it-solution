@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->string("name");
             $table->string("slug")->unique();
-            $table->unsignedBigInteger("products_count")->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

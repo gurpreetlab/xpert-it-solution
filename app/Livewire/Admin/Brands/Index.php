@@ -124,6 +124,7 @@ class Index extends Component
     private function brands(): LengthAwarePaginator
     {
         return Brand::search($this->search)
+            ->withCount('products')
             ->latest()
             ->paginate(10);
     }

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string("slug")->unique();
             $table->string("logo")->nullable();
             $table->text("description")->nullable();
-            $table->unsignedBigInteger("products_count")->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

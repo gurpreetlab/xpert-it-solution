@@ -1,15 +1,17 @@
-<div>
-    <div class="flex-1 max-md:pt-6 self-stretch">
-        <flux:heading size="xl" level="1" class="mb-6">Brands</flux:heading>
+<div class="space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <flux:heading size="xl" level="1">Brands</flux:heading>
+            <flux:text class="mt-1 text-gray-500">Manage your brands</flux:text>
+        </div>
+        <!-- Add new brand button -->
+        <flux:modal.trigger name="brand-modal" wire:click="create">
+            <flux:button icon="plus">Add Brand</flux:button>
+        </flux:modal.trigger>
     </div>
 
     <div class="mb-4 flex gap-2">
         <flux:input wire:model.live="search" placeholder="Search..." />
-
-        <!-- Add new brand button -->
-        <flux:modal.trigger name="brand-modal" wire:click="create">
-            <flux:button>Add New Brand</flux:button>
-        </flux:modal.trigger>
     </div>
 
     <!-- Brands Table -->
@@ -67,7 +69,7 @@
     <flux:modal name="brand-modal" @brand-saved.window="$flux.modal('brand-modal').close()" flyout>
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ $editingBrand ? 'Edit Brand' : 'Add New Brand' }}</flux:heading>
+                <flux:heading size="lg">{{ $editingBrand ? 'Edit Brand' : 'Add Brand' }}</flux:heading>
                 <flux:text class="mt-2">{{ $editingBrand ? 'Edit the brand details below.' : 'Add a new brand to the list.' }}</flux:text>
             </div>
 

@@ -104,6 +104,7 @@ class Index extends Component
     private function categories(): LengthAwarePaginator
     {
         return Category::search($this->search)
+            ->withCount('products')
             ->latest()
             ->paginate(10);
     }

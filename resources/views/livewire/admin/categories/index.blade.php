@@ -1,15 +1,17 @@
-<div>
-    <div class="flex-1 max-md:pt-6 self-stretch">
-        <flux:heading size="xl" level="1" class="mb-6">Categories</flux:heading>
+<div class="space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <flux:heading size="xl" level="1">Categories</flux:heading>
+            <flux:text class="mt-1 text-gray-500">Manage your categories</flux:text>
+        </div>
+        <!-- Add new category button -->
+        <flux:modal.trigger name="category-modal" wire:click="create">
+            <flux:button icon="plus">Add Category</flux:button>
+        </flux:modal.trigger>
     </div>
 
     <div class="mb-4 flex gap-2">
         <flux:input wire:model.live="search" placeholder="Search..." />
-
-        <!-- Add new category button -->
-        <flux:modal.trigger name="category-modal" wire:click="create">
-            <flux:button>Add New Category</flux:button>
-        </flux:modal.trigger>
     </div>
 
     <!-- Categories Table -->
@@ -62,7 +64,7 @@
     <flux:modal name="category-modal" @category-saved.window="$flux.modal('category-modal').close()" flyout>
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ $editingCategory ? 'Edit Category' : 'Add New Category' }}</flux:heading>
+                <flux:heading size="lg">{{ $editingCategory ? 'Edit Category' : 'Add Category' }}</flux:heading>
                 <flux:text class="mt-2">{{ $editingCategory ? 'Edit the category details below.' : 'Add a new category to the list.' }}</flux:text>
             </div>
 
