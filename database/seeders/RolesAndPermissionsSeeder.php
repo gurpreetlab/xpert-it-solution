@@ -14,7 +14,7 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        $permissions = ["view-dashboard", "manage-categories"];
+        $permissions = ["view-dashboard", "manage-categories", "manage-brands", "manage-products"];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
