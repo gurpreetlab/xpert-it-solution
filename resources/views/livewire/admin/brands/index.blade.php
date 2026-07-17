@@ -102,7 +102,7 @@
     </flux:modal>
 
     <!-- Delete brand modal -->
-    <flux:modal name="delete-brand" class="min-w-[22rem]" @brand-deleted.window="$flux.modal('delete-brand').close()">
+    <flux:modal name="delete-brand" class="min-w-88" @brand-deleted.window="$flux.modal('delete-brand').close()">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Delete brand?</flux:heading>

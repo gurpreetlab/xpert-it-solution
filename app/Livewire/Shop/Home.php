@@ -2,11 +2,12 @@
 
 namespace App\Livewire\Shop;
 
-use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Product;
+use App\Services\ShopCache;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -73,36 +74,25 @@ class Home extends Component
     #[Computed]
     public function categories(): Collection
     {
-        return Category::withCount([
-            "products" => function ($query) {
-                $query->where("is_active", true);
-            },
-        ])
-            ->orderBy("name")
-            ->get();
+        return ShopCache::categories();
     }
 
     #[Computed]
     public function brands(): Collection
     {
-        return Brand::withCount([
-            "products" => function ($query) {
-                $query->where("is_active", true);
-            },
-        ])
-            ->orderBy("name")
-            ->get();
+        return ShopCache::brands();
     }
 
     #[Computed]
     public function featuredProducts(): Collection
     {
-        return Product::query()
-            ->with(["category:id,name", "brand:id,name,logo", "primaryImage"])
-            ->where("is_active", true)
-            ->where("is_featured", true)
-            ->take(6)
-            ->get();
+        return ShopCache::featuredProducts();
+    }
+
+    #[Computed]
+    public function totalProductsCount(): int
+    {
+        return ShopCache::totalProductsCount();
     }
 
     #[Computed]
@@ -119,6 +109,30 @@ class Home extends Component
 
     #[Computed]
     public function products(): LengthAwarePaginator
+    {
+        if ($this->search !== "") {
+            return $this->buildProductsQuery()->paginate(12);
+        }
+
+        $key = ShopCache::productsListKey(
+            $this->selectedCategoryId,
+            $this->selectedBrandId,
+            $this->sortBy,
+            $this->getPage(),
+        );
+
+        return ShopCache::rememberProducts(
+            $key,
+            fn() => $this->buildProductsQuery()->paginate(12),
+        );
+    }
+
+    /**
+     * Build the products query based on filters and search term.
+     *
+     * @return Builder
+     */
+    protected function buildProductsQuery(): Builder
     {
         return Product::query()
             ->with(["category:id,name", "brand:id,name,logo", "primaryImage"])
@@ -163,11 +177,15 @@ class Home extends Component
                 fn($query) => $query
                     ->orderBy("is_featured", "desc")
                     ->orderBy("name", "asc"),
-            )
-            ->paginate(12);
+            );
     }
 
-    public function render()
+    /**
+     * Render the home page view.
+     *
+     * @return View
+     */
+    public function render(): View
     {
         return view("livewire.shop.home");
     }

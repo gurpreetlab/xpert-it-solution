@@ -23,9 +23,9 @@
 
                     <!-- Main Nav (Anchor links) -->
                     <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                        <a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200" wire:navigate>Categories</a>
-                        <a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200" wire:navigate>Featured</a>
-                        <a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200" wire:navigate>Products</a>
+                        <a href="#categories" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Categories</a>
+                        <a href="#featured" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Featured</a>
+                        <a href="#products" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Products</a>
                     </nav>
 
                     <!-- Right Buttons (Auth) -->
