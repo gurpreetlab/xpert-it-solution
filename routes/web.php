@@ -1,14 +1,17 @@
 <?php
 
-use App\Livewire\Admin\Categories\Index as CategoryIndex;
 use App\Livewire\Admin\Brands\Index as BrandIndex;
-use App\Livewire\Admin\Products\Index as ProductIndex;
+use App\Livewire\Admin\Categories\Index as CategoryIndex;
 use App\Livewire\Admin\Products\Create as ProductCreate;
 use App\Livewire\Admin\Products\Edit as ProductEdit;
+use App\Livewire\Admin\Products\Index as ProductIndex;
 use App\Livewire\Admin\Products\Show as ProductShow;
+use App\Livewire\Shop\Home;
+use App\Livewire\Shop\ProductDetail;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', Home::class)->name('home');
+Route::get('/{slug}', ProductDetail::class)->name('shop.product.details');
 
 // super-admin routes
 Route::middleware(['auth', 'verified', 'role:super-admin'])->prefix('super-admin')->group(function () {
