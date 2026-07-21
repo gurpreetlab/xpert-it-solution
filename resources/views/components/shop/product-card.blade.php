@@ -4,14 +4,31 @@
     $discount = $product->mrp > 0 ? round((($product->mrp - $product->sale_price) / $product->mrp) * 100) : 0;
     $categoryIcon = \App\Support\CategoryVisuals::icon($product->category?->name);
     [$gradientFrom, $gradientTo] = \App\Support\CategoryVisuals::gradient($product->category?->name, muted: true);
+
+    $img = $product->primaryImage?->path ?? ($product->images->first()?->path ?? null);
+    $imgUrl = null;
+    if ($img) {
+        if (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) {
+            $imgUrl = $img;
+        } elseif (str_starts_with($img, 'storage/')) {
+            $imgUrl = asset($img);
+        } else {
+            $imgUrl = asset('storage/' . $img);
+        }
+    }
 @endphp
 
 <div class="flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-    <div class="relative aspect-video bg-gradient-to-br {{ $gradientFrom }} {{ $gradientTo }} flex items-center justify-center p-6 text-white">
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_14px]"></div>
-        <div class="relative z-10 p-3.5 rounded-xl bg-white/10 border border-white/10 backdrop-blur-md shadow-lg group-hover:scale-105 transition-transform duration-300">
-            <flux:icon icon="{{ $categoryIcon }}" class="size-7 text-white" />
-        </div>
+    <div class="relative aspect-video bg-gradient-to-br {{ $gradientFrom }} {{ $gradientTo }} flex items-center justify-center text-white overflow-hidden">
+        @if($imgUrl)
+            <img src="{{ $imgUrl }}" alt="{{ $product->name }}" class="size-full object-cover group-hover:scale-105 transition-transform duration-300">
+        @else
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_14px]"></div>
+            <div class="relative z-10 p-3.5 rounded-xl bg-white/10 border border-white/10 backdrop-blur-md shadow-lg group-hover:scale-105 transition-transform duration-300">
+                <flux:icon icon="{{ $categoryIcon }}" class="size-7 text-white" />
+            </div>
+        @endif
+
         @if($discount > 0)
             <span class="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-500 text-white shadow-sm">
                 {{ $discount }}% OFF
