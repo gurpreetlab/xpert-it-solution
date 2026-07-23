@@ -33,15 +33,14 @@
                         @if (Route::has('login'))
                             @auth
                                 @role('super-admin')
-                                    <flux:button href="{{ route('dashboard') }}" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium">
+                                    <flux:button href="{{ route('dashboard') }}" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium" wire:navigate>
                                         Dashboard
                                     </flux:button>
                                 @endrole
 
-                                <div class="relative">
-                                    <flux:icon.shopping-cart class="size-5" />
-                                    <span class="-right-2 -top-2 absolute bg-red-800 flex h-full items-center justify-center rounded-full text-xs w-full overflow-hidden">0</span>
-                                </div>
+                                @role('customer')
+                                    <livewire:shop._partials.cart-count />
+                                @endrole
 
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
@@ -51,11 +50,11 @@
                                 </form>
 
                             @else
-                                <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900">
+                                <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900" wire:navigate>
                                     Log in
                                 </flux:button>
                                 @if (Route::has('register'))
-                                    <flux:button href="{{ route('register') }}" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium">
+                                    <flux:button href="{{ route('register') }}" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium" wire:navigate>
                                         Register
                                     </flux:button>
                                 @endif

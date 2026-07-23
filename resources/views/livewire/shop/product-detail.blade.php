@@ -199,29 +199,53 @@
 
                     <!-- Quantity Control & Enquire CTAs -->
                     <div class="space-y-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-                        <div class="flex items-center gap-4">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Quantity</span>
-                            <div class="flex items-center border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-1 shadow-sm">
-                                <button type="button" wire:click="decrementQuantity" class="size-6 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold transition">
-                                    -
-                                </button>
-                                <span class="w-10 text-center text-sm font-bold text-zinc-900 dark:text-white">{{ $quantity }}</span>
-                                <button type="button" wire:click="incrementQuantity" class="size-6 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold transition">
-                                    +
-                                </button>
-                            </div>
-                        </div>
+                        @auth
+                            @role('customer')
+                                <div class="flex items-center gap-4">
+                                    <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Quantity</span>
+                                    <div class="flex items-center border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-1 shadow-sm">
+                                        <button type="button" wire:click="decrementQuantity" class="size-6 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold transition">
+                                            -
+                                        </button>
+                                        <span class="w-10 text-center text-sm font-bold text-zinc-900 dark:text-white">{{ $quantity }}</span>
+                                        <button type="button" wire:click="incrementQuantity" class="size-6 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold transition">
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            @endrole
+                        @endauth
 
                         <!-- Buttons Row -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <flux:button icon="shopping-bag" class="cursor-pointer">
-                                Place Order
-                            </flux:button>
+                        @auth
+                            @role('customer')
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <flux:button icon="shopping-bag" class="cursor-pointer">
+                                        Place Order
+                                    </flux:button>
 
-                            <flux:button wire:click="addToCart" icon="shopping-cart" class="cursor-pointer">
-                                Add to Cart
-                            </flux:button>
-                        </div>
+                                    <flux:button wire:click="addToCart" icon="shopping-cart" class="cursor-pointer">
+                                        Add to Cart
+                                    </flux:button>
+                                </div>
+                            @endrole
+
+                            @role('super-admin')
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <flux:button href="{{ route('dashboard.products.show', $product->id) }}" class="cursor-pointer" wire:navigate>
+                                        View in Dashboard
+                                    </flux:button>
+                                </div>
+                            @endrole
+                        @endauth
+
+                        @guest
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <flux:button href="{{ route('login') }}" icon="arrow-right-end-on-rectangle" class="cursor-pointer" wire:navigate>
+                                    Login
+                                </flux:button>
+                            </div>
+                        @endguest
                     </div>
 
                 </div>
@@ -291,7 +315,8 @@
                         <h2 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Related IT Hardware</h2>
                         <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Other devices in {{ $product->category?->name ?? 'this category' }}</p>
                     </div>
-                    <a href="{{ route('home') }}#products" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">View All Products &rarr;</a>
+
+                    <flux:button size="sm" href="{{ route('shop.products') }}" wire:navigate>View All Products</flux:button>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

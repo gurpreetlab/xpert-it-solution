@@ -6,6 +6,7 @@ use App\Livewire\Admin\Products\Create as ProductCreate;
 use App\Livewire\Admin\Products\Edit as ProductEdit;
 use App\Livewire\Admin\Products\Index as ProductIndex;
 use App\Livewire\Admin\Products\Show as ProductShow;
+use App\Livewire\Shop\Cart as ShopCart;
 use App\Livewire\Shop\Home;
 use App\Livewire\Shop\ProductDetail;
 use App\Livewire\Shop\Products as ShopProducts;
@@ -16,6 +17,10 @@ Route::get("/products", ShopProducts::class)->name("shop.products");
 Route::get("/products/{slug}", ProductDetail::class)->name(
     "shop.product.details",
 );
+
+Route::middleware(["auth", "verified", "role:customer"])->group(function () {
+    Route::get("/cart", ShopCart::class)->name("shop.cart");
+});
 
 // super-admin routes
 Route::middleware(["auth", "verified", "role:super-admin"])

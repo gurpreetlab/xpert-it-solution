@@ -10,14 +10,14 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Profile settings')]
+#[Title("Profile settings")]
 class Profile extends Component
 {
     use ProfileValidationRules;
 
-    public string $name = '';
+    public string $name = "";
 
-    public string $email = '';
+    public string $email = "";
 
     /**
      * Mount the component.
@@ -39,13 +39,13 @@ class Profile extends Component
 
         $user->fill($validated);
 
-        if ($user->isDirty('email')) {
+        if ($user->isDirty("email")) {
             $user->email_verified_at = null;
         }
 
         $user->save();
 
-        Flux::toast(variant: 'success', text: __('Profile updated.'));
+        Flux::toast(variant: "success", text: __("Profile updated."));
     }
 
     /**
@@ -56,14 +56,20 @@ class Profile extends Component
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('dashboard', absolute: false));
+            $this->redirectIntended(
+                default: route("dashboard", absolute: false),
+            );
 
             return;
         }
 
         $user->sendEmailVerificationNotification();
 
-        Flux::toast(text: __('A new verification link has been sent to your email address.'));
+        Flux::toast(
+            text: __(
+                "A new verification link has been sent to your email address.",
+            ),
+        );
     }
 
     #[Computed]
@@ -71,7 +77,7 @@ class Profile extends Component
     {
         $user = Auth::user();
 
-        return $user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail();
+        return $user instanceof MustVerifyEmail && !$user->hasVerifiedEmail();
     }
 
     #[Computed]
@@ -79,6 +85,6 @@ class Profile extends Component
     {
         $user = Auth::user();
 
-        return ! $user instanceof MustVerifyEmail || $user->hasVerifiedEmail();
+        return !$user instanceof MustVerifyEmail || $user->hasVerifiedEmail();
     }
 }

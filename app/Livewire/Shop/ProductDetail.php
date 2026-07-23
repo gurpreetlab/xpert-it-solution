@@ -16,6 +16,12 @@ class ProductDetail extends Component
 
     public int $quantity = 1;
 
+    /**
+     * Initialize the component with the given slug.
+     *
+     * @param string $slug
+     * @return void
+     */
     public function mount(string $slug): void
     {
         $this->slug = $slug;
@@ -43,6 +49,11 @@ class ProductDetail extends Component
             ->firstOrFail();
     }
 
+    /**
+     * Get the related products for the current product.
+     *
+     * @return Collection<int, Product>
+     */
     public function relatedProducts(): Collection
     {
         $currentProduct = $this->product();
@@ -81,33 +92,49 @@ class ProductDetail extends Component
         }
     }
 
-    public function openEnquiry(): void
-    {
-        $product = $this->product();
-        $this->enquiryMessage = "Hello, I would like to enquire about \"{$product->name}\" (Quantity: {$this->quantity}). Please provide pricing, tax details, and lead time.";
-        $this->showEnquiryModal = true;
-    }
-
-    public function submitEnquiry(): void
-    {
-        $this->validate();
-
-        $this->reset([
-            "enquiryName",
-            "enquiryEmail",
-            "enquiryPhone",
-            "enquiryMessage",
-            "showEnquiryModal",
-        ]);
-
-        Flux::toast(
-            text: "Thank you! Your enquiry has been received. Our IT experts will contact you shortly.",
-            variant: "success",
-        );
-    }
-
     public function addToCart(): void
     {
+        if (!auth()->check()) {
+            Flux::toast(
+                text: "Please login to add items to your cart.",
+                variant: "danger",
+            );
+            return;
+        }
+
+        // Check if product is out of stock
+        if ($this->product()->stock <= 0) {
+            Flux::toast(text: "Product is out of stock.", variant: "danger");
+            return;
+        }
+
+        // Check if quantity exceeds stock
+        if ($this->quantity > $this->product()->stock) {
+            Flux::toast(
+                text: "Only {$this->product()->stock} unit(s) available in stock.",
+                variant: "warning",
+            );
+            return;
+        }
+
+        $cart = auth()->user()->cart()->firstOrCreate();
+
+        $item = $cart
+            ->items()
+            ->where("product_id", $this->product()->id)
+            ->first();
+
+        if ($item) {
+            $item->increment("quantity", $this->quantity);
+        } else {
+            $cart->items()->create([
+                "product_id" => $this->product()->id,
+                "quantity" => $this->quantity,
+                "sale_price" => $this->product()->sale_price,
+            ]);
+        }
+
+        $this->dispatch("cart-updated");
         Flux::toast(
             text: "Added {$this->quantity} unit(s) of {$this->product()->name} to cart.",
             variant: "success",
@@ -116,7 +143,7 @@ class ProductDetail extends Component
 
     public function placeOrder(): void
     {
-        $this->openEnquiry();
+        //
     }
 
     #[Layout("layouts.blank")]
