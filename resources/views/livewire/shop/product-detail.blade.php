@@ -218,7 +218,7 @@
                                 Place Order
                             </flux:button>
 
-                            <flux:button wire:click="addToCart" icon="shopping-bag" class="cursor-pointer">
+                            <flux:button wire:click="addToCart" icon="shopping-cart" class="cursor-pointer">
                                 Add to Cart
                             </flux:button>
                         </div>

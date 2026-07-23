@@ -37,12 +37,19 @@
                                         Dashboard
                                     </flux:button>
                                 @endrole
+
+                                <div class="relative">
+                                    <flux:icon.shopping-cart class="size-5" />
+                                    <span class="-right-2 -top-2 absolute bg-red-800 flex h-full items-center justify-center rounded-full text-xs w-full overflow-hidden">0</span>
+                                </div>
+
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
                                     <flux:button type="submit" variant="ghost" size="sm" class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900">
                                         Log out
                                     </flux:button>
                                 </form>
+
                             @else
                                 <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900">
                                     Log in
