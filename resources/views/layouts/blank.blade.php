@@ -130,6 +130,7 @@
                 </flux:toast.group>
             @endpersist
 
+            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
             <!-- Flux Scripts -->
             @fluxScripts
         </div>
