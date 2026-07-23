@@ -78,7 +78,7 @@ use App\Support\CategoryVisuals;
                 <div class="flex gap-2">
                     <a href="{{ route('shop.product.details', $product->slug) }}" wire:navigate>
                         <flux:button variant="ghost" size="sm" class="cursor-pointer text-zinc-600 dark:text-zinc-400 font-semibold">
-                            Details
+                            View
                         </flux:button>
                     </a>
                 </div>

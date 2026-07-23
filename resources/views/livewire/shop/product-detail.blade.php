@@ -376,7 +376,7 @@
                                     </div>
 
                                     <flux:button href="{{ route('shop.product.details', $relProduct->slug) }}" wire:navigate variant="ghost" size="sm" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
-                                        Details &rarr;
+                                        View
                                     </flux:button>
                                 </div>
                             </div>
@@ -387,50 +387,4 @@
         @endif
 
     </main>
-
-    <!-- General Enquiry Form Modal -->
-    <flux:modal wire:model="showEnquiryModal" class="w-full max-w-md p-6 rounded-3xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">
-        <div class="space-y-6">
-            <div>
-                <flux:heading size="lg" class="text-zinc-900 dark:text-white font-bold">Request Enterprise Quotation</flux:heading>
-                <flux:text class="mt-1 text-zinc-500 text-sm">Send us your technical requirements for {{ $product->name }} and our team will get back to you with custom corporate pricing.</flux:text>
-            </div>
-
-            <form wire:submit.prevent="submitEnquiry" class="space-y-4">
-                <!-- Name -->
-                <flux:field>
-                    <flux:label>Contact Name</flux:label>
-                    <flux:input wire:model.defer="enquiryName" placeholder="e.g. Gurpreet Singh" />
-                    <flux:error name="enquiryName" />
-                </flux:field>
-
-                <!-- Email -->
-                <flux:field>
-                    <flux:label>Corporate Email</flux:label>
-                    <flux:input type="email" wire:model.defer="enquiryEmail" placeholder="e.g. gurpreet@example.com" />
-                    <flux:error name="enquiryEmail" />
-                </flux:field>
-
-                <!-- Phone -->
-                <flux:field>
-                    <flux:label>Phone Number</flux:label>
-                    <flux:input wire:model.defer="enquiryPhone" placeholder="e.g. +91 98765 43210" />
-                    <flux:error name="enquiryPhone" />
-                </flux:field>
-
-                <!-- Message -->
-                <flux:field>
-                    <flux:label>Requirement Message</flux:label>
-                    <flux:textarea wire:model.defer="enquiryMessage" placeholder="Specify required quantity, delivery location, installation needs..." rows="4" />
-                    <flux:error name="enquiryMessage" />
-                </flux:field>
-
-                <div class="flex gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                    <flux:spacer />
-                    <flux:button wire:click="$set('showEnquiryModal', false)" variant="ghost" size="sm" class="font-semibold text-zinc-500">Cancel</flux:button>
-                    <flux:button type="submit" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium">Submit Quotation Request</flux:button>
-                </div>
-            </form>
-        </div>
-    </flux:modal>
 </div>

@@ -11,7 +11,7 @@
                 <div class="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
                     <div class="flex items-center gap-6">
                         <!-- Brand Logo & Name -->
-                        <a href="/" class="flex items-center gap-2.5 group">
+                        <a href="{{ route('home') }}" class="flex items-center gap-2.5 group" wire:navigate>
                             <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-md group-hover:scale-105 transition-transform duration-200">
                                 <x-app-logo-icon class="size-5 fill-current" />
                             </div>
@@ -25,7 +25,7 @@
                     <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
                         <a href="{{ route('home') . '#categories' }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Categories</a>
                         <a href="{{ route('home') . '#featured' }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Featured</a>
-                        <a href="{{ route('home') . '#products' }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Products</a>
+                        <a href="{{ route('shop.products') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200" wire:navigate>Products</a>
                     </nav>
 
                     <!-- Right Buttons (Auth) -->

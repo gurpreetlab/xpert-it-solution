@@ -16,24 +16,6 @@ class ProductDetail extends Component
 
     public int $quantity = 1;
 
-    public bool $showEnquiryModal = false;
-
-    // Enquiry form
-    public string $enquiryName = '';
-
-    public string $enquiryEmail = '';
-
-    public string $enquiryPhone = '';
-
-    public string $enquiryMessage = '';
-
-    protected array $rules = [
-        'enquiryName' => 'required|string|min:2|max:100',
-        'enquiryEmail' => 'required|email|max:150',
-        'enquiryPhone' => 'required|string|min:10|max:20',
-        'enquiryMessage' => 'nullable|string|max:1000',
-    ];
-
     public function mount(string $slug): void
     {
         $this->slug = $slug;
@@ -49,9 +31,15 @@ class ProductDetail extends Component
 
     public function product(): Product
     {
-        return Product::with(['images', 'specifications', 'category', 'brand', 'primaryImage'])
-            ->where('slug', $this->slug)
-            ->where('is_active', true)
+        return Product::with([
+            "images",
+            "specifications",
+            "category",
+            "brand",
+            "primaryImage",
+        ])
+            ->where("slug", $this->slug)
+            ->where("is_active", true)
             ->firstOrFail();
     }
 
@@ -59,10 +47,16 @@ class ProductDetail extends Component
     {
         $currentProduct = $this->product();
 
-        return Product::with(['images', 'specifications', 'category', 'brand', 'primaryImage'])
-            ->where('is_active', true)
-            ->where('category_id', $currentProduct->category_id)
-            ->where('id', '!=', $currentProduct->id)
+        return Product::with([
+            "images",
+            "specifications",
+            "category",
+            "brand",
+            "primaryImage",
+        ])
+            ->where("is_active", true)
+            ->where("category_id", $currentProduct->category_id)
+            ->where("id", "!=", $currentProduct->id)
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -98,11 +92,17 @@ class ProductDetail extends Component
     {
         $this->validate();
 
-        $this->reset(['enquiryName', 'enquiryEmail', 'enquiryPhone', 'enquiryMessage', 'showEnquiryModal']);
+        $this->reset([
+            "enquiryName",
+            "enquiryEmail",
+            "enquiryPhone",
+            "enquiryMessage",
+            "showEnquiryModal",
+        ]);
 
         Flux::toast(
-            text: 'Thank you! Your enquiry has been received. Our IT experts will contact you shortly.',
-            variant: 'success'
+            text: "Thank you! Your enquiry has been received. Our IT experts will contact you shortly.",
+            variant: "success",
         );
     }
 
@@ -110,7 +110,7 @@ class ProductDetail extends Component
     {
         Flux::toast(
             text: "Added {$this->quantity} unit(s) of {$this->product()->name} to cart.",
-            variant: 'success'
+            variant: "success",
         );
     }
 
@@ -119,12 +119,12 @@ class ProductDetail extends Component
         $this->openEnquiry();
     }
 
-    #[Layout('layouts.blank')]
+    #[Layout("layouts.blank")]
     public function render()
     {
-        return view('livewire.shop.product-detail', [
-            'product' => $this->product(),
-            'relatedProducts' => $this->relatedProducts(),
+        return view("livewire.shop.product-detail", [
+            "product" => $this->product(),
+            "relatedProducts" => $this->relatedProducts(),
         ]);
     }
 }

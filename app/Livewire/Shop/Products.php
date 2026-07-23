@@ -7,15 +7,14 @@ use App\Services\ShopCache;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\View\View;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Layout;
 
 #[Layout("layouts.blank")]
-class Home extends Component
+class Products extends Component
 {
     use WithPagination;
 
@@ -31,30 +30,6 @@ class Home extends Component
     #[Url(as: "sort")]
     public string $sortBy = "featured";
 
-    public function updating(string $property): void
-    {
-        if (
-            in_array(
-                $property,
-                ["search", "selectedCategoryId", "selectedBrandId", "sortBy"],
-                true,
-            )
-        ) {
-            $this->resetPage();
-        }
-    }
-
-    public function clearFilters(): void
-    {
-        $this->reset([
-            "search",
-            "selectedCategoryId",
-            "selectedBrandId",
-            "sortBy",
-        ]);
-        $this->resetPage();
-    }
-
     #[Computed]
     public function categories(): Collection
     {
@@ -65,12 +40,6 @@ class Home extends Component
     public function brands(): Collection
     {
         return ShopCache::brands();
-    }
-
-    #[Computed]
-    public function featuredProducts(): Collection
-    {
-        return ShopCache::featuredProducts();
     }
 
     #[Computed]
@@ -152,13 +121,8 @@ class Home extends Component
             );
     }
 
-    /**
-     * Render the home page view.
-     *
-     * @return View
-     */
-    public function render(): View
+    public function render()
     {
-        return view("livewire.shop.home");
+        return view("livewire.shop.products");
     }
 }
