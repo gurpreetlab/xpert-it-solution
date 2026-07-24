@@ -1,11 +1,18 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
+// Admin
 use App\Livewire\Admin\Brands\Index as BrandIndex;
 use App\Livewire\Admin\Categories\Index as CategoryIndex;
 use App\Livewire\Admin\Products\Create as ProductCreate;
 use App\Livewire\Admin\Products\Edit as ProductEdit;
 use App\Livewire\Admin\Products\Index as ProductIndex;
 use App\Livewire\Admin\Products\Show as ProductShow;
+use App\Livewire\Admin\Orders\Index as OrderIndex;
+use App\Livewire\Admin\Orders\Show as OrderShow;
+
+// Customer
 use App\Livewire\Shop\Cart as ShopCart;
 use App\Livewire\Shop\Checkout;
 use App\Livewire\Shop\Home;
@@ -13,7 +20,6 @@ use App\Livewire\Shop\OrderConfirmation as ShopOrderConfirmation;
 use App\Livewire\Shop\Orders as ShopOrders;
 use App\Livewire\Shop\ProductDetail;
 use App\Livewire\Shop\Products as ShopProducts;
-use Illuminate\Support\Facades\Route;
 
 Route::get("/", Home::class)->name("home");
 Route::get("/products", ShopProducts::class)->name("shop.products");
@@ -62,6 +68,14 @@ Route::middleware(["auth", "verified", "role:super-admin"])
             );
             Route::get("/{product}/edit", ProductEdit::class)->name(
                 "dashboard.products.edit",
+            );
+        });
+
+        // Orders
+        Route::prefix("orders")->group(function () {
+            Route::get("/", OrderIndex::class)->name("dashboard.orders.index");
+            Route::get("/{order}", OrderShow::class)->name(
+                "dashboard.orders.show",
             );
         });
     });

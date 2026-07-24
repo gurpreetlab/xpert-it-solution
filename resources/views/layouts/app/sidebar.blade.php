@@ -28,9 +28,15 @@
                     </flux:sidebar.item>
 
                     <!-- Products -->
-                    <flux:sidebar.item icon="shopping-bag" :href="route('dashboard.products.index')" :current="request()->routeIs('dashboard.products.index', 'dashboard.products.show', 'dashboard.products.create', 'dashboard.products.edit')" wire:navigate>
+                    <flux:sidebar.item icon="cube" :href="route('dashboard.products.index')" :current="request()->routeIs('dashboard.products.index', 'dashboard.products.show', 'dashboard.products.create', 'dashboard.products.edit')" wire:navigate>
                         Products
                     </flux:sidebar.item>
+
+                    <!-- Orders -->
+                    <flux:sidebar.item icon="shopping-bag" :href="route('dashboard.orders.index')" :current="request()->routeIs('dashboard.orders.index')" wire:navigate>
+                        Orders
+                    </flux:sidebar.item>
+
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
