@@ -121,8 +121,8 @@
 
         <div class="pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
             <div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300">
-                <span>Subtotal</span>
-                <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($order->subtotal, 2) }}</span>
+                <span>Price</span>
+                <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($order->subtotal + $order->discount, 2) }}</span>
             </div>
             @if($order->discount > 0)
                 <div class="flex items-center justify-between text-sm text-emerald-600 dark:text-emerald-400">
@@ -130,6 +130,10 @@
                     <span class="font-semibold">- ₹{{ number_format($order->discount, 2) }}</span>
                 </div>
             @endif
+            <div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300 pt-2 border-t border-dashed border-zinc-100 dark:border-zinc-800">
+                <span>Subtotal</span>
+                <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($order->subtotal, 2) }}</span>
+            </div>
             <div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300">
                 <span>Shipping</span>
                 <span class="font-semibold {{ $order->shipping_fee > 0 ? 'text-zinc-900 dark:text-white' : 'text-emerald-600 dark:text-emerald-400' }}">

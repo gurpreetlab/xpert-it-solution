@@ -150,7 +150,7 @@
 
                         <div class="space-y-3 text-sm">
                             <div class="flex items-center justify-between text-zinc-600 dark:text-zinc-300">
-                                <span>MRP</span>
+                                <span>Price</span>
                                 <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($this->mrp, 2) }}</span>
                             </div>
 

@@ -72,8 +72,8 @@
             <!-- Totals -->
             <div class="rounded-lg border border-zinc-200 dark:border-zinc-700 p-5 space-y-2 ml-auto max-w-xs">
                 <div class="flex items-center justify-between text-sm">
-                    <flux:text class="text-gray-500">Subtotal</flux:text>
-                    <span>₹{{ number_format($order->subtotal, 2) }}</span>
+                    <flux:text class="text-gray-500">Price</flux:text>
+                    <span>₹{{ number_format($order->subtotal + $order->discount, 2) }}</span>
                 </div>
                 @if($order->discount > 0)
                     <div class="flex items-center justify-between text-sm">
@@ -81,6 +81,10 @@
                         <span>- ₹{{ number_format($order->discount, 2) }}</span>
                     </div>
                 @endif
+                <div class="flex items-center justify-between text-sm pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-700">
+                    <flux:text class="text-gray-500">Subtotal</flux:text>
+                    <span>₹{{ number_format($order->subtotal, 2) }}</span>
+                </div>
                 <div class="flex items-center justify-between text-sm">
                     <flux:text class="text-gray-500">Shipping</flux:text>
                     <span>{{ $order->shipping_fee > 0 ? '₹' . number_format($order->shipping_fee, 2) : 'Free' }}</span>
