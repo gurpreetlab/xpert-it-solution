@@ -12,12 +12,14 @@
                     <div class="flex items-center gap-6">
                         <!-- Brand Logo & Name -->
                         <a href="{{ route('home') }}" class="flex items-center gap-2.5 group" wire:navigate>
-                            <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-md group-hover:scale-105 transition-transform duration-200">
-                                <x-app-logo-icon class="size-5 fill-current" />
+                            <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-200 text-zinc-800  dark:bg-white dark:text-zinc-950 shadow-md group-hover:scale-105 transition-transform duration-200">
+                                <!--<x-app-logo-icon class="size-5 fill-current" />-->
+                                <img src="/logo-xpert-it-solution.png"/>
                             </div>
                             <span class="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
                                 Xpert <span class="text-blue-600 dark:text-blue-500 font-semibold">IT Solution</span>
                             </span>
+
                         </a>
                     </div>
 
@@ -32,22 +34,34 @@
                     <div class="flex items-center gap-4">
                         @if (Route::has('login'))
                             @auth
-                                @role('super-admin')
-                                    <flux:button href="{{ route('dashboard') }}" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium" wire:navigate>
-                                        Dashboard
-                                    </flux:button>
-                                @endrole
 
                                 @role('customer')
                                     <livewire:shop._partials.cart-count />
                                 @endrole
 
-                                <form method="POST" action="{{ route('logout') }}" class="inline">
-                                    @csrf
-                                    <flux:button type="submit" variant="ghost" size="sm" class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900">
-                                        Log out
-                                    </flux:button>
-                                </form>
+                                <flux:dropdown>
+                                    <flux:profile avatar="" name="{{ Auth::user()->name }}" />
+
+                                    <flux:navmenu>
+                                        @role('super-admin')
+                                            <flux:navmenu.item href="{{ route('dashboard') }}" icon="home" wire:navigate>{{ __('Dashboard') }}</flux:navmenu.item>
+                                        @endrole
+
+                                        @role('customer')
+                                            <flux:navmenu.item href="{{ route('shop.orders') }}" icon="shopping-bag" wire:navigate>My Orders</flux:navmenu.item>
+                                        @endrole
+
+                                        <flux:menu.separator />
+
+                                        <!-- Logout -->
+                                        <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                            @csrf
+                                            <flux:navmenu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full cursor-pointer">
+                                                {{ __('Log out') }}
+                                            </flux:navmenu.item>
+                                        </form>
+                                    </flux:navmenu>
+                                </flux:dropdown>
 
                             @else
                                 <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900" wire:navigate>

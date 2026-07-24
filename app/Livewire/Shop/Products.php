@@ -30,6 +30,17 @@ class Products extends Component
     #[Url(as: "sort")]
     public string $sortBy = "featured";
 
+    public function clearFilters(): void
+    {
+        $this->reset([
+            "search",
+            "selectedCategoryId",
+            "selectedBrandId",
+            "sortBy",
+        ]);
+        $this->resetPage();
+    }
+
     #[Computed]
     public function categories(): Collection
     {

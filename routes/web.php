@@ -9,6 +9,8 @@ use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Shop\Cart as ShopCart;
 use App\Livewire\Shop\Checkout;
 use App\Livewire\Shop\Home;
+use App\Livewire\Shop\OrderConfirmation as ShopOrderConfirmation;
+use App\Livewire\Shop\Orders as ShopOrders;
 use App\Livewire\Shop\ProductDetail;
 use App\Livewire\Shop\Products as ShopProducts;
 use Illuminate\Support\Facades\Route;
@@ -22,16 +24,14 @@ Route::get("/products/{slug}", ProductDetail::class)->name(
 Route::middleware(["auth", "verified", "role:customer"])->group(function () {
     Route::get("/cart", ShopCart::class)->name("shop.cart");
 
-    Route::get("/cart/checkout", Checkout::class)
-        ->name("shop.checkout")
-        ->middleware("auth");
+    Route::get("/cart/checkout", Checkout::class)->name("shop.checkout");
 
-    // Route::get(
-    //     "/order/{order:order_number}/confirmation",
-    //     OrderConfirmation::class,
-    // )
-    //     ->name("shop.order.confirmation")
-    //     ->middleware("auth");
+    Route::get("/orders", ShopOrders::class)->name("shop.orders");
+
+    Route::get(
+        "/order/{order:order_number}/confirmation",
+        ShopOrderConfirmation::class,
+    )->name("shop.order.confirmation");
 });
 
 // super-admin routes

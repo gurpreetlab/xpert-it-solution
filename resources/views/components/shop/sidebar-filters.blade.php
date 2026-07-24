@@ -14,7 +14,7 @@
 
     <div>
         <span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Filter by Category</span>
-        <div class="space-y-1 max-h-48 overflow-y-auto pr-2">
+        <div class="space-y-1 overflow-y-auto pr-2">
             <button
                 wire:click="$set('selectedCategoryId', '')"
                 class="w-full text-left px-2 py-1.5 rounded-lg text-sm flex justify-between items-center transition {{ $selectedCategoryId === '' ? 'bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 font-semibold' : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800' }}"
@@ -38,7 +38,7 @@
 
     <div>
         <span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Filter by Brand</span>
-        <div class="space-y-1 max-h-48 overflow-y-auto pr-2">
+        <div class="space-y-1 overflow-y-auto pr-2">
             <button
                 wire:click="$set('selectedBrandId', '')"
                 class="w-full text-left px-2 py-1.5 rounded-lg text-sm flex justify-between items-center transition {{ $selectedBrandId === '' ? 'bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 font-semibold' : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800' }}"

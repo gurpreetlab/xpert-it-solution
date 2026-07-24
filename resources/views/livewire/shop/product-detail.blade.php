@@ -220,10 +220,6 @@
                         @auth
                             @role('customer')
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <flux:button icon="shopping-bag" class="cursor-pointer">
-                                        Place Order
-                                    </flux:button>
-
                                     <flux:button wire:click="addToCart" icon="shopping-cart" class="cursor-pointer">
                                         Add to Cart
                                     </flux:button>
