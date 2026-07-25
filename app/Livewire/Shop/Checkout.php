@@ -3,6 +3,7 @@
 namespace App\Livewire\Shop;
 
 use App\Models\Address;
+use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
@@ -113,10 +114,27 @@ class Checkout extends Component
         return 0; // free shipping for now — adjust if you introduce thresholds/zones
     }
 
+    /**
+     * Prices are GST-exclusive, so tax is calculated on top of the
+     * subtotal here and charged to the customer — it is not baked
+     * into sale_price.
+     */
+    #[Computed]
+    public function gstRate()
+    {
+        return (float) config("shop.gst_rate", 18);
+    }
+
+    #[Computed]
+    public function taxAmount()
+    {
+        return round($this->subtotal * ($this->gstRate / 100), 2);
+    }
+
     #[Computed]
     public function total()
     {
-        return $this->subtotal + $this->shippingFee;
+        return $this->subtotal + $this->taxAmount + $this->shippingFee;
     }
 
     public function selectAddress($addressId)
@@ -210,7 +228,7 @@ class Checkout extends Component
                 "subtotal" => $this->subtotal,
                 "discount" => $this->savings,
                 "shipping_fee" => $this->shippingFee,
-                "tax_amount" => 0,
+                "tax_amount" => $this->taxAmount,
                 "total" => $this->total,
                 "payment_method" => "razorpay",
                 "payment_status" => "pending",
@@ -218,6 +236,9 @@ class Checkout extends Component
             ]);
 
             foreach ($this->cartItems as $item) {
+                $lineTaxable = $item->sale_price * $item->quantity;
+                $lineTax = round($lineTaxable * ($this->gstRate / 100), 2);
+
                 OrderItem::create([
                     "order_id" => $order->id,
                     "product_id" => $item->product_id,
@@ -227,6 +248,8 @@ class Checkout extends Component
                     "unit_price" => $item->sale_price,
                     "mrp" => $item->product->mrp,
                     "quantity" => $item->quantity,
+                    "tax_rate" => $this->gstRate,
+                    "tax_amount" => $lineTax,
                 ]);
             }
 
@@ -321,6 +344,10 @@ class Checkout extends Component
 
             Auth::user()->cart?->items()->delete();
         });
+
+        // Invoice numbers must be issued sequentially at the moment
+        // of sale — generated here, not lazily on first PDF download.
+        Invoice::generateForOrder($order);
 
         $this->dispatch("cart-updated");
 

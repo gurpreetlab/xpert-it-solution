@@ -87,8 +87,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-zinc-800">
                         <div class="space-y-4">
                             <div class="flex items-center gap-2 text-white">
-                                <div class="flex aspect-square size-8 items-center justify-center rounded bg-blue-600 text-white">
-                                    <x-app-logo-icon class="size-4.5 fill-current" />
+                                <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-200 text-zinc-800  dark:bg-white dark:text-zinc-950 shadow-md group-hover:scale-105 transition-transform duration-200">
+                                    <!--<x-app-logo-icon class="size-5 fill-current" />-->
+                                    <img src="/logo-xpert-it-solution.png"/>
                                 </div>
                                 <span class="text-lg font-bold">Xpert IT Solution</span>
                             </div>
@@ -125,7 +126,7 @@
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <flux:icon icon="map-pin" class="size-4 shrink-0 text-zinc-500" />
-                                    <span>Gurpreet Lab Complex, Phase 8, Mohali, Punjab</span>
+                                    <span>Gurpreet Lab, Mukerian, Punjab</span>
                                 </li>
                             </ul>
                         </div>

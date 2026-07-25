@@ -23,9 +23,20 @@
             </flux:text>
         </div>
 
-        <flux:button href="{{ route('dashboard.orders.index') }}" wire:navigate variant="ghost" icon="arrow-left">
-            Back to Orders
-        </flux:button>
+        <div class="flex items-center gap-2">
+            @if($order->invoice)
+                <flux:button href="{{ route('dashboard.orders.invoice', $order) }}" icon="arrow-down-tray" variant="primary">
+                    Download Invoice
+                </flux:button>
+            @else
+                <flux:button variant="ghost" icon="arrow-down-tray" disabled title="Invoice is generated automatically once payment is confirmed">
+                    Invoice Pending
+                </flux:button>
+            @endif
+            <flux:button href="{{ route('dashboard.orders.index') }}" wire:navigate variant="ghost" icon="arrow-left">
+                Back to Orders
+            </flux:button>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -38,8 +49,10 @@
                     <flux:table.column>Product</flux:table.column>
                     <flux:table.column>Sku</flux:table.column>
                     <flux:table.column>Hsn Code</flux:table.column>
-                    <flux:table.column>Unit Price</flux:table.column>
+                    <flux:table.column>Rate</flux:table.column>
                     <flux:table.column>Qty</flux:table.column>
+                    <flux:table.column>Taxable Amt</flux:table.column>
+                    <flux:table.column>GST</flux:table.column>
                     <flux:table.column>Total</flux:table.column>
                 </flux:table.columns>
 
@@ -59,11 +72,16 @@
                             <flux:table.cell class="whitespace-nowrap">{{ $item->hsn_code ?? '-' }}</flux:table.cell>
                             <flux:table.cell class="whitespace-nowrap">₹{{ number_format($item->unit_price, 2) }}</flux:table.cell>
                             <flux:table.cell class="whitespace-nowrap">{{ $item->quantity }}</flux:table.cell>
-                            <flux:table.cell class="whitespace-nowrap font-semibold">₹{{ number_format($item->line_total, 2) }}</flux:table.cell>
+                            <flux:table.cell class="whitespace-nowrap">₹{{ number_format($item->line_total, 2) }}</flux:table.cell>
+                            <flux:table.cell class="whitespace-nowrap">
+                                ₹{{ number_format($item->tax_amount, 2) }}
+                                <span class="text-gray-500 text-xs">({{ rtrim(rtrim(number_format($item->tax_rate, 2), '0'), '.') }}%)</span>
+                            </flux:table.cell>
+                            <flux:table.cell class="whitespace-nowrap font-semibold">₹{{ number_format($item->line_total_with_tax, 2) }}</flux:table.cell>
                         </flux:table.row>
                     @empty
                         <flux:table.row>
-                            <flux:table.cell colspan="6" class="text-center">No items on this order.</flux:table.cell>
+                            <flux:table.cell colspan="8" class="text-center">No items on this order.</flux:table.cell>
                         </flux:table.row>
                     @endforelse
                 </flux:table.rows>

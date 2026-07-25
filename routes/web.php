@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 
 // Admin
+use App\Http\Controllers\Admin\InvoiceController;
 use App\Livewire\Admin\Brands\Index as BrandIndex;
 use App\Livewire\Admin\Categories\Index as CategoryIndex;
+use App\Livewire\Admin\Invoices\Index as InvoiceIndex;
 use App\Livewire\Admin\Products\Create as ProductCreate;
 use App\Livewire\Admin\Products\Edit as ProductEdit;
 use App\Livewire\Admin\Products\Index as ProductIndex;
@@ -77,6 +79,21 @@ Route::middleware(["auth", "verified", "role:super-admin"])
             Route::get("/{order}", OrderShow::class)->name(
                 "dashboard.orders.show",
             );
+            Route::get("/{order}/invoice", [
+                InvoiceController::class,
+                "downloadForOrder",
+            ])->name("dashboard.orders.invoice");
+        });
+
+        // Invoices
+        Route::prefix("invoices")->group(function () {
+            Route::get("/", InvoiceIndex::class)->name(
+                "dashboard.invoices.index",
+            );
+            Route::get("/{invoice}/download", [
+                InvoiceController::class,
+                "download",
+            ])->name("dashboard.invoices.download");
         });
     });
 

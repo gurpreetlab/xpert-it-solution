@@ -56,7 +56,7 @@
             @forelse($orders as $order)
                 <flux:table.row :key="$order->id">
                     <flux:table.cell class="whitespace-nowrap">
-                        <a href="{{ route('dashboard.orders.show', $order) }}" wire:navigate class="font-mono hover:text-emerald-400">
+                        <a href="{{ route('dashboard.orders.show', $order) }}" class="font-mono hover:text-emerald-400">
                             {{ $order->order_number }}
                         </a>
                     </flux:table.cell>

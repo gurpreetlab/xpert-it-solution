@@ -37,6 +37,11 @@
                         Orders
                     </flux:sidebar.item>
 
+                    <!-- Invoices -->
+                    <flux:sidebar.item icon="clipboard" :href="route('dashboard.invoices.index')" :current="request()->routeIs('dashboard.invoices.index')" wire:navigate>
+                        Invoices
+                    </flux:sidebar.item>
+
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

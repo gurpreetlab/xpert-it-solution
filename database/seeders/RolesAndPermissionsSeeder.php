@@ -14,20 +14,27 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        $permissions = ["view-dashboard", "manage-categories", "manage-brands", "manage-products"];
+        $permissions = [
+            "view-dashboard",
+            "manage-categories",
+            "manage-brands",
+            "manage-products",
+            "manage-orders",
+            "manage-invoices",
+        ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
-                "name" => $permission
+                "name" => $permission,
             ]);
         }
 
         $superAdmin = Role::firstOrCreate([
-            "name" => "super-admin"
+            "name" => "super-admin",
         ]);
 
         $customer = Role::firstOrCreate([
-            "name" => "customer"
+            "name" => "customer",
         ]);
 
         $superAdmin->syncPermissions(Permission::all());
