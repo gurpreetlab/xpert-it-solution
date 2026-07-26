@@ -67,9 +67,13 @@ class Invoice extends Model
             $taxableAmount = (float) $order->subtotal;
             $taxAmount = (float) $order->tax_amount;
 
-            $cgst = $isInterState ? 0 : round($taxAmount / 2, 2);
-            $sgst = $isInterState ? 0 : round($taxAmount / 2, 2);
-            $igst = $isInterState ? round($taxAmount, 2) : 0;
+            // $cgst = $isInterState ? 0 : round($taxAmount / 2, 2);
+            // $sgst = $isInterState ? 0 : round($taxAmount / 2, 2);
+            // $igst = $isInterState ? round($taxAmount, 2) : 0;
+
+            $cgst = round($taxAmount / 2, 2);
+            $sgst = round($taxAmount / 2, 2);
+            $igst = round($taxAmount, 2);
 
             return static::create([
                 "order_id" => $order->id,

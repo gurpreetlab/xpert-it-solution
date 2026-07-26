@@ -56,9 +56,6 @@
 
                     <flux:table.cell class="whitespace-nowrap">
                         {{ $invoice->place_of_supply }}
-                        <flux:badge size="sm" color="{{ $invoice->is_inter_state ? 'purple' : 'blue' }}" class="ml-1">
-                            {{ $invoice->is_inter_state ? 'IGST' : 'CGST+SGST' }}
-                        </flux:badge>
                     </flux:table.cell>
 
                     <flux:table.cell class="whitespace-nowrap">₹{{ number_format($invoice->taxable_amount, 2) }}</flux:table.cell>

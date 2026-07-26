@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Livewire\Admin\Brands\Index as BrandIndex;
 use App\Livewire\Admin\Categories\Index as CategoryIndex;
+use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Invoices\Index as InvoiceIndex;
 use App\Livewire\Admin\Products\Create as ProductCreate;
 use App\Livewire\Admin\Products\Edit as ProductEdit;
@@ -46,7 +47,8 @@ Route::middleware(["auth", "verified", "role:customer"])->group(function () {
 Route::middleware(["auth", "verified", "role:super-admin"])
     ->prefix("super-admin")
     ->group(function () {
-        Route::view("dashboard", "dashboard")->name("dashboard");
+        // Route::view("dashboard", "dashboard")->name("dashboard");
+        Route::get("/dashboard", Dashboard::class)->name("dashboard");
 
         Route::prefix("categories")->group(function () {
             Route::get("/", CategoryIndex::class)->name(

@@ -8,6 +8,9 @@
     <meta charset="utf-8">
     <title>{{ $invoice->invoice_number }}</title>
     <style>
+    @page {
+        margin: 0; /* top, right, bottom, left */
+    }
         * { box-sizing: border-box; }
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -128,11 +131,11 @@
                 <th class="text-right">Qty</th>
                 <th class="text-right">Rate</th>
                 <th class="text-right">Taxable Amt</th>
-                <th class="text-right">CGST %</th>
+                <th class="text-right">CGST (9%)</th>
                 <!--<th class="text-right">CGST Amt</th>-->
-                <th class="text-right">SGST %</th>
+                <th class="text-right">SGST (9%)</th>
                 <!--<th class="text-right">SGST Amt</th>-->
-                <th class="text-right">IGST %</th>
+                <th class="text-right">IGST (18%)</th>
                 <!--<th class="text-right">IGST Amt</th>-->
                 <th class="text-right">Total</th>
             </tr>
@@ -150,12 +153,12 @@
                     <td class="text-right">{{ $item->quantity }}</td>
                     <td class="text-right">₹{{ number_format($item->unit_price, 2) }}</td>
                     <td class="text-right">₹{{ number_format($item->line_total, 2) }}</td>
-                    <td class="text-right">{{ number_format($halfRate, 2) }}%</td>
-                    <!--<td class="text-right">₹{{ number_format($halfAmount, 2) }}</td>-->
-                    <td class="text-right">{{ number_format($halfRate, 2) }}%</td>
-                    <!--<td class="text-right">₹{{ number_format($halfAmount, 2) }}</td>-->
-                    <td class="text-right">{{ number_format($item->tax_rate, 2) }}%</td>
-                    <!--<td class="text-right">₹{{ number_format($item->tax_amount, 2) }}</td>-->
+                    <!--<td class="text-right">{{ number_format($halfRate, 2) }}%</td>-->
+                    <td class="text-right">₹{{ number_format($halfAmount, 2) }}</td>
+                    <!--<td class="text-right">{{ number_format($halfRate, 2) }}%</td>-->
+                    <td class="text-right">₹{{ number_format($halfAmount, 2) }}</td>
+                    <!--<td class="text-right">{{ number_format($item->tax_rate, 2) }}%</td>-->
+                    <td class="text-right">₹{{ number_format($item->tax_amount, 2) }}</td>
                     <td class="text-right">₹{{ number_format($item->line_total_with_tax, 2) }}</td>
                 </tr>
             @endforeach
@@ -167,21 +170,21 @@
             <td class="muted">Taxable Amount</td>
             <td class="text-right">₹{{ number_format($invoice->taxable_amount, 2) }}</td>
         </tr>
-        @if($invoice->is_inter_state)
-            <tr>
-                <td class="muted">IGST</td>
-                <td class="text-right">₹{{ number_format($invoice->igst_amount, 2) }}</td>
-            </tr>
-        @else
-            <tr>
-                <td class="muted">CGST</td>
-                <td class="text-right">₹{{ number_format($invoice->cgst_amount, 2) }}</td>
-            </tr>
-            <tr>
-                <td class="muted">SGST</td>
-                <td class="text-right">₹{{ number_format($invoice->sgst_amount, 2) }}</td>
-            </tr>
-        @endif
+
+        <!--<tr>
+            <td class="muted">IGST</td>
+            <td class="text-right">₹{{ number_format($invoice->igst_amount, 2) }}</td>
+        </tr>-->
+
+        <tr>
+            <td class="muted">CGST</td>
+            <td class="text-right">₹{{ number_format($invoice->cgst_amount, 2) }}</td>
+        </tr>
+        <tr>
+            <td class="muted">SGST</td>
+            <td class="text-right">₹{{ number_format($invoice->sgst_amount, 2) }}</td>
+        </tr>
+
         @if($order->shipping_fee > 0)
             <tr>
                 <td class="muted">Shipping</td>
