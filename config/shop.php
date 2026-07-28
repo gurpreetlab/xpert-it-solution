@@ -6,6 +6,8 @@ return [
      * percentage (e.g. 18 for 18%). Split evenly into CGST + SGST
      * for intra-state sales, or charged in full as IGST for inter-state.
      */
+    "cgst_rate" => (float) env("SHOP_CGST_RATE", 9),
+    "sgst_rate" => (float) env("SHOP_SGST_RATE", 8),
     "gst_rate" => (float) env("SHOP_GST_RATE", 18),
 
     /*

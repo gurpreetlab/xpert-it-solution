@@ -156,7 +156,7 @@
 
                             @if($this->savings > 0)
                                 <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
-                                    <span>Corporate Savings</span>
+                                    <span>Savings</span>
                                     <span class="font-semibold">- ₹{{ number_format($this->savings, 2) }}</span>
                                 </div>
                             @endif

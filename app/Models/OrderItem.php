@@ -7,15 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 #[
     Fillable(
-        "order_id",
         "product_id",
         "product_name",
         "sku",
         "hsn_code",
         "unit_price",
         "mrp",
-        "tax_rate",
-        "tax_amount",
+        "cgst_rate",
+        "cgst_amount",
+        "sgst_rate",
+        "sgst_amount",
+        "gst_rate",
+        "gst_amount",
         "quantity",
     ),
 ]

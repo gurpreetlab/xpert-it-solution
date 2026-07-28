@@ -25,6 +25,19 @@ return new class extends Migration {
             $table->string("hsn_code")->nullable();
             $table->decimal("unit_price", 10, 2);
             $table->decimal("mrp", 10, 2)->default(0);
+
+            // CGST
+            $table->decimal("cgst_rate", 5, 2)->default(0);
+            $table->decimal("cgst_amount", 10, 2)->default(0);
+
+            // SGST
+            $table->decimal("sgst_rate", 5, 2)->default(0);
+            $table->decimal("sgst_amount", 10, 2)->default(0);
+
+            // GST
+            $table->decimal("gst_rate", 5, 2)->default(0);
+            $table->decimal("gst_amount", 10, 2)->default(0);
+
             $table->unsignedInteger("quantity");
             $table->timestamps();
 

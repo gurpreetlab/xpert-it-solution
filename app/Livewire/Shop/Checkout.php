@@ -114,27 +114,34 @@ class Checkout extends Component
         return 0; // free shipping for now — adjust if you introduce thresholds/zones
     }
 
-    /**
-     * Prices are GST-exclusive, so tax is calculated on top of the
-     * subtotal here and charged to the customer — it is not baked
-     * into sale_price.
-     */
-    #[Computed]
-    public function gstRate()
-    {
-        return (float) config("shop.gst_rate", 18);
-    }
-
     #[Computed]
     public function taxAmount()
     {
-        return round($this->subtotal * ($this->gstRate / 100), 2);
+        return round($this->subtotal * (config("shop.gst_rate") / 100));
     }
 
     #[Computed]
     public function total()
     {
-        return $this->subtotal + $this->taxAmount + $this->shippingFee;
+        return $this->subtotal + $this->shippingFee;
+    }
+
+    #[Computer]
+    private function cgstAmount()
+    {
+        return round($this->subtotal * (config("shop.cgst_rate") / 100));
+    }
+
+    #[Computer]
+    private function sgstAmount()
+    {
+        return round($this->subtotal * (config("shop.sgst_rate") / 100));
+    }
+
+    #[Computer]
+    private function gstAmount()
+    {
+        return round($this->subtotal * (config("shop.gst_rate") / 100));
     }
 
     public function selectAddress($addressId)
@@ -237,19 +244,25 @@ class Checkout extends Component
 
             foreach ($this->cartItems as $item) {
                 $lineTaxable = $item->sale_price * $item->quantity;
-                $lineTax = round($lineTaxable * ($this->gstRate / 100), 2);
+                $lineTax = round(
+                    $lineTaxable * (config("shop.gst_rate") / 100),
+                    2,
+                );
 
-                OrderItem::create([
-                    "order_id" => $order->id,
+                $order->items()->create([
                     "product_id" => $item->product_id,
                     "product_name" => $item->product->name,
                     "sku" => $item->product->sku,
                     "hsn_code" => $item->product->hsn_code,
                     "unit_price" => $item->sale_price,
                     "mrp" => $item->product->mrp,
+                    "cgst_rate" => config("shop.cgst_rate"),
+                    "cgst_amount" => $this->cgstAmount(),
+                    "sgst_rate" => config("shop.sgst_rate"),
+                    "sgst_amount" => $this->sgstAmount(),
+                    "gst_rate" => config("shop.gst_rate"),
+                    "gst_amount" => $this->gstAmount(),
                     "quantity" => $item->quantity,
-                    "tax_rate" => $this->gstRate,
-                    "tax_amount" => $lineTax,
                 ]);
             }
 

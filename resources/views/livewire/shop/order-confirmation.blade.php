@@ -134,10 +134,7 @@
                 <span>Subtotal</span>
                 <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($order->subtotal, 2) }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300">
-                <span>GST</span>
-                <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($order->tax_amount, 2) }}</span>
-            </div>
+
             <div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300">
                 <span>Shipping</span>
                 <span class="font-semibold {{ $order->shipping_fee > 0 ? 'text-zinc-900 dark:text-white' : 'text-emerald-600 dark:text-emerald-400' }}">

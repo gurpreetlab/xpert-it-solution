@@ -127,25 +127,18 @@
             <tr>
                 <th>#</th>
                 <th>Product</th>
-                <th>HSN</th>
-                <th class="text-right">Qty</th>
-                <th class="text-right">Rate</th>
-                <th class="text-right">Taxable Amt</th>
-                <th class="text-right">CGST (9%)</th>
-                <!--<th class="text-right">CGST Amt</th>-->
-                <th class="text-right">SGST (9%)</th>
-                <!--<th class="text-right">SGST Amt</th>-->
-                <th class="text-right">IGST (18%)</th>
-                <!--<th class="text-right">IGST Amt</th>-->
-                <th class="text-right">Total</th>
+                <th nowrap="nowrap">HSN</th>
+                <th class="text-right" nowrap="nowrap">Qty</th>
+                <th class="text-right" nowrap="nowrap">Rate</th>
+                <th class="text-right" nowrap="nowrap">Taxable Amt</th>
+                <th class="text-right" nowrap="nowrap">CGST (9%)</th>
+                <th class="text-right" nowrap="nowrap">SGST (9%)</th>
+                <th class="text-right" nowrap="nowrap">IGST (18%)</th>
+                <th class="text-right" nowrap="nowrap">Total</th>
             </tr>
         </thead>
         <tbody>
             @foreach($order->items as $index => $item)
-                @php
-                    $halfRate = $item->tax_rate / 2;
-                    $halfAmount = $item->tax_amount / 2;
-                @endphp
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $item->product_name }}</td>
@@ -153,12 +146,9 @@
                     <td class="text-right">{{ $item->quantity }}</td>
                     <td class="text-right">₹{{ number_format($item->unit_price, 2) }}</td>
                     <td class="text-right">₹{{ number_format($item->line_total, 2) }}</td>
-                    <!--<td class="text-right">{{ number_format($halfRate, 2) }}%</td>-->
-                    <td class="text-right">₹{{ number_format($halfAmount, 2) }}</td>
-                    <!--<td class="text-right">{{ number_format($halfRate, 2) }}%</td>-->
-                    <td class="text-right">₹{{ number_format($halfAmount, 2) }}</td>
-                    <!--<td class="text-right">{{ number_format($item->tax_rate, 2) }}%</td>-->
-                    <td class="text-right">₹{{ number_format($item->tax_amount, 2) }}</td>
+                    <td class="text-right">₹{{ number_format($item->cgst_amount, 2) }}</td>
+                    <td class="text-right">₹{{ number_format($item->sgst_amount, 2) }}</td>
+                    <td class="text-right">₹{{ number_format($item->gst_amount, 2) }}</td>
                     <td class="text-right">₹{{ number_format($item->line_total_with_tax, 2) }}</td>
                 </tr>
             @endforeach
@@ -170,11 +160,6 @@
             <td class="muted">Taxable Amount</td>
             <td class="text-right">₹{{ number_format($invoice->taxable_amount, 2) }}</td>
         </tr>
-
-        <!--<tr>
-            <td class="muted">IGST</td>
-            <td class="text-right">₹{{ number_format($invoice->igst_amount, 2) }}</td>
-        </tr>-->
 
         <tr>
             <td class="muted">CGST</td>

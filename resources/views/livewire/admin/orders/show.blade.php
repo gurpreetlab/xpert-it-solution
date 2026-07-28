@@ -52,7 +52,7 @@
                     <flux:table.column>Rate</flux:table.column>
                     <flux:table.column>Qty</flux:table.column>
                     <flux:table.column>Taxable Amt</flux:table.column>
-                    <flux:table.column>GST</flux:table.column>
+                    <flux:table.column>GST ({{ config("shop.gst_rate") }}%)</flux:table.column>
                     <flux:table.column>Total</flux:table.column>
                 </flux:table.columns>
 
@@ -74,8 +74,7 @@
                             <flux:table.cell class="whitespace-nowrap">{{ $item->quantity }}</flux:table.cell>
                             <flux:table.cell class="whitespace-nowrap">₹{{ number_format($item->line_total, 2) }}</flux:table.cell>
                             <flux:table.cell class="whitespace-nowrap">
-                                ₹{{ number_format($item->tax_amount, 2) }}
-                                <span class="text-gray-500 text-xs">({{ rtrim(rtrim(number_format($item->tax_rate, 2), '0'), '.') }}%)</span>
+                                ₹{{ number_format($item->gst_amount, 2) }}
                             </flux:table.cell>
                             <flux:table.cell class="whitespace-nowrap font-semibold">₹{{ number_format($item->line_total_with_tax, 2) }}</flux:table.cell>
                         </flux:table.row>
@@ -90,7 +89,7 @@
             <!-- Totals -->
             <div class="rounded-lg border border-zinc-200 dark:border-zinc-700 p-5 space-y-2 ml-auto max-w-xs">
                 <div class="flex items-center justify-between text-sm">
-                    <flux:text class="text-gray-500">Price</flux:text>
+                    <flux:text class="text-gray-500">MRP</flux:text>
                     <span>₹{{ number_format($order->subtotal + $order->discount, 2) }}</span>
                 </div>
                 @if($order->discount > 0)
@@ -107,12 +106,7 @@
                     <flux:text class="text-gray-500">Shipping</flux:text>
                     <span>{{ $order->shipping_fee > 0 ? '₹' . number_format($order->shipping_fee, 2) : 'Free' }}</span>
                 </div>
-                @if($order->tax_amount > 0)
-                    <div class="flex items-center justify-between text-sm">
-                        <flux:text class="text-gray-500">Tax</flux:text>
-                        <span>₹{{ number_format($order->tax_amount, 2) }}</span>
-                    </div>
-                @endif
+
                 <div class="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-700 font-semibold">
                     <span>Total</span>
                     <span>₹{{ number_format($order->total, 2) }}</span>
