@@ -14,9 +14,15 @@ return new class extends Migration
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->string('path');
+
+            $table->string('path'); // local storage path, or the external Icecat URL if not re-hosted
+            $table->enum('source', ['manual', 'icecat'])->default('manual');
+            $table->enum('type', ['main', 'gallery', 'thumbnail'])->default('gallery');
+             $table->string('alt_text')->nullable();
+
             $table->boolean('is_primary')->default(false);
             $table->unsignedSmallInteger('sort_order')->default(0);
+            
             $table->timestamps();
         });
     }

@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string("slug")->unique();
             $table->string("logo")->nullable();
             $table->text("description")->nullable();
+            $table->string("website")->nullable();
+
+            $table->unsignedInteger("icecat_brand_id")->nullable()->unique();
+            
             $table->timestamps();
             $table->softDeletes();
         });
