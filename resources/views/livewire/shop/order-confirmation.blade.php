@@ -121,7 +121,7 @@
 
         <div class="pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
             <div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300">
-                <span>Price</span>
+                <span>MRP</span>
                 <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($order->subtotal + $order->discount, 2) }}</span>
             </div>
             @if($order->discount > 0)

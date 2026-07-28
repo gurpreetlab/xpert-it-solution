@@ -44,14 +44,14 @@
 
                                     <flux:navmenu>
                                         @role('super-admin')
-                                            <flux:navmenu.item href="{{ route('dashboard') }}" icon="home" wire:navigate>{{ __('Dashboard') }}</flux:navmenu.item>
+                                            <flux:navmenu.item href="{{ route('dashboard') }}" icon="home">{{ __('Dashboard') }}</flux:navmenu.item>
                                         @endrole
 
                                         @role('customer')
-                                            <flux:navmenu.item href="{{ route('shop.orders') }}" icon="shopping-bag" wire:navigate>{{ __('My Orders') }}</flux:navmenu.item>
+                                            <flux:navmenu.item href="{{ route('shop.orders') }}" icon="shopping-bag">{{ __('My Orders') }}</flux:navmenu.item>
                                         @endrole
 
-                                        <flux:navmenu.item href="{{ route('profile.edit') }}" icon="user-circle" wire:navigate>{{ __('Profile') }}</flux:navmenu.item>
+                                        <flux:navmenu.item href="{{ route('profile.edit') }}" icon="user-circle">{{ __('Profile') }}</flux:navmenu.item>
 
                                         <flux:menu.separator />
 
