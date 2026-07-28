@@ -7,10 +7,12 @@ use Flux\Flux;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Profile settings')]
+#[Layout('layouts.blank')]
 class Profile extends Component
 {
     use ProfileValidationRules;
