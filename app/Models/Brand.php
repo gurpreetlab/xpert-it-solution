@@ -11,7 +11,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-#[Fillable(["name", "logo", "description"])]
+#[Fillable([
+    "name",
+    "slug",
+    "logo",
+    "description",
+    "website",
+    "icecat_brand_id"
+])]
 class Brand extends Model
 {
     use SoftDeletes, HasSlug;

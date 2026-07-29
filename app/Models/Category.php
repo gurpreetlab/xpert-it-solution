@@ -9,7 +9,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(["name"])]
+#[Fillable([
+    "parent_id",
+    "name",
+    "slug",
+    "description",
+    "image",
+    "icecat_category_id",
+    "sort_order",
+    "is_active"
+])]
 class Category extends Model
 {
     use SoftDeletes, HasSlug;

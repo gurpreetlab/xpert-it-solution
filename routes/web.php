@@ -14,6 +14,7 @@ use App\Livewire\Admin\Products\Index as ProductIndex;
 use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Admin\Orders\Index as OrderIndex;
 use App\Livewire\Admin\Orders\Show as OrderShow;
+use App\Livewire\Admin\Icecat\Import as IcecatImport;
 
 // Customer
 use App\Livewire\Shop\Cart as ShopCart;
@@ -96,6 +97,10 @@ Route::middleware(["auth", "verified", "role:super-admin"])
                 InvoiceController::class,
                 "download",
             ])->name("dashboard.invoices.download");
+        });
+
+        Route::prefix("icecat")->group(function () {
+            Route::get("/", IcecatImport::class)->name("dashboard.icecat.import");
         });
     });
 
