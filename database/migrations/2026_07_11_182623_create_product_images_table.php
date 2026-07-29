@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
 
-            $table->string('path'); // local storage path, or the external Icecat URL if not re-hosted
+            $table->string('path'); // local storage path
+            $table->string('source_url')->nullable(); // the external Icecat URL
             $table->enum('source', ['manual', 'icecat'])->default('manual');
             $table->enum('type', ['main', 'gallery', 'thumbnail'])->default('gallery');
              $table->string('alt_text')->nullable();

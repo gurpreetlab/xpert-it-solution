@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'product_id',
     'path',
+    'source_url',
     'source',
     'type',
     'alt_text',
