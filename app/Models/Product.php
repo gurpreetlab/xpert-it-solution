@@ -10,11 +10,57 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 
 #[Fillable(['category_id', 'brand_id', 'type', 'name', 'slug', 'sku', 'mpn', 'gtin', 'hsn_code', 'icecat_id', 'icecat_synced_at', 'mrp', 'purchase_price', 'sale_price', 'stock', 'short_description', 'description', 'weight', 'warranty', 'is_featured', 'is_active'])]
 class Product extends Model
 {
-    use SoftDeletes, HasSlug;
+    use SoftDeletes, HasSlug, Searchable;
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'sku' => $this->sku,
+            'mpn' => $this->mpn,
+            'gtin' => $this->gtin,
+            'short_description' => $this->short_description,
+            'description' => $this->description,
+            'category_id' => $this->category_id,
+            'brand_id' => $this->brand_id,
+            'category_name' => $this->category?->name,
+            'brand_name' => $this->brand?->name,
+            'sale_price' => (float) $this->sale_price,
+            'mrp' => (float) $this->mrp,
+            'stock' => (int) $this->stock,
+            'is_featured' => (bool) $this->is_featured,
+            'is_active' => (bool) $this->is_active,
+            'created_at' => $this->created_at?->timestamp,
+        ];
+    }
+
+    /**
+     * Only ever index active products — keeps the index smaller and means
+     * a de-activated product disappears from search immediately, without
+     * relying on every query remembering to filter is_active itself.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    /**
+     * Eager-load relations during `scout:import` / bulk re-indexing.
+     * Without this, toSearchableArray()'s $this->category / $this->brand
+     * access triggers one query PER PRODUCT during a full re-index —
+     * fine for saving one product, very slow for importing thousands.
+     */
+    public function makeAllSearchableUsing($query)
+    {
+        return $query->with(['category:id,name', 'brand:id,name']);
+    }
 
     protected $casts = [
         'category_id' => 'integer',

@@ -81,7 +81,7 @@ class Checkout extends Component
     }
 
     #[Computed]
-    public function mrp(): int
+    public function mrp(): float
     {
         return $this->cartItems->sum(
             fn($item) => $item->product->mrp * $item->quantity ?? 0,
@@ -89,7 +89,7 @@ class Checkout extends Component
     }
 
     #[Computed]
-    public function subtotal()
+    public function subtotal(): float
     {
         return $this->cartItems->sum(
             fn($item) => $item->sale_price * $item->quantity,
@@ -97,7 +97,7 @@ class Checkout extends Component
     }
 
     #[Computed]
-    public function savings()
+    public function savings(): float
     {
         return $this->cartItems->sum(function ($item) {
             $mrp = $item->product->mrp ?? 0;
@@ -109,48 +109,51 @@ class Checkout extends Component
     }
 
     #[Computed]
-    public function shippingFee()
+    public function shippingFee(): int
     {
         return 0; // free shipping for now — adjust if you introduce thresholds/zones
     }
 
     #[Computed]
-    public function taxAmount()
+    public function taxAmount(): float
     {
-        return round($this->subtotal * (config("shop.gst_rate") / 100));
+        return $this->subtotal * (config("shop.gst_rate") / 100);
     }
 
     #[Computed]
-    public function total()
+    public function total(): float
     {
         return $this->subtotal + $this->shippingFee;
     }
 
-    #[Computer]
-    private function cgstAmount()
+    #[Computed]
+    private function cgstAmount(): float
     {
-        return round($this->subtotal * (config("shop.cgst_rate") / 100));
+        return $this->subtotal * (config("shop.cgst_rate") / 100);
     }
 
-    #[Computer]
-    private function sgstAmount()
+    #[Computed]
+    private function sgstAmount(): float
     {
-        return round($this->subtotal * (config("shop.sgst_rate") / 100));
+        return $this->subtotal * (config("shop.sgst_rate") / 100);
     }
 
-    #[Computer]
-    private function gstAmount()
+    /*
+    * The GST amount is the sum of CGST and SGST.
+    */
+    #[Computed]
+    private function gstAmount(): float
     {
-        return round($this->subtotal * (config("shop.gst_rate") / 100));
+        return $this->subtotal * (config("shop.gst_rate") / 100);
     }
 
-    public function selectAddress($addressId)
+    public function selectAddress($addressId): void
     {
         $this->selectedAddressId = $addressId;
         $this->showAddressForm = false;
     }
 
-    public function saveAddress()
+    public function saveAddress(): void
     {
         $this->validate();
 

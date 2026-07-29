@@ -7,7 +7,7 @@ use App\Support\CategoryVisuals;
 <section id="categories" class="mb-16 scroll-mt-20">
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">Shop by IT Category</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">Shop by Category</h2>
             <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Select a category to filter products dynamically.</p>
         </div>
         @if($selectedCategoryId)
@@ -21,6 +21,7 @@ use App\Support\CategoryVisuals;
         @foreach($categories as $cat)
             <div
                 wire:click="$set('selectedCategoryId', '{{ $selectedCategoryId == $cat->id ? '' : $cat->id }}')"
+                @click="document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })"
                 class="cursor-pointer group flex flex-col items-center text-center p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 {{ CategoryVisuals::pillClasses($cat->name) }} {{ $selectedCategoryId == $cat->id ? 'ring-2 ring-blue-600 dark:ring-blue-500 scale-105' : '' }}"
             >
                 <div class="p-3.5 rounded-xl bg-white dark:bg-zinc-800 shadow-sm mb-3 group-hover:scale-110 transition-transform duration-200">

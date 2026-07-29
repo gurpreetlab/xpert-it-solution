@@ -8,39 +8,46 @@ class CategoryVisuals
         "Networking" => [
             "icon" => "wifi",
             "pill" =>
-                "text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30",
+            "text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30",
             "gradient" => ["from-blue-900", "from-blue-800"],
         ],
         "CCTV & Security" => [
             "icon" => "video-camera",
             "pill" =>
-                "text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30",
+            "text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30",
             "gradient" => ["from-emerald-900", "from-emerald-800"],
         ],
         "Storage" => [
             "icon" => "circle-stack",
             "pill" =>
-                "text-purple-600 dark:text-purple-400 bg-purple-50/50 dark:bg-purple-950/20 border-purple-100 dark:border-purple-900/30",
+            "text-purple-600 dark:text-purple-400 bg-purple-50/50 dark:bg-purple-950/20 border-purple-100 dark:border-purple-900/30",
             "gradient" => ["from-purple-900", "from-purple-800"],
         ],
         "Computer Peripherals" => [
             "icon" => "computer-desktop",
             "pill" =>
-                "text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30",
+            "text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30",
             "gradient" => ["from-amber-900", "from-amber-800"],
         ],
         "Power & Accessories" => [
             "icon" => "bolt",
             "pill" =>
-                "text-orange-600 dark:text-orange-400 bg-orange-50/50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/30",
+            "text-orange-600 dark:text-orange-400 bg-orange-50/50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/30",
             "gradient" => ["from-orange-900", "from-orange-800"],
         ],
         "Printing" => [
             "icon" => "printer",
             "pill" =>
-                "text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30",
+            "text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30",
             "gradient" => ["from-indigo-900", "from-indigo-800"],
         ],
+        "Laptops" => [
+            "icon" => "cpu-chip",
+            "pill" =>
+            "text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30",
+            "gradient" => ["from-blue-900", "from-blue-800"],
+        ],
+
     ];
 
     private const DEFAULT_ICON = "square-3-stack-3d";
