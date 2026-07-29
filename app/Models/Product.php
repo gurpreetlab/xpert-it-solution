@@ -15,7 +15,7 @@ use Laravel\Scout\Searchable;
 #[Fillable(['category_id', 'brand_id', 'type', 'name', 'slug', 'sku', 'mpn', 'gtin', 'hsn_code', 'icecat_id', 'icecat_synced_at', 'mrp', 'purchase_price', 'sale_price', 'stock', 'short_description', 'description', 'weight', 'warranty', 'is_featured', 'is_active'])]
 class Product extends Model
 {
-    use SoftDeletes, HasSlug, Searchable;
+    use HasSlug, Searchable, SoftDeletes;
 
     public function toSearchableArray(): array
     {
@@ -75,10 +75,6 @@ class Product extends Model
 
     /**
      * Scope a query to search for brands by name.
-     *
-     * @param Builder $query
-     * @param string|null $search
-     * @return Builder
      */
     public function scopeSearch(Builder $query, ?string $search): Builder
     {
@@ -122,10 +118,16 @@ class Product extends Model
     /**
      * Get the brand that this product belongs to.
      */
-
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
     }
 
+    /**
+     * Get the reviews for the product.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class)->latest();
+    }
 }

@@ -312,6 +312,176 @@
 
         </section>
 
+        <!-- Customer Ratings & Reviews Section -->
+        <section id="reviews" class="mb-16 pt-12 border-t border-zinc-200 dark:border-zinc-800">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                <!-- Left Column: Summary & Submission Form (Cols 1-5) -->
+                <div class="lg:col-span-5 space-y-8">
+                    <div>
+                        <h3 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Customer Reviews</h3>
+                        <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Real feedback from verified corporate buyers.</p>
+                    </div>
+
+                    <!-- Overall Rating Card -->
+                    @php
+                        $reviews = $product->reviews;
+                        $totalReviews = $reviews->count();
+                        $averageRating = $totalReviews > 0 ? $reviews->avg('rating') : 0;
+                    @endphp
+                    <div class="p-6 rounded-3xl bg-zinc-100/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 flex items-center gap-6">
+                        <div class="text-center">
+                            <span class="text-4xl font-black text-zinc-950 dark:text-white">{{ number_format($averageRating, 1) }}</span>
+                            <div class="flex items-center justify-center gap-1 mt-1 text-amber-400">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <flux:icon icon="star" class="size-4 {{ $i <= round($averageRating) ? 'fill-current' : 'text-zinc-300 dark:text-zinc-700' }}" />
+                                @endfor
+                            </div>
+                            <span class="text-xs text-zinc-500 mt-1 block">{{ $totalReviews }} Review(s)</span>
+                        </div>
+                        <div class="flex-1 border-l border-zinc-200 dark:border-zinc-800 pl-6 space-y-1.5 text-xs text-zinc-500">
+                            <div class="flex items-center justify-between">
+                                <span>Quality & Durability</span>
+                                <span class="font-bold text-zinc-900 dark:text-white">4.9 / 5.0</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Shipping & Packaging</span>
+                                <span class="font-bold text-zinc-900 dark:text-white">4.8 / 5.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Write a Review Box -->
+                    @auth
+                        @role('customer')
+                        <div class="p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-4">
+                            <h4 class="text-base font-bold text-zinc-900 dark:text-white">Leave a Review</h4>
+                            
+                            <form wire:submit="submitReview" class="space-y-4">
+                                <!-- Interactive Star Rating Selector -->
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Rating</label>
+                                    <select wire:model="rating" class="w-full text-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="5">⭐⭐⭐⭐⭐ - 5 Star (Exceptional)</option>
+                                        <option value="4">⭐⭐⭐⭐ - 4 Star (Good)</option>
+                                        <option value="3">⭐⭐⭐ - 3 Star (Average)</option>
+                                        <option value="2">⭐⭐ - 2 Star (Below Expectations)</option>
+                                        <option value="1">⭐ - 1 Star (Poor)</option>
+                                    </select>
+                                    @error('rating') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+
+                                <!-- Comment Textarea -->
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Review Comment</label>
+                                    <textarea wire:model="comment" rows="4" placeholder="Write details about your experience with this hardware..." class="w-full text-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 dark:text-white rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                    @error('comment') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+
+                                <flux:button type="submit" variant="primary" class="w-full cursor-pointer">
+                                    Post Review
+                                </flux:button>
+                            </form>
+                        </div>
+                        @endrole
+                    @else
+                        <div class="p-6 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center bg-zinc-50/50 dark:bg-zinc-900/50">
+                            <p class="text-sm text-zinc-500 dark:text-zinc-400 mb-3">Want to share your experience with this device?</p>
+                            <flux:button href="{{ route('login') }}" size="sm" variant="outline" wire:navigate>Login to Write a Review</flux:button>
+                        </div>
+                    @endauth
+                </div>
+
+                <!-- Right Column: User Reviews Feed (Cols 6-12) -->
+                <div class="lg:col-span-7 space-y-4">
+                    <h4 class="text-lg font-bold text-zinc-900 dark:text-white mb-6">Verified Buyer Feedback</h4>
+
+                    <div class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                        @forelse($reviews as $review)
+                        <div class="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="size-10 rounded-full bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
+                                        {{ substr($review->user->name ?? 'U', 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-zinc-900 dark:text-white">{{ $review->user->name ?? 'Verified Buyer' }}</h5>
+                                        <span class="text-xs text-zinc-400">{{ $review->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Star Badges & Owner Action Icons -->
+                                <div class="flex items-center gap-3">
+                                    @if($editingReviewId !== $review->id)
+                                        <div class="flex items-center gap-1 text-amber-400">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <flux:icon icon="star" class="size-3.5 {{ $i <= $review->rating ? 'fill-current' : 'text-zinc-300 dark:text-zinc-700' }}" />
+                                            @endfor
+                                        </div>
+                                    @endif
+
+                                    @auth
+                                        @if($review->user_id === auth()->id())
+                                            <div class="flex items-center gap-1.5 pl-2 border-l border-zinc-200 dark:border-zinc-800">
+                                                @if($editingReviewId !== $review->id)
+                                                    <button type="button" wire:click="editReview({{ $review->id }})" class="p-1 text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer" title="Edit Review">
+                                                        <flux:icon icon="pencil-square" class="size-4" />
+                                                    </button>
+                                                    <button type="button" wire:click="deleteReview({{ $review->id }})" wire:confirm="Are you sure you want to delete your review?" class="p-1 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer" title="Delete Review">
+                                                        <flux:icon icon="trash" class="size-4" />
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @endauth
+                                </div>
+                            </div>
+
+                            <!-- Inline Edit Form or Normal Comment View -->
+                            @if($editingReviewId === $review->id)
+                                <div wire:key="edit-review-{{ $review->id }}" class="space-y-3 pt-2">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Update Rating</label>
+                                        <select wire:model="editRating" class="w-full text-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="5">⭐⭐⭐⭐⭐ - 5 Star</option>
+                                            <option value="4">⭐⭐⭐⭐ - 4 Star</option>
+                                            <option value="3">⭐⭐⭐ - 3 Star</option>
+                                            <option value="2">⭐⭐ - 2 Star</option>
+                                            <option value="1">⭐ - 1 Star</option>
+                                        </select>
+                                        @error('editRating') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Update Comment</label>
+                                        <textarea wire:model="editComment" rows="3" class="w-full text-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 dark:text-white rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                        @error('editComment') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div class="flex items-center gap-2 pt-1">
+                                        <flux:button size="sm" variant="primary" wire:click="updateReview" class="cursor-pointer">Save Changes</flux:button>
+                                        <flux:button size="sm" variant="subtle" wire:click="cancelEdit" class="cursor-pointer">Cancel</flux:button>
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                                    {{ $review->comment }}
+                                </p>
+                            @endif
+                        </div>
+                        @empty
+                        <div class="p-12 text-center rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
+                            <flux:icon icon="chat-bubble-bottom-center-text" class="size-10 text-zinc-400 mx-auto mb-3" />
+                            <h5 class="text-base font-semibold text-zinc-900 dark:text-white">No reviews yet</h5>
+                            <p class="text-sm text-zinc-500 mt-1">Be the first corporate buyer to review this product!</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
         <!-- Related Products Section (Matching Homepage Card Layout) -->
         @if($relatedProducts->isNotEmpty())
         <section class="border-t border-zinc-200 dark:border-zinc-800 pt-12">

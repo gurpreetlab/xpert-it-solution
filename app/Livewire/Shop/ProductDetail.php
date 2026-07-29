@@ -3,6 +3,7 @@
 namespace App\Livewire\Shop;
 
 use App\Models\Product;
+use App\Models\Review;
 use Flux\Flux;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
@@ -16,11 +17,26 @@ class ProductDetail extends Component
 
     public int $quantity = 1;
 
+    public int $rating = 5;
+
+    public string $comment = '';
+
+    public ?int $editingReviewId = null;
+
+    public int $editRating = 5;
+
+    public string $editComment = '';
+
+    protected function rules(): array
+    {
+        return [
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'required|string|min:10|max:1000',
+        ];
+    }
+
     /**
      * Initialize the component with the given slug.
-     *
-     * @param string $slug
-     * @return void
      */
     public function mount(string $slug): void
     {
@@ -38,15 +54,118 @@ class ProductDetail extends Component
     public function product(): Product
     {
         return Product::with([
-            "images",
-            "specifications",
-            "category",
-            "brand",
-            "primaryImage",
+            'images',
+            'specifications',
+            'category',
+            'brand',
+            'primaryImage',
+            'reviews.user', // Eager load reviews and review authors
         ])
-            ->where("slug", $this->slug)
-            ->where("is_active", true)
+            ->where('slug', $this->slug)
+            ->where('is_active', true)
             ->firstOrFail();
+    }
+
+    public function submitReview(): void
+    {
+        if (! auth()->check()) {
+            Flux::toast(text: 'Please login to write a review.', variant: 'danger');
+
+            return;
+        }
+
+        $this->validate();
+
+        $product = $this->product();
+
+        // Check if user already reviewed this product
+        $existingReview = $product->reviews()->where('user_id', auth()->id())->first();
+
+        if ($existingReview) {
+            Flux::toast(text: 'You have already reviewed this product.', variant: 'warning');
+
+            return;
+        }
+
+        $product->reviews()->create([
+            'user_id' => auth()->id(),
+            'rating' => $this->rating,
+            'comment' => $this->comment,
+        ]);
+
+        $this->reset(['rating', 'comment']);
+        $this->rating = 5;
+
+        Flux::toast(text: 'Your review has been submitted successfully!', variant: 'success');
+    }
+
+    public function editReview(int $reviewId): void
+    {
+        $review = Review::where('id', $reviewId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $review) {
+            return;
+        }
+
+        $this->editingReviewId = $review->id;
+        $this->editRating = $review->rating;
+        $this->editComment = $review->comment;
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->editingReviewId = null;
+        $this->reset(['editRating', 'editComment']);
+        $this->editRating = 5;
+    }
+
+    public function updateReview(): void
+    {
+        $this->validate([
+            'editRating' => 'required|integer|min:1|max:5',
+            'editComment' => 'required|string|min:10|max:1000',
+        ]);
+
+        $review = Review::where('id', $this->editingReviewId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $review) {
+            Flux::toast(text: 'Unauthorized or review not found.', variant: 'danger');
+
+            return;
+        }
+
+        $review->update([
+            'rating' => $this->editRating,
+            'comment' => $this->editComment,
+        ]);
+
+        $this->cancelEdit();
+        Flux::toast(text: 'Review updated successfully!', variant: 'success');
+    }
+
+    public function deleteReview(int $reviewId): void
+    {
+        $review = Review::where('id', $reviewId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $review) {
+            Flux::toast(text: 'Unauthorized or review not found.', variant: 'danger');
+
+            return;
+        }
+
+        $review->delete();
+
+        if ($this->editingReviewId === $reviewId) {
+            $this->cancelEdit();
+        }
+
+        Flux::toast(text: 'Review deleted successfully.', variant: 'success');
     }
 
     /**
@@ -59,15 +178,15 @@ class ProductDetail extends Component
         $currentProduct = $this->product();
 
         return Product::with([
-            "images",
-            "specifications",
-            "category",
-            "brand",
-            "primaryImage",
+            'images',
+            'specifications',
+            'category',
+            'brand',
+            'primaryImage',
         ])
-            ->where("is_active", true)
-            ->where("category_id", $currentProduct->category_id)
-            ->where("id", "!=", $currentProduct->id)
+            ->where('is_active', true)
+            ->where('category_id', $currentProduct->category_id)
+            ->where('id', '!=', $currentProduct->id)
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -94,17 +213,19 @@ class ProductDetail extends Component
 
     public function addToCart(): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             Flux::toast(
-                text: "Please login to add items to your cart.",
-                variant: "danger",
+                text: 'Please login to add items to your cart.',
+                variant: 'danger',
             );
+
             return;
         }
 
         // Check if product is out of stock
         if ($this->product()->stock <= 0) {
-            Flux::toast(text: "Product is out of stock.", variant: "danger");
+            Flux::toast(text: 'Product is out of stock.', variant: 'danger');
+
             return;
         }
 
@@ -112,8 +233,9 @@ class ProductDetail extends Component
         if ($this->quantity > $this->product()->stock) {
             Flux::toast(
                 text: "Only {$this->product()->stock} unit(s) available in stock.",
-                variant: "warning",
+                variant: 'warning',
             );
+
             return;
         }
 
@@ -121,23 +243,23 @@ class ProductDetail extends Component
 
         $item = $cart
             ->items()
-            ->where("product_id", $this->product()->id)
+            ->where('product_id', $this->product()->id)
             ->first();
 
         if ($item) {
-            $item->increment("quantity", $this->quantity);
+            $item->increment('quantity', $this->quantity);
         } else {
             $cart->items()->create([
-                "product_id" => $this->product()->id,
-                "quantity" => $this->quantity,
-                "sale_price" => $this->product()->sale_price,
+                'product_id' => $this->product()->id,
+                'quantity' => $this->quantity,
+                'sale_price' => $this->product()->sale_price,
             ]);
         }
 
-        $this->dispatch("cart-updated");
+        $this->dispatch('cart-updated');
         Flux::toast(
             text: "Added {$this->quantity} unit(s) of {$this->product()->name} to cart.",
-            variant: "success",
+            variant: 'success',
         );
     }
 
@@ -146,12 +268,12 @@ class ProductDetail extends Component
         //
     }
 
-    #[Layout("layouts.blank")]
+    #[Layout('layouts.blank')]
     public function render()
     {
-        return view("livewire.shop.product-detail", [
-            "product" => $this->product(),
-            "relatedProducts" => $this->relatedProducts(),
+        return view('livewire.shop.product-detail', [
+            'product' => $this->product(),
+            'relatedProducts' => $this->relatedProducts(),
         ]);
     }
 }
