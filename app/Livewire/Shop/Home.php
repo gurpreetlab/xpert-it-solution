@@ -16,14 +16,6 @@ class Home extends Component
 {
     use WithPagination, HandlesProductCatalog;
 
-    public string $search = "";
-
-    public string $selectedCategoryId = "";
-
-    public string $selectedBrandId = "";
-
-    public string $sortBy = "featured";
-
     #[Computed]
     public function featuredProducts(): Collection
     {

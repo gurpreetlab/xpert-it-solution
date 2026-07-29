@@ -53,6 +53,11 @@ trait HandlesProductCatalog
             || $this->sortBy !== 'featured';
     }
 
+    /**
+     * Get the available sorting options.
+     * 
+     * @return array<string, string>
+     */
     #[Computed]
     public function sortOptions(): array
     {
