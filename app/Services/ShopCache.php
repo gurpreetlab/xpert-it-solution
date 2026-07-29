@@ -46,6 +46,8 @@ final class ShopCache
                 "mrp",
                 "stock",
                 "is_featured",
+                "sku",
+                "short_description"
             ])
             ->with([
                 "category:id,name,slug",

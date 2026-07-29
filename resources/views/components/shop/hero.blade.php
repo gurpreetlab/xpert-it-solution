@@ -31,7 +31,7 @@
                         id="hero-search-input"
                     />
                 </div>
-                <flux:button href="#products" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium px-5 rounded-lg text-sm transition">
+                <flux:button @click="document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium px-5 rounded-lg text-sm transition">
                     Browse Store
                 </flux:button>
             </div>

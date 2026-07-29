@@ -16,20 +16,19 @@
             wire:model.live.debounce.400ms="search"
             placeholder="Search name, SKU, HSN..."
             icon="magnifying-glass"
-            class="lg:col-span-2"
-        />
+            class="lg:col-span-2" />
 
         <flux:select wire:model.live="categoryId" placeholder="All categories">
             <flux:select.option value="">All categories</flux:select.option>
             @foreach ($this->categories as $category)
-                <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
+            <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
             @endforeach
         </flux:select>
 
         <flux:select wire:model.live="brandId" placeholder="All brands">
             <flux:select.option value="">All brands</flux:select.option>
             @foreach ($this->brands as $brand)
-                <flux:select.option value="{{ $brand->id }}">{{ $brand->name }}</flux:select.option>
+            <flux:select.option value="{{ $brand->id }}">{{ $brand->name }}</flux:select.option>
             @endforeach
         </flux:select>
 
@@ -41,7 +40,7 @@
             </flux:select>
 
             @if ($search !== '' || $categoryId !== '' || $brandId !== '' || $status !== '')
-                <flux:button variant="ghost" icon="x-mark" wire:click="clearFilters" title="Clear filters" />
+            <flux:button variant="ghost" icon="x-mark" wire:click="clearFilters" title="Clear filters" />
             @endif
         </div>
     </div>
@@ -67,38 +66,39 @@
         <!-- Product Rows -->
         <flux:table.rows>
             @forelse($products as $product)
-                <flux:table.row :key="$product->id">
-                    <flux:table.cell class="whitespace-nowrap">
-                        <flux:avatar :src="$product->primaryImage ? asset('storage/' . $product->primaryImage->path) : null" name="{{ $product->name }}" />
-                    </flux:table.cell>
+            <flux:table.row :key="$product->id">
+                <flux:table.cell class="whitespace-nowrap">
+                    <flux:avatar :src="$product->primaryImage ? asset('storage/' . $product->primaryImage->path) : null" name="{{ $product->name }}" />
+                </flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">
-                        <a href="{{ route('dashboard.products.show', $product) }}" class="hover:text-emerald-400">{{ $product->name }}</a>
-                    </flux:table.cell>
+                <flux:table.cell class="whitespace-normal break-words min-w-88">
+                    <a href="{{ route('dashboard.products.show', $product) }}" class="hover:text-emerald-400">{{ $product->name }}</a>
+                </flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">{{ $product->sku ?? '-' }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">{{ $product->sku ?? '-' }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">{{ $product->hsn_code ?? '-' }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">{{ $product->hsn_code ?? '-' }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">{{ $product->category->name }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">{{ $product->category->name }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">{{ $product->brand?->name ?? '-' }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">{{ $product->brand?->name ?? '-' }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">₹{{ number_format($product->mrp, 2) }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">₹{{ number_format($product->mrp, 2) }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">₹{{ number_format($product->purchase_price, 2) }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">₹{{ number_format($product->purchase_price, 2) }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">₹{{ number_format($product->sale_price, 2) }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">₹{{ number_format($product->sale_price, 2) }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">{{ $product->stock }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">{{ $product->stock }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">
-                        <flux:badge size="sm" color="{{ $product->is_active ? 'emerald' : 'zinc' }}">{{ $product->is_active ? 'Active' : 'Inactive' }}</flux:badge>
-                    </flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">
+                    <flux:badge size="sm" color="{{ $product->is_active ? 'emerald' : 'zinc' }}">{{ $product->is_active ? 'Active' : 'Inactive' }}</flux:badge>
+                </flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap">{{ $product->created_at->format('d-m-Y') }}</flux:table.cell>
+                <flux:table.cell class="whitespace-nowrap">{{ $product->created_at->format('d-m-Y') }}</flux:table.cell>
 
-                    <flux:table.cell class="whitespace-nowrap gap-2 flex">
+                <flux:table.cell class="whitespace-nowrap">
+                    <div class="gap-2 flex">
                         <!-- Edit product button -->
                         <flux:button size="sm" href="{{ route('dashboard.products.edit', $product) }}" wire:navigate>
                             Edit
@@ -110,12 +110,13 @@
                                 Delete
                             </flux:button>
                         </flux:modal.trigger>
-                    </flux:table.cell>
-                </flux:table.row>
+                    </div>
+                </flux:table.cell>
+            </flux:table.row>
             @empty
-                <flux:table.row>
-                    <flux:table.cell colspan="10" class="text-center">No categories found.</flux:table.cell>
-                </flux:table.row>
+            <flux:table.row>
+                <flux:table.cell colspan="10" class="text-center">No categories found.</flux:table.cell>
+            </flux:table.row>
             @endforelse
         </flux:table.rows>
     </flux:table>

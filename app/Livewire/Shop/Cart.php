@@ -33,7 +33,7 @@ class Cart extends Component
     }
 
     #[Computed]
-    public function mrp(): int
+    public function mrp(): float
     {
         return $this->cartItems->sum(
             fn($item) => $item->product->mrp * $item->quantity ?? 0,
@@ -41,7 +41,7 @@ class Cart extends Component
     }
 
     #[Computed]
-    public function subtotal(): int
+    public function subtotal(): float
     {
         return $this->cartItems->sum(
             fn($item) => $item->sale_price * $item->quantity,
@@ -49,7 +49,7 @@ class Cart extends Component
     }
 
     #[Computed]
-    public function savings(): int
+    public function savings(): float
     {
         return $this->cartItems->sum(function ($item) {
             $mrp = $item->product->mrp ?? 0;
