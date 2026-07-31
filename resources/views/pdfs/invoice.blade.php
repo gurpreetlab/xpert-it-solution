@@ -1,6 +1,14 @@
 @php
     $company = config('shop.company');
     $order = $invoice->order;
+
+    $signaturePath = null;
+    if (! empty($company['signature_path'])) {
+        $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path($company['signature_path']);
+        if (file_exists($absolutePath)) {
+            $signaturePath = $absolutePath;
+        }
+    }
 @endphp
 <!DOCTYPE html>
 <html>
@@ -8,9 +16,9 @@
     <meta charset="utf-8">
     <title>{{ $invoice->invoice_number }}</title>
     <style>
-    @page {
-        margin: 0; /* top, right, bottom, left */
-    }
+        @page {
+            margin: 0; /* top, right, bottom, left */
+        }
         * { box-sizing: border-box; }
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -199,15 +207,24 @@
                     <li>Goods once sold will not be taken back or exchanged.</li>
                     <li>Bills unpaid past due date will attract 24% interest.</li>
                     <li>All disputes subject to {{ $company['state'] }} jurisdiction only.</li>
-                    <li>This is a computer-generated invoice.</li>
                 </ul>
             </td>
         </tr>
     </table>
 
     <div class="signatory">
-        For {{ $company['name'] }}<br><br><br>
+        For {{ $company['name'] }}<br>
+        @if($signaturePath)
+            <img src="{{ $signaturePath }}" alt="Authorised Signatory" style="height: 30px; margin: 6px 0;"><br>
+        @else
+            <div style="height: 56px;"></div>
+        @endif
         Authorised Signatory
+        @unless($signaturePath)
+            <div style="margin-top: 4px; color: #555; font-size: 9px;">
+                This is a computer-generated invoice and does not require a physical signature.
+            </div>
+        @endunless
     </div>
 
 </body>

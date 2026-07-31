@@ -5,7 +5,7 @@ namespace App\Livewire\Shop;
 use App\Models\Address;
 use App\Models\Invoice;
 use App\Models\Order;
-use App\Models\OrderItem;
+use App\Notifications\OrderConfirmed;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
@@ -21,36 +21,37 @@ class Checkout extends Component
 
     public bool $showAddressForm = false;
 
-    #[Validate("required|string|max:255")]
-    public string $full_name = "";
+    #[Validate('required|string|max:255')]
+    public string $full_name = '';
 
-    #[Validate("required|string|max:20")]
-    public string $phone = "";
+    #[Validate('required|string|max:20')]
+    public string $phone = '';
 
-    #[Validate("required|string|max:255")]
-    public string $address_line1 = "";
+    #[Validate('required|string|max:255')]
+    public string $address_line1 = '';
 
-    #[Validate("nullable|string|max:255")]
-    public string $address_line2 = "";
+    #[Validate('nullable|string|max:255')]
+    public string $address_line2 = '';
 
-    #[Validate("required|string|max:100")]
-    public string $city = "";
+    #[Validate('required|string|max:100')]
+    public string $city = '';
 
-    #[Validate("required|string|max:100")]
-    public string $state = "";
+    #[Validate('required|string|max:100')]
+    public string $state = '';
 
-    #[Validate("required|string|max:10")]
-    public string $pincode = "";
+    #[Validate('required|string|max:10')]
+    public string $pincode = '';
 
     public function mount()
     {
         if ($this->cartItems->isEmpty()) {
-            $this->redirect(route("shop.cart"), navigate: true);
+            $this->redirect(route('shop.cart'), navigate: true);
+
             return;
         }
 
         $default =
-            $this->addresses->firstWhere("is_default", true) ??
+            $this->addresses->firstWhere('is_default', true) ??
             $this->addresses->first();
         $this->selectedAddressId = $default?->id;
 
@@ -70,13 +71,13 @@ class Checkout extends Component
     {
         $cart = Auth::user()->cart;
 
-        if (!$cart) {
+        if (! $cart) {
             return collect();
         }
 
         return $cart
             ->items()
-            ->with(["product.category", "product.brand"])
+            ->with(['product.category', 'product.brand'])
             ->get();
     }
 
@@ -84,7 +85,7 @@ class Checkout extends Component
     public function mrp(): float
     {
         return $this->cartItems->sum(
-            fn($item) => $item->product->mrp * $item->quantity ?? 0,
+            fn ($item) => $item->product->mrp * $item->quantity ?? 0,
         );
     }
 
@@ -92,7 +93,7 @@ class Checkout extends Component
     public function subtotal(): float
     {
         return $this->cartItems->sum(
-            fn($item) => $item->sale_price * $item->quantity,
+            fn ($item) => $item->sale_price * $item->quantity,
         );
     }
 
@@ -117,7 +118,7 @@ class Checkout extends Component
     #[Computed]
     public function taxAmount(): float
     {
-        return $this->subtotal * (config("shop.gst_rate") / 100);
+        return $this->subtotal * (config('shop.gst_rate') / 100);
     }
 
     #[Computed]
@@ -129,13 +130,13 @@ class Checkout extends Component
     #[Computed]
     private function cgstAmount(): float
     {
-        return $this->subtotal * (config("shop.cgst_rate") / 100);
+        return $this->subtotal * (config('shop.cgst_rate') / 100);
     }
 
     #[Computed]
     private function sgstAmount(): float
     {
-        return $this->subtotal * (config("shop.sgst_rate") / 100);
+        return $this->subtotal * (config('shop.sgst_rate') / 100);
     }
 
     /*
@@ -144,7 +145,7 @@ class Checkout extends Component
     #[Computed]
     private function gstAmount(): float
     {
-        return $this->subtotal * (config("shop.gst_rate") / 100);
+        return $this->subtotal * (config('shop.gst_rate') / 100);
     }
 
     public function selectAddress($addressId): void
@@ -160,26 +161,26 @@ class Checkout extends Component
         $address = Auth::user()
             ->addresses()
             ->create([
-                "full_name" => $this->full_name,
-                "phone" => $this->phone,
-                "address_line1" => $this->address_line1,
-                "address_line2" => $this->address_line2,
-                "city" => $this->city,
-                "state" => $this->state,
-                "pincode" => $this->pincode,
-                "is_default" => $this->addresses->isEmpty(),
+                'full_name' => $this->full_name,
+                'phone' => $this->phone,
+                'address_line1' => $this->address_line1,
+                'address_line2' => $this->address_line2,
+                'city' => $this->city,
+                'state' => $this->state,
+                'pincode' => $this->pincode,
+                'is_default' => $this->addresses->isEmpty(),
             ]);
 
         $this->selectedAddressId = $address->id;
         $this->showAddressForm = false;
         $this->reset([
-            "full_name",
-            "phone",
-            "address_line1",
-            "address_line2",
-            "city",
-            "state",
-            "pincode",
+            'full_name',
+            'phone',
+            'address_line1',
+            'address_line2',
+            'city',
+            'state',
+            'pincode',
         ]);
 
         unset($this->addresses);
@@ -191,17 +192,19 @@ class Checkout extends Component
      */
     public function placeOrder()
     {
-        if (!$this->selectedAddressId) {
+        if (! $this->selectedAddressId) {
             $this->dispatch(
-                "cart-toast",
-                message: "Please select a shipping address",
-                variant: "warning",
+                'cart-toast',
+                message: 'Please select a shipping address',
+                variant: 'warning',
             );
+
             return;
         }
 
         if ($this->cartItems->isEmpty()) {
-            $this->redirect(route("shop.cart"), navigate: true);
+            $this->redirect(route('shop.cart'), navigate: true);
+
             return;
         }
 
@@ -210,62 +213,63 @@ class Checkout extends Component
         foreach ($this->cartItems as $item) {
             if ($item->product->stock < $item->quantity) {
                 $this->dispatch(
-                    "cart-toast",
+                    'cart-toast',
                     message: "\"{$item->product->name}\" no longer has enough stock",
-                    variant: "danger",
+                    variant: 'danger',
                 );
                 unset($this->cartItems);
+
                 return;
             }
         }
 
-        $address = Address::where("user_id", Auth::id())->findOrFail(
+        $address = Address::where('user_id', Auth::id())->findOrFail(
             $this->selectedAddressId,
         );
 
         DB::transaction(function () use ($address) {
             $order = Order::create([
-                "user_id" => Auth::id(),
-                "address_id" => $address->id,
-                "shipping_name" => $address->full_name,
-                "shipping_phone" => $address->phone,
-                "shipping_address_line1" => $address->address_line1,
-                "shipping_address_line2" => $address->address_line2,
-                "shipping_city" => $address->city,
-                "shipping_state" => $address->state,
-                "shipping_pincode" => $address->pincode,
-                "shipping_country" => $address->country,
-                "subtotal" => $this->subtotal,
-                "discount" => $this->savings,
-                "shipping_fee" => $this->shippingFee,
-                "tax_amount" => $this->taxAmount,
-                "total" => $this->total,
-                "payment_method" => "razorpay",
-                "payment_status" => "pending",
-                "status" => "pending",
+                'user_id' => Auth::id(),
+                'address_id' => $address->id,
+                'shipping_name' => $address->full_name,
+                'shipping_phone' => $address->phone,
+                'shipping_address_line1' => $address->address_line1,
+                'shipping_address_line2' => $address->address_line2,
+                'shipping_city' => $address->city,
+                'shipping_state' => $address->state,
+                'shipping_pincode' => $address->pincode,
+                'shipping_country' => $address->country,
+                'subtotal' => $this->subtotal,
+                'discount' => $this->savings,
+                'shipping_fee' => $this->shippingFee,
+                'tax_amount' => $this->taxAmount,
+                'total' => $this->total,
+                'payment_method' => 'razorpay',
+                'payment_status' => 'pending',
+                'status' => 'pending',
             ]);
 
             foreach ($this->cartItems as $item) {
                 $lineTaxable = $item->sale_price * $item->quantity;
                 $lineTax = round(
-                    $lineTaxable * (config("shop.gst_rate") / 100),
+                    $lineTaxable * (config('shop.gst_rate') / 100),
                     2,
                 );
 
                 $order->items()->create([
-                    "product_id" => $item->product_id,
-                    "product_name" => $item->product->name,
-                    "sku" => $item->product->sku,
-                    "hsn_code" => $item->product->hsn_code,
-                    "unit_price" => $item->sale_price,
-                    "mrp" => $item->product->mrp,
-                    "cgst_rate" => config("shop.cgst_rate"),
-                    "cgst_amount" => $this->cgstAmount(),
-                    "sgst_rate" => config("shop.sgst_rate"),
-                    "sgst_amount" => $this->sgstAmount(),
-                    "gst_rate" => config("shop.gst_rate"),
-                    "gst_amount" => $this->gstAmount(),
-                    "quantity" => $item->quantity,
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product->name,
+                    'sku' => $item->product->sku,
+                    'hsn_code' => $item->product->hsn_code,
+                    'unit_price' => $item->sale_price,
+                    'mrp' => $item->product->mrp,
+                    'cgst_rate' => config('shop.cgst_rate'),
+                    'cgst_amount' => $this->cgstAmount(),
+                    'sgst_rate' => config('shop.sgst_rate'),
+                    'sgst_amount' => $this->sgstAmount(),
+                    'gst_rate' => config('shop.gst_rate'),
+                    'gst_amount' => $this->gstAmount(),
+                    'quantity' => $item->quantity,
                 ]);
             }
 
@@ -273,33 +277,33 @@ class Checkout extends Component
             $amountInPaise = (int) round($order->total * 100);
 
             $api = new Api(
-                config("services.razorpay.key"),
-                config("services.razorpay.secret"),
+                config('services.razorpay.key'),
+                config('services.razorpay.secret'),
             );
 
             $razorpayOrder = $api->order->create([
-                "receipt" => $order->order_number,
-                "amount" => $amountInPaise,
-                "currency" => "INR",
-                "notes" => [
-                    "order_id" => $order->id,
-                    "user_id" => Auth::id(),
+                'receipt' => $order->order_number,
+                'amount' => $amountInPaise,
+                'currency' => 'INR',
+                'notes' => [
+                    'order_id' => $order->id,
+                    'user_id' => Auth::id(),
                 ],
             ]);
 
-            $order->update(["razorpay_order_id" => $razorpayOrder->id]);
+            $order->update(['razorpay_order_id' => $razorpayOrder->id]);
 
-            $this->dispatch("razorpay-checkout", [
-                "key" => config("services.razorpay.key"),
-                "amount" => $amountInPaise,
-                "currency" => "INR",
-                "razorpayOrderId" => $razorpayOrder->id,
-                "orderNumber" => $order->order_number,
-                "name" => "Xpert IT Solution",
-                "prefill" => [
-                    "name" => $address->full_name,
-                    "contact" => $address->phone,
-                    "email" => Auth::user()->email,
+            $this->dispatch('razorpay-checkout', [
+                'key' => config('services.razorpay.key'),
+                'amount' => $amountInPaise,
+                'currency' => 'INR',
+                'razorpayOrderId' => $razorpayOrder->id,
+                'orderNumber' => $order->order_number,
+                'name' => 'Xpert IT Solution',
+                'prefill' => [
+                    'name' => $address->full_name,
+                    'contact' => $address->phone,
+                    'email' => Auth::user()->email,
                 ],
             ]);
         });
@@ -315,28 +319,29 @@ class Checkout extends Component
         $razorpayOrderId,
         $razorpaySignature,
     ) {
-        $order = Order::where("razorpay_order_id", $razorpayOrderId)
-            ->where("user_id", Auth::id())
+        $order = Order::where('razorpay_order_id', $razorpayOrderId)
+            ->where('user_id', Auth::id())
             ->firstOrFail();
 
         $api = new Api(
-            config("services.razorpay.key"),
-            config("services.razorpay.secret"),
+            config('services.razorpay.key'),
+            config('services.razorpay.secret'),
         );
 
         try {
             $api->utility->verifyPaymentSignature([
-                "razorpay_order_id" => $razorpayOrderId,
-                "razorpay_payment_id" => $razorpayPaymentId,
-                "razorpay_signature" => $razorpaySignature,
+                'razorpay_order_id' => $razorpayOrderId,
+                'razorpay_payment_id' => $razorpayPaymentId,
+                'razorpay_signature' => $razorpaySignature,
             ]);
         } catch (SignatureVerificationError $e) {
-            $order->update(["payment_status" => "failed"]);
+            $order->update(['payment_status' => 'failed']);
             $this->dispatch(
-                "cart-toast",
-                message: "Payment verification failed. Please try again.",
-                variant: "danger",
+                'cart-toast',
+                message: 'Payment verification failed. Please try again.',
+                variant: 'danger',
             );
+
             return;
         }
 
@@ -346,15 +351,15 @@ class Checkout extends Component
             $razorpaySignature,
         ) {
             $order->update([
-                "payment_status" => "paid",
-                "status" => "processing",
-                "razorpay_payment_id" => $razorpayPaymentId,
-                "razorpay_signature" => $razorpaySignature,
+                'payment_status' => 'paid',
+                'status' => 'processing',
+                'razorpay_payment_id' => $razorpayPaymentId,
+                'razorpay_signature' => $razorpaySignature,
             ]);
 
             foreach ($order->items as $item) {
                 if ($item->product) {
-                    $item->product->decrement("stock", $item->quantity);
+                    $item->product->decrement('stock', $item->quantity);
                 }
             }
 
@@ -365,10 +370,12 @@ class Checkout extends Component
         // of sale — generated here, not lazily on first PDF download.
         Invoice::generateForOrder($order);
 
-        $this->dispatch("cart-updated");
+        $this->dispatch('cart-updated');
+
+        Auth::user()->notify(new OrderConfirmed($order));
 
         $this->redirect(
-            route("shop.order.confirmation", $order->order_number),
+            route('shop.order.confirmation', $order->order_number),
             navigate: true,
         );
     }
@@ -380,20 +387,20 @@ class Checkout extends Component
      */
     public function paymentFailed($razorpayOrderId)
     {
-        Order::where("razorpay_order_id", $razorpayOrderId)
-            ->where("user_id", Auth::id())
-            ->update(["payment_status" => "failed"]);
+        Order::where('razorpay_order_id', $razorpayOrderId)
+            ->where('user_id', Auth::id())
+            ->update(['payment_status' => 'failed']);
 
         $this->dispatch(
-            "cart-toast",
-            message: "Payment was not completed",
-            variant: "warning",
+            'cart-toast',
+            message: 'Payment was not completed',
+            variant: 'warning',
         );
     }
 
-    #[Layout("layouts.blank")]
+    #[Layout('layouts.blank')]
     public function render()
     {
-        return view("livewire.shop.checkout");
+        return view('livewire.shop.checkout');
     }
 }
