@@ -29,7 +29,7 @@ return [
         'state' => env('SHOP_COMPANY_STATE', 'Punjab'),
         'state_code' => env('SHOP_COMPANY_STATE_CODE', '03'),
         'phone' => env('SHOP_COMPANY_PHONE', '6280004560'),
-        'email' => env('SHOP_COMPANY_EMAIL', 'info@xpertitsolution.com'),
+        'email' => env('SHOP_COMPANY_EMAIL', 'xpertitsolution6@gmail.com'),
         'bank_account_number' => env(
             'SHOP_COMPANY_BANK_ACCOUNT',
             '2092651100003292',

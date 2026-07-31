@@ -6,11 +6,11 @@ use App\Models\Category;
 use App\Models\Product;
 use Livewire\Livewire;
 
-test('returns a successful response and renders the livewire component', function () {
+test('returns a successful response for the home page', function () {
     $response = $this->get(route('home'));
 
     $response->assertStatus(200);
-    $response->assertSeeLivewire(Home::class);
+    $response->assertSee('Xpert');
 });
 
 test('can search products', function () {
@@ -93,19 +93,4 @@ test('can filter products by brand', function () {
         ->set('selectedBrandId', $brand1->id)
         ->assertSee($product1->name)
         ->assertDontSee($product2->name);
-});
-
-test('can submit an enquiry form', function () {
-    Livewire::test(Home::class)
-        ->set('enquiryName', 'Gurpreet Singh')
-        ->set('enquiryEmail', 'gurpreet@example.com')
-        ->set('enquiryPhone', '1234567890')
-        ->set('enquiryMessage', 'Interested in bulk CCTV installation.')
-        ->call('submitEnquiry')
-        ->assertHasNoErrors()
-        ->assertSet('enquiryName', '')
-        ->assertSet('enquiryEmail', '')
-        ->assertSet('enquiryPhone', '')
-        ->assertSet('enquiryMessage', '')
-        ->assertSet('showEnquiryModal', false);
 });

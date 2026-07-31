@@ -117,15 +117,15 @@
                             <ul class="space-y-2 text-xs">
                                 <li class="flex items-center gap-2">
                                     <flux:icon icon="envelope" class="size-4 shrink-0 text-zinc-500" />
-                                    <span>info@xpertitsolution.com</span>
+                                    <span>{{ config("shop.company.email") }}</span>
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <flux:icon icon="phone" class="size-4 shrink-0 text-zinc-500" />
-                                    <span>+91 98765 43210</span>
+                                    <span>+91 {{ config("shop.company.phone") }}</span>
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <flux:icon icon="map-pin" class="size-4 shrink-0 text-zinc-500" />
-                                    <span>Gurpreet Lab, Mukerian, Punjab</span>
+                                    <span>{{ config("shop.company.address_line1") . ' ' . config("shop.company.address_line2") . ', ' . config("shop.company.state") }}</span>
                                 </li>
                             </ul>
                         </div>

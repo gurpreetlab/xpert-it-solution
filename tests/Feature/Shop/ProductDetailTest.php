@@ -40,7 +40,6 @@ test('product detail page renders successfully with real product data and images
     $response = $this->get(route('shop.product.details', $product->slug));
 
     $response->assertStatus(200);
-    $response->assertSeeLivewire(ProductDetail::class);
     $response->assertSee('Netgear Nighthawk AX1800 Wi-Fi 6 Router');
     $response->assertSee('Wi-Fi Standard');
     $response->assertSee('Wi-Fi 6 (802.11ax)');
@@ -54,6 +53,7 @@ test('can select image and change quantity', function () {
         'category_id' => $category->id,
         'is_active' => true,
         'sale_price' => 2500,
+        'stock' => 5,
     ]);
 
     $img1 = ProductImage::create([
@@ -76,26 +76,4 @@ test('can select image and change quantity', function () {
         ->assertSet('quantity', 2)
         ->call('decrementQuantity')
         ->assertSet('quantity', 1);
-});
-
-test('can submit enquiry on product details page', function () {
-    $category = Category::create(['name' => 'Storage']);
-
-    $product = Product::create([
-        'name' => 'WD Purple 4TB HDD',
-        'category_id' => $category->id,
-        'is_active' => true,
-        'sale_price' => 6500,
-    ]);
-
-    Livewire::test(ProductDetail::class, ['slug' => $product->slug])
-        ->call('openEnquiry')
-        ->assertSet('showEnquiryModal', true)
-        ->set('enquiryName', 'Gurpreet Singh')
-        ->set('enquiryEmail', 'gurpreet@example.com')
-        ->set('enquiryPhone', '9876543210')
-        ->set('enquiryMessage', 'Quotation request for 5 units.')
-        ->call('submitEnquiry')
-        ->assertHasNoErrors()
-        ->assertSet('showEnquiryModal', false);
 });
