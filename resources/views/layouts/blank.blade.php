@@ -25,7 +25,10 @@
 
                     <!-- Main Nav (Anchor links) -->
                     <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                        <a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Home</a>
                         <a href="{{ route('shop.products') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Products</a>
+                        <a href="{{ route('about') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">About</a>
+                        <a href="{{ route('contact') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Contact</a>
                     </nav>
 
                     <!-- Right Buttons (Auth) -->
