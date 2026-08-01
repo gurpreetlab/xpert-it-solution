@@ -99,11 +99,12 @@
                             <p class="text-xs leading-relaxed text-zinc-500">Premium IT Infrastructure, CCTV surveillance networking systems, enterprise back-ups, and storage solutions supplier.</p>
                         </div>
                         <div>
-                            <h5 class="text-white text-xs font-semibold uppercase tracking-wider mb-4">Product Domains</h5>
+                            <h5 class="text-white text-xs font-semibold uppercase tracking-wider mb-4">Quick Links</h5>
                             <ul class="space-y-2 text-xs">
-                                <li><a href="#" class="hover:text-white transition">Storage</a></li>
-                                <li><a href="#" class="hover:text-white transition">Printing</a></li>
-                                <li><a href="#" class="hover:text-white transition">Laptops</a></li>
+                                <li><a href="{{ route('home') }}" class="hover:text-white transition" wire:navigate>Home</a></li>
+                                <li><a href="{{ route('shop.products') }}" class="hover:text-white transition" wire:navigate>Shop All Products</a></li>
+                                <li><a href="{{ route('about') }}" class="hover:text-white transition" wire:navigate>About Us</a></li>
+                                <li><a href="{{ route('contact') }}" class="hover:text-white transition" wire:navigate>Contact Us</a></li>
                             </ul>
                         </div>
                         <div>

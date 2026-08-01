@@ -13,8 +13,11 @@ use Livewire\Attributes\Computed;
 trait HandlesProductCatalog
 {
     public string $search = '';
+
     public string $selectedCategoryId = '';
+
     public string $selectedBrandId = '';
+
     public string $sortBy = 'featured';
 
     protected const array SORT_OPTIONS = [
@@ -32,7 +35,7 @@ trait HandlesProductCatalog
 
         if ($property === 'selectedCategoryId' && $this->selectedBrandId !== '') {
             $validBrands = $this->brands;
-            if (!$validBrands->contains('id', (int) $this->selectedBrandId)) {
+            if (! $validBrands->contains('id', (int) $this->selectedBrandId)) {
                 $this->selectedBrandId = '';
             }
         }
@@ -55,7 +58,7 @@ trait HandlesProductCatalog
 
     /**
      * Get the available sorting options.
-     * 
+     *
      * @return array<string, string>
      */
     #[Computed]
@@ -110,16 +113,18 @@ trait HandlesProductCatalog
         $rawResults = Product::search('', function ($meilisearch, $query, $options) {
             $options['facets'] = ['category_id'];
             $options['filter'] = 'is_active = true';
+
             return $meilisearch->search($query, $options);
         })->raw();
 
         $distribution = $rawResults['facetDistribution']['category_id'] ?? [];
-        $categoryIds = array_keys(array_filter($distribution, fn($count) => $count > 0));
+        $categoryIds = array_keys(array_filter($distribution, fn ($count) => $count > 0));
 
         return Category::whereIn('id', $categoryIds)
             ->get()
             ->map(function ($category) use ($distribution) {
                 $category->products_count = $distribution[$category->id] ?? 0;
+
                 return $category;
             });
     }
@@ -147,12 +152,13 @@ trait HandlesProductCatalog
         })->raw();
 
         $distribution = $rawResults['facetDistribution']['brand_id'] ?? [];
-        $brandIds = array_keys(array_filter($distribution, fn($count) => $count > 0));
+        $brandIds = array_keys(array_filter($distribution, fn ($count) => $count > 0));
 
         return Brand::whereIn('id', $brandIds)
             ->get()
             ->map(function ($brand) use ($distribution) {
                 $brand->products_count = $distribution[$brand->id] ?? 0;
+
                 return $brand;
             });
     }
@@ -164,9 +170,18 @@ trait HandlesProductCatalog
     }
 
     #[Computed]
+    // show selectedCategoryId products_count
     public function currentScopeProductsCount(): int
     {
         return $this->getSearchBuilder()->raw()['estimatedTotalHits'] ?? 0;
+    }
+
+    #[Computed]
+    public function selectedCategoryProductsCount(): ?int
+    {
+        return $this->selectedCategoryId === ''
+            ? null
+            : $this->categories->firstWhere('id', (int) $this->selectedCategoryId)?->products_count;
     }
 
     #[Computed]
