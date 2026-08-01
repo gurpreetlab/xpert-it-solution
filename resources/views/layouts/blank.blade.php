@@ -109,10 +109,10 @@
                         <div>
                             <h5 class="text-white text-xs font-semibold uppercase tracking-wider mb-4">Corporate Info</h5>
                             <ul class="space-y-2 text-xs">
-                                <li><a href="#" class="hover:text-white transition">About Us</a></li>
-                                <li><a href="#" class="hover:text-white transition">Case Studies</a></li>
-                                <li><a href="#" class="hover:text-white transition">Careers</a></li>
-                                <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                                <li><a href="{{ route('shop.privacy-policy') }}" class="hover:text-white transition" wire:navigate>Privacy Policy</a></li>
+                                <li><a href="{{ route('shop.terms-and-conditions') }}" class="hover:text-white transition" wire:navigate>Terms &amp; Conditions</a></li>
+                                <li><a href="{{ route('shop.refund-policy') }}" class="hover:text-white transition" wire:navigate>Refund &amp; Return Policy</a></li>
+                                <li><a href="{{ route('shop.shipping-policy') }}" class="hover:text-white transition" wire:navigate>Shipping Policy</a></li>
                             </ul>
                         </div>
                         <div>

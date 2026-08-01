@@ -106,4 +106,10 @@ Route::middleware(['auth', 'verified', 'role:super-admin'])
         });
     });
 
+// Legal Pages
+Route::livewire('/privacy-policy', 'pages::shop.privacy-policy')->name('shop.privacy-policy');
+Route::livewire('/terms-and-conditions', 'pages::shop.terms-and-conditions')->name('shop.terms-and-conditions');
+Route::livewire('/refund-policy', 'pages::shop.refund-policy')->name('shop.refund-policy');
+Route::livewire('/shipping-policy', 'pages::shop.shipping-policy')->name('shop.shipping-policy');
+
 require __DIR__.'/settings.php';
