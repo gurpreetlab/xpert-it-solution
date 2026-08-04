@@ -39,7 +39,27 @@ class ShopSetting extends Model
 
     public static function current(): self
     {
-        return static::query()->firstOrCreate([]);
+        if (! Schema::hasTable((new static)->getTable())) {
+            return static::fromConfig();
+        }
+
+        $instance = static::query()->first();
+
+        if ($instance) {
+            return $instance;
+        }
+
+        $defaults = static::fromConfig()->getAttributes();
+
+        if (! empty($defaults['logo_path'])) {
+            $defaults['logo_path'] = preg_replace('#^/?storage/#', '', $defaults['logo_path']);
+        }
+
+        if (! empty($defaults['signature_path'])) {
+            $defaults['signature_path'] = preg_replace('#^/?storage/#', '', $defaults['signature_path']);
+        }
+
+        return static::create($defaults);
     }
 
     public static function refreshCache(): void
@@ -53,7 +73,14 @@ class ShopSetting extends Model
     {
         $company = config('shop.company', []);
         $logoPath = $company['logo_path'] ?? null;
+        if ($logoPath) {
+            $logoPath = preg_replace('#^/?storage/#', '', $logoPath);
+        }
+
         $signaturePath = $company['signature_path'] ?? null;
+        if ($signaturePath) {
+            $signaturePath = preg_replace('#^/?storage/#', '', $signaturePath);
+        }
 
         return (new static)->forceFill([
             'name' => $company['name'] ?? '',
