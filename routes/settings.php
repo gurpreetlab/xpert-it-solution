@@ -3,6 +3,7 @@
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Security;
+use App\Livewire\Settings\ShopSettings;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -19,11 +20,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'password.confirm',
         ])
         ->name('security.edit');
+
+    Route::livewire('settings/shop', ShopSettings::class)
+        ->middleware([
+            'role:super-admin',
+        ])
+        ->name('shop.edit');
 });
 
-Route::get('.well-known/passkey-endpoints', function () {
-    return response()->json([
-        'enroll' => route('security.edit'),
-        'manage' => route('security.edit'),
-    ]);
-})->name('well-known.passkeys');
+Route::get('.well-known/passkey-endpoints', fn () => response()->json([
+    'enroll' => route('security.edit'),
+    'manage' => route('security.edit'),
+]))->name('well-known.passkeys');

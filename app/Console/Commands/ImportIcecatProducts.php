@@ -8,8 +8,8 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature("icecat:import {--category= : Target category slug to map imported products to} {--file= : Path to a text file containing line-separated GTINs/MPNs to import}")]
-#[Description("Selective product importer from Icecat")]
+#[Signature('icecat:import {--category= : Target category slug to map imported products to} {--file= : Path to a text file containing line-separated GTINs/MPNs to import}')]
+#[Description('Selective product importer from Icecat')]
 class ImportIcecatProducts extends Command
 {
     /**
@@ -21,13 +21,13 @@ class ImportIcecatProducts extends Command
         $categorySlug = $this->option('category');
 
         if (! $filePath || ! file_exists($filePath)) {
-            $this->error("Please provide a valid text file containing SKUs/GTINs using --file=path/to/list.txt");
+            $this->error('Please provide a valid text file containing SKUs/GTINs using --file=path/to/list.txt');
 
             return 1;
         }
 
         if (! $categorySlug) {
-            $this->error("Please specify a target category slug using --category=category-slug");
+            $this->error('Please specify a target category slug using --category=category-slug');
 
             return 1;
         }

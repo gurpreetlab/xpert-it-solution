@@ -9,7 +9,6 @@ use Flux\Flux;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -18,9 +17,13 @@ class Index extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $categoryId = '';
+
     public string $brandId = '';
+
     public string $status = '';
+
     public ?Product $deletingProduct = null;
 
     /**
@@ -42,7 +45,7 @@ class Index extends Component
 
     public function delete(): void
     {
-        if (!$this->deletingProduct) {
+        if (! $this->deletingProduct) {
             return;
         }
 

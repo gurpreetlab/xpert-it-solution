@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Brand;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -191,8 +190,8 @@ class BrandSeeder extends Seeder
         DB::transaction(function () use ($brands) {
             foreach ($brands as $brand) {
                 Brand::firstOrCreate(
-                    [ 'name' => $brand['name'] ],
-                    [ 'description' => $brand['description'] ]
+                    ['name' => $brand['name']],
+                    ['description' => $brand['description']]
                 );
             }
         }, attempts: 5);

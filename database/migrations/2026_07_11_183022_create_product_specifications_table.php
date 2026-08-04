@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('group_name')->nullable(); // e.g. "General", "Connectivity", "Power"
             $table->string('key');
             $table->text('value');
-            $table->string('unit')->nullable(); // e.g. "Mbps", "GB", "dBi" 
+            $table->string('unit')->nullable(); // e.g. "Mbps", "GB", "dBi"
 
             $table->unsignedInteger('icecat_feature_id')->nullable();
 

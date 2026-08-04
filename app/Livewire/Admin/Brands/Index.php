@@ -16,19 +16,22 @@ use Livewire\WithPagination;
 
 class Index extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     public ?Brand $editingBrand = null;
+
     public ?Brand $deletingBrand = null;
-    public string $name = "";
+
+    public string $name = '';
+
     public ?TemporaryUploadedFile $logo = null;
+
     public ?string $description = null;
-    public string $search = "";
+
+    public string $search = '';
 
     /**
      * Get the validation rules for the category name.
-     *
-     * @return array
      */
     protected function rules(): array
     {
@@ -41,8 +44,6 @@ class Index extends Component
 
     /**
      * Get the custom validation messages for the brand name
-     *
-     * @return array
      */
     protected function messages(): array
     {
@@ -110,7 +111,7 @@ class Index extends Component
 
     public function delete(): void
     {
-        if (!$this->deletingBrand) {
+        if (! $this->deletingBrand) {
             return;
         }
 

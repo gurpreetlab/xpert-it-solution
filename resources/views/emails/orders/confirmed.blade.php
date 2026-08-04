@@ -1,5 +1,4 @@
 @php
-$company = config('shop.company');
 
 $subtotal = (float) $order->subtotal;
 $discount = (float) $order->discount;
@@ -88,7 +87,7 @@ $statusLabel = $statusLabels[$order->status] ?? ucfirst($order->status);
 <body>
     <!-- Preheader (hidden preview text) -->
     <div style="display:none; max-height:0; overflow:hidden; opacity:0; mso-hide:all;">
-        Your order {{ $order->order_number }} is confirmed — total ₹{{ number_format($total, 2) }}. Thank you for shopping with {{ $company['name'] }}.
+        Your order {{ $order->order_number }} is confirmed — total ₹{{ number_format($total, 2) }}. Thank you for shopping with {{ shop()->name }}.
     </div>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;">
@@ -105,7 +104,7 @@ $statusLabel = $statusLabels[$order->status] ?? ucfirst($order->status);
                                         <table role="presentation" cellpadding="0" cellspacing="0" width="36" height="36" style="background-color:#18181b; border-radius:8px;">
                                             <tr>
                                                 <td align="center" valign="middle" style="width:36px; height:36px;">
-                                                    <img src="{{ asset('logo-xpert-it-solution.png') }}" width="20" height="20" alt="{{ $company['name'] }}" style="display:block;">
+                                                    <img src="{{ asset('logo-xpert-it-solution.png') }}" width="20" height="20" alt="{{ shop()->name }}" style="display:block;">
                                                 </td>
                                             </tr>
                                         </table>
@@ -322,14 +321,14 @@ $statusLabel = $statusLabels[$order->status] ?? ucfirst($order->status);
                         <td style="padding: 24px 20px 0 20px;" align="center">
                             <p style="margin:0 0 4px 0; font-size:12px; color:#71717a;">
                                 Questions about your order? Contact us at
-                                <a href="mailto:{{ $company['email'] }}" style="color:#2563eb; font-weight:600;">{{ $company['email'] }}</a>
-                                or +91 {{ $company['phone'] }}
+                                <a href="mailto:{{ shop()->email }}" style="color:#2563eb; font-weight:600;">{{ shop()->email }}</a>
+                                or +91 {{ shop()->phone }}
                             </p>
                             <p style="margin:0 0 4px 0; font-size:11px; color:#a1a1aa;">
-                                {{ $company['address_line1'] }}, {{ $company['address_line2'] }}, {{ $company['state'] }}
+                                {{ shop()->address_line1 }}, {{ shop()->address_line2 }}, {{ shop()->state }}
                             </p>
                             <p style="margin:12px 0 0 0; font-size:11px; color:#d4d4d8;">
-                                &copy; {{ date('Y') }} {{ $company['name'] }}. All rights reserved.
+                                &copy; {{ date('Y') }} {{ shop()->name }}. All rights reserved.
                             </p>
                         </td>
                     </tr>

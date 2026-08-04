@@ -19,31 +19,31 @@ class Import extends Component
      * CLI's one-category-per-run limitation.
      */
     public array $rows = [];
- 
+
     public function mount(): void
     {
         $this->rows = [$this->blankRow()];
     }
- 
+
     protected function blankRow(): array
     {
         return ['key' => (string) Str::uuid(), 'category_id' => '', 'input' => ''];
     }
- 
+
     public function addRow(): void
     {
         $this->rows[] = $this->blankRow();
     }
- 
+
     public function removeRow(string $key): void
     {
         if (count($this->rows) <= 1) {
             return;
         }
- 
+
         $this->rows = array_values(array_filter($this->rows, fn ($row) => $row['key'] !== $key));
     }
- 
+
     public function submit(): void
     {
         $this->validate([
@@ -54,16 +54,16 @@ class Import extends Component
             'rows.*.category_id.required' => 'Select a category for every row.',
             'rows.*.input.required' => 'Paste at least one GTIN or ProductCode per row.',
         ]);
- 
+
         $queued = 0;
- 
+
         foreach ($this->rows as $row) {
-            $lines = array_values(array_filter(array_map('trim', explode("\n", $row['input']))));
- 
+            $lines = array_values(array_filter(array_map(trim(...), explode("\n", $row['input']))));
+
             if (empty($lines)) {
                 continue;
             }
- 
+
             $batch = IcecatImportBatch::create([
                 'category_id' => $row['category_id'],
                 'created_by' => Auth::id(),
@@ -71,22 +71,22 @@ class Import extends Component
                 'total' => count($lines),
                 'status' => 'pending',
             ]);
- 
+
             ProcessIcecatImportBatch::dispatch($batch->id);
             $queued++;
         }
- 
+
         $this->rows = [$this->blankRow()];
- 
+
         Flux::toast(variant: 'success', text: "{$queued} import batch(es) queued. Track progress below.");
     }
- 
+
     #[Computed]
     public function categories()
     {
         return Category::orderBy('name')->get(['id', 'name']);
     }
- 
+
     #[Computed]
     public function recentBatches()
     {
@@ -95,13 +95,13 @@ class Import extends Component
             ->limit(20)
             ->get();
     }
- 
+
     #[Computed]
     public function hasActiveBatches(): bool
     {
         return $this->recentBatches->contains(fn ($batch) => ! $batch->isFinished());
     }
-    
+
     public function render()
     {
         return view('livewire.admin.icecat.import');

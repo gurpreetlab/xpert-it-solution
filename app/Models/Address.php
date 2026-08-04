@@ -9,20 +9,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[
     Fillable([
-        "full_name",
-        "phone",
-        "address_line1",
-        "address_line2",
-        "city",
-        "state",
-        "pincode",
-        "country",
+        'full_name',
+        'phone',
+        'address_line1',
+        'address_line2',
+        'city',
+        'state',
+        'pincode',
+        'country',
     ]),
 ]
 class Address extends Model
 {
     protected $casts = [
-        "is_default" => "boolean",
+        'is_default' => 'boolean',
     ];
 
     /**
@@ -47,8 +47,6 @@ class Address extends Model
 
     /**
      * One-line formatted string for display in summaries/emails.
-     *
-     * @return string
      */
     public function getFormattedAttribute(): string
     {
@@ -60,6 +58,6 @@ class Address extends Model
             $this->pincode,
         ])
             ->filter()
-            ->implode(", ");
+            ->implode(', ');
     }
 }

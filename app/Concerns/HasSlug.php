@@ -30,6 +30,6 @@ trait HasSlug
 
     protected static function slugSource(): string
     {
-        return "name";
+        return 'name';
     }
 }

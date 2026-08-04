@@ -42,6 +42,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array
     {
         return [

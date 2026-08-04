@@ -17,7 +17,7 @@ class GenerateUniqueSlug
     public function handle(
         string $model,
         string $value,
-        string $slugColumn = "slug",
+        string $slugColumn = 'slug',
         ?int $ignoreId = null,
     ): string {
         $slug = Str::slug($value);
@@ -31,9 +31,8 @@ class GenerateUniqueSlug
         $count = 1;
 
         while (
-            $model
-                ::query()
-                ->when($ignoreId, fn($q) => $q->whereKeyNot($ignoreId))
+            $model::query()
+                ->when($ignoreId, fn ($q) => $q->whereKeyNot($ignoreId))
                 ->where($slugColumn, $slug)
                 ->exists()
         ) {

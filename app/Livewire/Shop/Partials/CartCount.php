@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Shop\Partials;
 
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 class CartCount extends Component
 {
@@ -14,7 +14,7 @@ class CartCount extends Component
         $this->refreshCount();
     }
 
-    #[On("cart-updated")]
+    #[On('cart-updated')]
     public function refreshCount()
     {
         $this->count = auth()->check()
@@ -24,6 +24,6 @@ class CartCount extends Component
 
     public function render()
     {
-        return view("livewire.shop._partials.cart-count");
+        return view('livewire.shop._partials.cart-count');
     }
 }

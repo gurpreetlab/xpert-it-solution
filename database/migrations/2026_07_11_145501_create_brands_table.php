@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
-            $table->string("slug")->unique();
-            $table->string("logo")->nullable();
-            $table->text("description")->nullable();
-            $table->string("website")->nullable();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->string('logo')->nullable();
+            $table->text('description')->nullable();
+            $table->string('website')->nullable();
 
-            $table->unsignedInteger("icecat_brand_id")->nullable()->unique();
-            
+            $table->unsignedInteger('icecat_brand_id')->nullable()->unique();
+
             $table->timestamps();
             $table->softDeletes();
         });

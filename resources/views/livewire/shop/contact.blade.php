@@ -27,23 +27,23 @@
 
     <!-- Quick Contact Info Cards -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-        <a href="mailto:{{ config('shop.company.email') }}" class="group p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center gap-4 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-md transition">
+        <a href="mailto:{{ shop()->email }}" class="group p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center gap-4 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-md transition">
             <div class="size-11 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                 <flux:icon icon="envelope" class="size-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div class="min-w-0">
                 <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Email Us</p>
-                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">{{ config('shop.company.email') }}</p>
+                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">{{ shop()->email }}</p>
             </div>
         </a>
 
-        <a href="tel:+91{{ config('shop.company.phone') }}" class="group p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center gap-4 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-md transition">
+        <a href="tel:+91{{ shop()->phone }}" class="group p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center gap-4 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-md transition">
             <div class="size-11 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                 <flux:icon icon="phone" class="size-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div class="min-w-0">
                 <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Call Us</p>
-                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">+91 {{ config('shop.company.phone') }}</p>
+                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">+91 {{ shop()->phone }}</p>
             </div>
         </a>
 
@@ -53,7 +53,7 @@
             </div>
             <div class="min-w-0">
                 <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Visit Us</p>
-                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">{{ config('shop.company.address_line1') . ', ' . config('shop.company.state') }}</p>
+                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">{{ shop()->address_line1 }}, {{ shop()->address_line2 }}, {{ shop()->state }}
             </div>
         </div>
     </section>
@@ -185,9 +185,9 @@
                     <h3 class="text-sm font-bold text-zinc-900 dark:text-white">Head Office</h3>
                 </div>
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                    {{ config('shop.company.address_line1') }}<br>
-                    {{ config('shop.company.address_line2') }}<br>
-                    {{ config('shop.company.state') }}
+                    {{ shop()->address_line1 }}<br>
+                    {{ shop()->address_line2 }}<br>
+                    {{ shop()->state }}
                 </p>
             </div>
 

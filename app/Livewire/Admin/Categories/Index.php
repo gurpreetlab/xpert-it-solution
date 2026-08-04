@@ -16,14 +16,15 @@ class Index extends Component
     use WithPagination;
 
     public ?Category $editingCategory = null;
+
     public ?Category $deletingCategory = null;
-    public string $name = "";
-    public string $search = "";
+
+    public string $name = '';
+
+    public string $search = '';
 
     /**
      * Get the validation rules for the category name.
-     *
-     * @return array
      */
     protected function rules(): array
     {
@@ -34,8 +35,6 @@ class Index extends Component
 
     /**
      * Get the custom validation messages for the category name
-     *
-     * @return array
      */
     protected function messages(): array
     {
@@ -90,7 +89,7 @@ class Index extends Component
 
     public function delete(): void
     {
-        if (!$this->deletingCategory) {
+        if (! $this->deletingCategory) {
             return;
         }
 
@@ -116,8 +115,6 @@ class Index extends Component
 
     /**
      * Get the categories based on the search query
-     *
-     * @return View
      */
     public function render(): View
     {

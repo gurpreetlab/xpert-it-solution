@@ -3,7 +3,6 @@
 namespace App\Livewire\Admin\Orders;
 
 use App\Models\Order;
-use Flux\Flux;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -13,9 +12,11 @@ class Index extends Component
 {
     use WithPagination;
 
-    public string $search = "";
-    public string $status = "";
-    public string $paymentStatus = "";
+    public string $search = '';
+
+    public string $status = '';
+
+    public string $paymentStatus = '';
 
     /**
      * Reset to page 1 whenever a filter changes, so the user
@@ -23,14 +24,14 @@ class Index extends Component
      */
     public function updating(string $property): void
     {
-        if (in_array($property, ["search", "status", "paymentStatus"], true)) {
+        if (in_array($property, ['search', 'status', 'paymentStatus'], true)) {
             $this->resetPage();
         }
     }
 
     public function clearFilters(): void
     {
-        $this->reset(["search", "status", "paymentStatus"]);
+        $this->reset(['search', 'status', 'paymentStatus']);
         $this->resetPage();
     }
 
@@ -38,31 +39,31 @@ class Index extends Component
     public function orders(): LengthAwarePaginator
     {
         return Order::query()
-            ->with(["user:id,name,email"])
-            ->withCount("items")
-            ->when($this->search !== "", function ($query) {
+            ->with(['user:id,name,email'])
+            ->withCount('items')
+            ->when($this->search !== '', function ($query) {
                 $query->where(function ($q) {
                     $q->where(
-                        "order_number",
-                        "like",
+                        'order_number',
+                        'like',
                         "%{$this->search}%",
-                    )->orWhereHas("user", function ($uq) {
+                    )->orWhereHas('user', function ($uq) {
                         $uq->where(
-                            "name",
-                            "like",
+                            'name',
+                            'like',
                             "%{$this->search}%",
-                        )->orWhere("email", "like", "%{$this->search}%");
+                        )->orWhere('email', 'like', "%{$this->search}%");
                     });
                 });
             })
             ->when(
-                $this->status !== "",
-                fn($query) => $query->where("status", $this->status),
+                $this->status !== '',
+                fn ($query) => $query->where('status', $this->status),
             )
             ->when(
-                $this->paymentStatus !== "",
-                fn($query) => $query->where(
-                    "payment_status",
+                $this->paymentStatus !== '',
+                fn ($query) => $query->where(
+                    'payment_status',
                     $this->paymentStatus,
                 ),
             )
@@ -72,8 +73,8 @@ class Index extends Component
 
     public function render()
     {
-        return view("livewire.admin.orders.index", [
-            "orders" => $this->orders(),
+        return view('livewire.admin.orders.index', [
+            'orders' => $this->orders(),
         ]);
     }
 }

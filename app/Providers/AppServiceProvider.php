@@ -5,9 +5,11 @@ namespace App\Providers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ShopSetting;
 use App\Observers\BrandObserver;
 use App\Observers\CategoryObserver;
 use App\Observers\ProductObserver;
+use App\Observers\ShopSettingObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
+    #[\Override]
     public function register(): void
     {
         //
@@ -30,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        ShopSetting::observe(ShopSettingObserver::class);
+        ShopSetting::getCached();
 
         Brand::observe(BrandObserver::class);
         Category::observe(CategoryObserver::class);

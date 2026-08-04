@@ -11,10 +11,10 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout("layouts.blank")]
+#[Layout('layouts.blank')]
 class Home extends Component
 {
-    use WithPagination, HandlesProductCatalog;
+    use HandlesProductCatalog, WithPagination;
 
     #[Computed]
     public function featuredProducts(): Collection
@@ -24,11 +24,9 @@ class Home extends Component
 
     /**
      * Render the home page view.
-     *
-     * @return View
      */
     public function render(): View
     {
-        return view("livewire.shop.home");
+        return view('livewire.shop.home');
     }
 }

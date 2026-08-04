@@ -60,7 +60,7 @@ class Invoice extends Model
 
             $sequence = $lastSequence + 1;
 
-            $sellerState = config('shop.company.state');
+            $sellerState = shop()->state;
             $isInterState =
                 strcasecmp(trim($order->shipping_state), trim($sellerState)) !==
                 0;

@@ -5,12 +5,11 @@ namespace App\Livewire\Admin\Products;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductImage;
-use App\Models\ProductSpecification;
 use Flux\Flux;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 class Create extends Component
@@ -19,6 +18,7 @@ class Create extends Component
 
     // ---- Relations ----
     public ?int $category_id = null;
+
     public ?int $brand_id = null;
 
     // ---- Basic info ----
@@ -29,25 +29,32 @@ class Create extends Component
     public string $slug = '';
 
     public ?string $sku = null;
+
     public ?string $hsn_code = null;
 
     // ---- Pricing & inventory ----
     public string $mrp = '';
+
     public string $purchase_price = '';
+
     public string $sale_price = '';
+
     public int $stock = 0;
 
     // ---- Content ----
     public ?string $short_description = null;
+
     public ?string $description = null;
 
     // ---- Flags ----
     public bool $is_featured = false;
+
     public bool $is_active = true;
 
     // ---- Images (temporary uploads, not yet persisted) ----
-    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile[] */
+    /** @var TemporaryUploadedFile[] */
     public array $images = [];
+
     public int $primaryImageIndex = 0;
 
     // ---- Specifications (key/value repeater) ----

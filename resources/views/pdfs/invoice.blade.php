@@ -1,10 +1,9 @@
 @php
-    $company = config('shop.company');
     $order = $invoice->order;
 
     $signaturePath = null;
-    if (! empty($company['signature_path'])) {
-        $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path($company['signature_path']);
+    if (! empty(shop()->signature_path)) {
+        $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path(shop()->signature_path);
         if (file_exists($absolutePath)) {
             $signaturePath = $absolutePath;
         }
@@ -89,11 +88,11 @@
     <table class="header-table">
         <tr>
             <td>
-                <div class="company-name">{{ $company['name'] }}</div>
-                <div class="muted">{{ $company['address_line1'] }}</div>
-                <div class="muted">{{ $company['address_line2'] }}, {{ $company['state'] }}</div>
-                <div class="muted">Phone: {{ $company['phone'] }} &middot; {{ $company['email'] }}</div>
-                <div class="muted">GSTIN: {{ $company['gstin'] }}</div>
+                <div class="company-name">{{ shop()->name }}</div>
+                <div class="muted">{{ shop()->address_line1 }}</div>
+                <div class="muted">{{ shop()->address_line2 }}, {{ shop()->state }}</div>
+                <div class="muted">Phone: {{ shop()->phone }} &middot; {{ shop()->email }}</div>
+                <div class="muted">GSTIN: {{ shop()->gstin }}</div>
             </td>
             <td class="text-right">
                 <div class="muted">Invoice No: <strong>{{ $invoice->invoice_number }}</strong></div>
@@ -198,22 +197,22 @@
         <tr>
             <td>
                 <strong>Bank Details</strong><br>
-                Account Number: {{ $company['bank_account_number'] }}<br>
-                IFSC Code: {{ $company['bank_ifsc'] }}
+                Account Number: {{ shop()->bank_account_number }}<br>
+                IFSC Code: {{ shop()->bank_ifsc }}
             </td>
             <td>
                 <strong>Terms &amp; Conditions</strong>
                 <ul class="terms" style="padding-left: 14px; margin: 4px 0;">
                     <li>Goods once sold will not be taken back or exchanged.</li>
                     <li>Bills unpaid past due date will attract 24% interest.</li>
-                    <li>All disputes subject to {{ $company['state'] }} jurisdiction only.</li>
+                    <li>All disputes subject to {{ shop()->state }} jurisdiction only.</li>
                 </ul>
             </td>
         </tr>
     </table>
 
     <div class="signatory">
-        For {{ $company['name'] }}<br>
+        For {{ shop()->name }}<br>
         @if($signaturePath)
             <img src="{{ $signaturePath }}" alt="Authorised Signatory" style="height: 30px; margin: 6px 0;"><br>
         @else

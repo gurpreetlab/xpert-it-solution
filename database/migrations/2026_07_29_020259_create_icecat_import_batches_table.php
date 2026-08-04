@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            
+
             // Newline-separated "GTIN" or "ProductCode,Brand" entries, kept
             // on the row itself so the queued job doesn't depend on a
             // serialized payload and progress survives a queue restart.

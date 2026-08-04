@@ -36,6 +36,7 @@ return [
         ),
         'bank_ifsc' => env('SHOP_COMPANY_BANK_IFSC', 'IBKL0002092'),
 
-        'signature_path' => env('SHOP_COMPANY_SIGNATURE_PATH'),
+        'signature_path' => env('SHOP_COMPANY_SIGNATURE_PATH', 'storage/signature.png'),
+        'logo_path' => env('SHOP_COMPANY_LOGO_PATH', 'storage/logo.png'),
     ],
 ];

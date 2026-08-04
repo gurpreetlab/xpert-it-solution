@@ -14,7 +14,7 @@
                         <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
                             <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-200 text-zinc-800  dark:bg-white dark:text-zinc-950 shadow-md group-hover:scale-105 transition-transform duration-200">
                                 <!--<x-app-logo-icon class="size-5 fill-current" />-->
-                                <img src="/logo-xpert-it-solution.png"/>
+                                <img src="{{ asset('storage/' . shop()->logo_path) }}" alt="{{ shop()->name }}" />
                             </div>
                             <span class="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
                                 Xpert <span class="text-blue-600 dark:text-blue-500 font-semibold">IT Solution</span>
@@ -92,7 +92,7 @@
                             <div class="flex items-center gap-2 text-white">
                                 <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-200 text-zinc-800  dark:bg-white dark:text-zinc-950 shadow-md group-hover:scale-105 transition-transform duration-200">
                                     <!--<x-app-logo-icon class="size-5 fill-current" />-->
-                                    <img src="/logo-xpert-it-solution.png"/>
+                                    <img src="{{ asset('storage/' . shop()->logo_path) }}" alt="{{ shop()->name }}" />
                                 </div>
                                 <span class="text-lg font-bold">Xpert IT Solution</span>
                             </div>
@@ -121,22 +121,22 @@
                             <ul class="space-y-2 text-xs">
                                 <li class="flex items-center gap-2">
                                     <flux:icon icon="envelope" class="size-4 shrink-0 text-zinc-500" />
-                                    <span>{{ config("shop.company.email") }}</span>
+                                    <span>{{ shop()->email }}</span>
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <flux:icon icon="phone" class="size-4 shrink-0 text-zinc-500" />
-                                    <span>+91 {{ config("shop.company.phone") }}</span>
+                                    <span>+91 {{ shop()->phone }}</span>
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <flux:icon icon="map-pin" class="size-4 shrink-0 text-zinc-500" />
-                                    <span>{{ config("shop.company.address_line1") . ' ' . config("shop.company.address_line2") . ', ' . config("shop.company.state") }}</span>
+                                    <span>{{ shop()->address_line1 . ' ' . shop()->address_line2 . ', ' . shop()->state }}</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
                     <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500">
                         <span>&copy; {{ date('Y') }} Xpert IT Solution. All rights reserved.</span>
-                        <span class="mt-2 sm:mt-0">Designed by Senior UX/UI Engineer</span>
+                        <span class="mt-2 sm:mt-0">Designed by gurpreetlab</span>
                     </div>
                 </div>
             </footer>

@@ -9,6 +9,7 @@ use Livewire\Component;
 class Show extends Component
 {
     public Product $product;
+
     public ?Product $deletingProduct = null;
 
     public function mount(Product $product): void
@@ -51,7 +52,7 @@ class Show extends Component
 
     public function delete()
     {
-        if (!$this->deletingProduct) {
+        if (! $this->deletingProduct) {
             return;
         }
 
@@ -59,6 +60,7 @@ class Show extends Component
         $this->reset('deletingProduct');
         $this->dispatch('product-deleted');
         Flux::toast('Product deleted successfully!');
+
         return $this->redirect(route('dashboard.products.index'), navigate: true);
     }
 

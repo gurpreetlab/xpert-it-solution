@@ -118,7 +118,7 @@ class Checkout extends Component
     #[Computed]
     public function taxAmount(): float
     {
-        return $this->subtotal * (config('shop.gst_rate') / 100);
+        return $this->subtotal * (shop()->gst_rate / 100);
     }
 
     #[Computed]
@@ -130,13 +130,13 @@ class Checkout extends Component
     #[Computed]
     private function cgstAmount(): float
     {
-        return $this->subtotal * (config('shop.cgst_rate') / 100);
+        return $this->subtotal * (shop()->cgst_rate / 100);
     }
 
     #[Computed]
     private function sgstAmount(): float
     {
-        return $this->subtotal * (config('shop.sgst_rate') / 100);
+        return $this->subtotal * (shop()->sgst_rate / 100);
     }
 
     /*
@@ -145,7 +145,7 @@ class Checkout extends Component
     #[Computed]
     private function gstAmount(): float
     {
-        return $this->subtotal * (config('shop.gst_rate') / 100);
+        return $this->subtotal * (shop()->gst_rate / 100);
     }
 
     public function selectAddress($addressId): void
@@ -252,7 +252,7 @@ class Checkout extends Component
             foreach ($this->cartItems as $item) {
                 $lineTaxable = $item->sale_price * $item->quantity;
                 $lineTax = round(
-                    $lineTaxable * (config('shop.gst_rate') / 100),
+                    $lineTaxable * (shop()->gst_rate / 100),
                     2,
                 );
 
@@ -263,11 +263,11 @@ class Checkout extends Component
                     'hsn_code' => $item->product->hsn_code,
                     'unit_price' => $item->sale_price,
                     'mrp' => $item->product->mrp,
-                    'cgst_rate' => config('shop.cgst_rate'),
+                    'cgst_rate' => shop()->cgst_rate,
                     'cgst_amount' => $this->cgstAmount(),
-                    'sgst_rate' => config('shop.sgst_rate'),
+                    'sgst_rate' => shop()->sgst_rate,
                     'sgst_amount' => $this->sgstAmount(),
-                    'gst_rate' => config('shop.gst_rate'),
+                    'gst_rate' => shop()->gst_rate,
                     'gst_amount' => $this->gstAmount(),
                     'quantity' => $item->quantity,
                 ]);
@@ -334,7 +334,7 @@ class Checkout extends Component
                 'razorpay_payment_id' => $razorpayPaymentId,
                 'razorpay_signature' => $razorpaySignature,
             ]);
-        } catch (SignatureVerificationError $e) {
+        } catch (SignatureVerificationError) {
             $order->update(['payment_status' => 'failed']);
             $this->dispatch(
                 'cart-toast',

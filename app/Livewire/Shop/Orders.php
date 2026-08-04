@@ -16,14 +16,14 @@ class Orders extends Component
     {
         return Auth::user()
             ->orders()
-            ->withCount("items")
+            ->withCount('items')
             ->latest()
             ->paginate(8);
     }
 
-    #[Layout("layouts.blank")]
+    #[Layout('layouts.blank')]
     public function render()
     {
-        return view("livewire.shop.orders");
+        return view('livewire.shop.orders');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 // Path: app/Livewire/Admin/Products/Edit.php
 // Register with implicit model binding, e.g.:
 // Route::get('/dashboard/products/{product}/edit', Edit::class)->name('dashboard.products.edit');
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 class Edit extends Component
@@ -25,6 +27,7 @@ class Edit extends Component
 
     // ---- Relations ----
     public ?int $category_id = null;
+
     public ?int $brand_id = null;
 
     // ---- Basic info ----
@@ -36,20 +39,26 @@ class Edit extends Component
     public string $slug = '';
 
     public ?string $sku = null;
+
     public ?string $hsn_code = null;
 
     // ---- Pricing & inventory ----
     public string $mrp = '';
+
     public string $purchase_price = '';
+
     public string $sale_price = '';
+
     public int $stock = 0;
 
     // ---- Content ----
     public ?string $short_description = null;
+
     public ?string $description = null;
 
     // ---- Flags ----
     public bool $is_featured = false;
+
     public bool $is_active = true;
 
     // ---- Images ----
@@ -62,7 +71,7 @@ class Edit extends Component
     public array $removedImageIds = [];
 
     // Newly staged uploads, not yet persisted.
-    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile[] */
+    /** @var TemporaryUploadedFile[] */
     public array $newImages = [];
 
     // Which image is primary, across both groups: "existing-{id}" or "new-{index}".
@@ -352,7 +361,7 @@ class Edit extends Component
             $oldIndex = (int) str_replace('new-', '', $this->primaryImageKey);
 
             if ($oldIndex > $index) {
-                $this->primaryImageKey = 'new-' . ($oldIndex - 1);
+                $this->primaryImageKey = 'new-'.($oldIndex - 1);
             }
         }
 

@@ -23,9 +23,7 @@ class ProcessIcecatImportBatch implements ShouldQueue
 
     public int $tries = 1; // a partial re-run would re-process already-imported lines; retry manually via the UI instead
 
-    public function __construct(public int $batchId)
-    {
-    }
+    public function __construct(public int $batchId) {}
 
     public function handle(IcecatProductImporter $importer): void
     {
@@ -35,7 +33,7 @@ class ProcessIcecatImportBatch implements ShouldQueue
             return;
         }
 
-        $lines = array_values(array_filter(array_map('trim', explode("\n", $batch->raw_input))));
+        $lines = array_values(array_filter(array_map(trim(...), explode("\n", $batch->raw_input))));
 
         $batch->update([
             'status' => 'processing',

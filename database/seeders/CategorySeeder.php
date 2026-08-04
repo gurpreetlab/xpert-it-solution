@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\Category;
 
 class CategorySeeder extends Seeder
 {
@@ -15,17 +14,17 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            "Networking",
-            "CCTV & Security",
-            "Storage",
-            "Computer Peripherals",
-            "Power & Accessories",
-            "Printing",
+            'Networking',
+            'CCTV & Security',
+            'Storage',
+            'Computer Peripherals',
+            'Power & Accessories',
+            'Printing',
         ];
 
         DB::transaction(function () use ($categories) {
             foreach ($categories as $category) {
-                Category::firstOrCreate(["name" => $category]);
+                Category::firstOrCreate(['name' => $category]);
             }
         }, attempts: 5);
     }

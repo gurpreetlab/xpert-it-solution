@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'type',
     'alt_text',
     'is_primary',
-    'sort_order'
+    'sort_order',
 ])]
 class ProductImage extends Model
 {

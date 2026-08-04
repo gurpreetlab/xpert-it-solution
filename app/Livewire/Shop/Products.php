@@ -10,7 +10,7 @@ use Livewire\WithPagination;
 #[Layout('layouts.blank')]
 class Products extends Component
 {
-    use WithPagination, HandlesProductCatalog;
+    use HandlesProductCatalog, WithPagination;
 
     public function render()
     {

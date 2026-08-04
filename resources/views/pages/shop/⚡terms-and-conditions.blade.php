@@ -170,7 +170,7 @@ new #[Layout('layouts::blank')] class extends Component
                     10. Governing Law
                 </h2>
                 <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                    These Terms &amp; Conditions are governed by the laws of India. Any disputes arising out of or in connection with these terms shall be subject to the exclusive jurisdiction of the courts located in {{ config('shop.company.state') }}.
+                    These Terms &amp; Conditions are governed by the laws of India. Any disputes arising out of or in connection with these terms shall be subject to the exclusive jurisdiction of the courts located in {{ shop()->state }}.
                 </p>
             </section>
 
@@ -186,15 +186,15 @@ new #[Layout('layouts::blank')] class extends Component
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                     <div class="flex items-center gap-2">
                         <flux:icon icon="envelope" class="size-4 shrink-0 text-zinc-500" />
-                        <span>{{ config('shop.company.email') }}</span>
+                        <span>{{ shop()->email }}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <flux:icon icon="phone" class="size-4 shrink-0 text-zinc-500" />
-                        <span>+91 {{ config('shop.company.phone') }}</span>
+                        <span>+91 {{ shop()->phone }}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <flux:icon icon="map-pin" class="size-4 shrink-0 text-zinc-500" />
-                        <span>{{ config('shop.company.address_line1') . ' ' . config('shop.company.address_line2') . ', ' . config('shop.company.state') }}</span>
+                        <span>{{ shop()->address_line1 }}, {{ shop()->address_line2 }}, {{ shop()->state }}</span>
                     </div>
                 </div>
             </section>

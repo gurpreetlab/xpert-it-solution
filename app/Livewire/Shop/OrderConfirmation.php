@@ -15,12 +15,12 @@ class OrderConfirmation extends Component
     {
         abort_unless($order->user_id === Auth::id(), 403);
 
-        $this->order = $order->load("items.product", "address");
+        $this->order = $order->load('items.product', 'address');
     }
 
-    #[Layout("layouts.blank")]
+    #[Layout('layouts.blank')]
     public function render()
     {
-        return view("livewire.shop.order-confirmation");
+        return view('livewire.shop.order-confirmation');
     }
 }

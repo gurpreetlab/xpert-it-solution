@@ -16,9 +16,7 @@ use Illuminate\Support\Str;
 
 class IcecatProductImporter
 {
-    public function __construct(protected IcecatService $icecatService)
-    {
-    }
+    public function __construct(protected IcecatService $icecatService) {}
 
     /**
      * Imports a list of "GTIN" or "ProductCode,Brand" lines into the given
@@ -58,7 +56,7 @@ class IcecatProductImporter
             } catch (\Throwable $e) {
                 report($e);
                 $skipped++;
-                $failures[] = ['term' => $searchTerm, 'reason' => 'Unexpected error: ' . $e->getMessage()];
+                $failures[] = ['term' => $searchTerm, 'reason' => 'Unexpected error: '.$e->getMessage()];
             }
 
             if ($onProgress) {
@@ -98,7 +96,7 @@ class IcecatProductImporter
                     ['icecat_brand_id' => (int) $icecatBrandId],
                     [
                         'name' => $supplierName ?: 'Unknown Brand',
-                        'slug' => Str::slug($supplierName ?: 'brand-' . $icecatBrandId),
+                        'slug' => Str::slug($supplierName ?: 'brand-'.$icecatBrandId),
                     ]
                 );
                 $brandId = $brand->id;
@@ -128,8 +126,8 @@ class IcecatProductImporter
                     'category_id' => $category->id,
                     'brand_id' => $brandId,
                     'name' => $name,
-                    'slug' => Str::slug($name . '-' . ($mpn ?: $icecatId)),
-                    'sku' => $mpn ?: ('ICECAT-' . $icecatId),
+                    'slug' => Str::slug($name.'-'.($mpn ?: $icecatId)),
+                    'sku' => $mpn ?: ('ICECAT-'.$icecatId),
                     'mpn' => $mpn,
                     'gtin' => $gtin,
                     'short_description' => $shortDesc,
@@ -235,11 +233,12 @@ class IcecatProductImporter
 
             if (! $response instanceof Response || $response->failed()) {
                 report(new \RuntimeException("Icecat import: failed to download image for product #{$product->id}: {$candidate['url']}"));
+
                 continue;
             }
 
             $extension = strtolower(pathinfo(parse_url($candidate['url'], PHP_URL_PATH) ?? '', PATHINFO_EXTENSION)) ?: 'jpg';
-            $relativePath = "{$directory}/" . (string) Str::uuid() . '.' . $extension;
+            $relativePath = "{$directory}/".(string) Str::uuid().'.'.$extension;
 
             Storage::disk('public')->put($relativePath, $response->body());
 

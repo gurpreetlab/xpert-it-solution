@@ -5,39 +5,39 @@ namespace App\Support;
 class IndianNumberToWords
 {
     private static array $ones = [
-        "",
-        "One",
-        "Two",
-        "Three",
-        "Four",
-        "Five",
-        "Six",
-        "Seven",
-        "Eight",
-        "Nine",
-        "Ten",
-        "Eleven",
-        "Twelve",
-        "Thirteen",
-        "Fourteen",
-        "Fifteen",
-        "Sixteen",
-        "Seventeen",
-        "Eighteen",
-        "Nineteen",
+        '',
+        'One',
+        'Two',
+        'Three',
+        'Four',
+        'Five',
+        'Six',
+        'Seven',
+        'Eight',
+        'Nine',
+        'Ten',
+        'Eleven',
+        'Twelve',
+        'Thirteen',
+        'Fourteen',
+        'Fifteen',
+        'Sixteen',
+        'Seventeen',
+        'Eighteen',
+        'Nineteen',
     ];
 
     private static array $tens = [
-        "",
-        "",
-        "Twenty",
-        "Thirty",
-        "Forty",
-        "Fifty",
-        "Sixty",
-        "Seventy",
-        "Eighty",
-        "Ninety",
+        '',
+        '',
+        'Twenty',
+        'Thirty',
+        'Forty',
+        'Fifty',
+        'Sixty',
+        'Seventy',
+        'Eighty',
+        'Ninety',
     ];
 
     /**
@@ -49,15 +49,15 @@ class IndianNumberToWords
         $rupees = (int) floor($amount);
         $paise = (int) round(($amount - $rupees) * 100);
 
-        $words = "Rupees " . self::convertWholeNumber($rupees) . " Only";
+        $words = 'Rupees '.self::convertWholeNumber($rupees).' Only';
 
         if ($paise > 0) {
             $words =
-                "Rupees " .
-                self::convertWholeNumber($rupees) .
-                " and " .
-                self::convertWholeNumber($paise) .
-                " Paise Only";
+                'Rupees '.
+                self::convertWholeNumber($rupees).
+                ' and '.
+                self::convertWholeNumber($paise).
+                ' Paise Only';
         }
 
         return $words;
@@ -66,7 +66,7 @@ class IndianNumberToWords
     private static function convertWholeNumber(int $number): string
     {
         if ($number === 0) {
-            return "Zero";
+            return 'Zero';
         }
 
         $crore = intdiv($number, 10000000);
@@ -81,22 +81,22 @@ class IndianNumberToWords
         $parts = [];
 
         if ($crore > 0) {
-            $parts[] = self::convertTwoDigits($crore) . " Crore";
+            $parts[] = self::convertTwoDigits($crore).' Crore';
         }
         if ($lakh > 0) {
-            $parts[] = self::convertTwoDigits($lakh) . " Lakh";
+            $parts[] = self::convertTwoDigits($lakh).' Lakh';
         }
         if ($thousand > 0) {
-            $parts[] = self::convertTwoDigits($thousand) . " Thousand";
+            $parts[] = self::convertTwoDigits($thousand).' Thousand';
         }
         if ($hundred > 0) {
-            $parts[] = self::$ones[$hundred] . " Hundred";
+            $parts[] = self::$ones[$hundred].' Hundred';
         }
         if ($remainder > 0) {
             $parts[] = self::convertTwoDigits($remainder);
         }
 
-        return implode(" ", $parts);
+        return implode(' ', $parts);
     }
 
     private static function convertTwoDigits(int $number): string
@@ -108,6 +108,6 @@ class IndianNumberToWords
         $ten = intdiv($number, 10);
         $one = $number % 10;
 
-        return trim(self::$tens[$ten] . " " . self::$ones[$one]);
+        return trim(self::$tens[$ten].' '.self::$ones[$one]);
     }
 }

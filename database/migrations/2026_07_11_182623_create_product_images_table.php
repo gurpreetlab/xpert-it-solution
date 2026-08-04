@@ -19,11 +19,11 @@ return new class extends Migration
             $table->string('source_url')->nullable(); // the external Icecat URL
             $table->enum('source', ['manual', 'icecat'])->default('manual');
             $table->enum('type', ['main', 'gallery', 'thumbnail'])->default('gallery');
-             $table->string('alt_text')->nullable();
+            $table->string('alt_text')->nullable();
 
             $table->boolean('is_primary')->default(false);
             $table->unsignedSmallInteger('sort_order')->default(0);
-            
+
             $table->timestamps();
         });
     }

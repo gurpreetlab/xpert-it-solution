@@ -12,18 +12,18 @@ class Index extends Component
 {
     use WithPagination;
 
-    public string $search = "";
+    public string $search = '';
 
     public function updating(string $property): void
     {
-        if (in_array($property, ["search"], true)) {
+        if (in_array($property, ['search'], true)) {
             $this->resetPage();
         }
     }
 
     public function clearFilters(): void
     {
-        $this->reset(["search"]);
+        $this->reset(['search']);
         $this->resetPage();
     }
 
@@ -31,36 +31,36 @@ class Index extends Component
     public function invoices(): LengthAwarePaginator
     {
         return Invoice::query()
-            ->with(["order.user:id,name,email"])
-            ->when($this->search !== "", function ($query) {
+            ->with(['order.user:id,name,email'])
+            ->when($this->search !== '', function ($query) {
                 $query->where(function ($q) {
                     $q->where(
-                        "invoice_number",
-                        "like",
+                        'invoice_number',
+                        'like',
                         "%{$this->search}%",
-                    )->orWhereHas("order", function ($oq) {
+                    )->orWhereHas('order', function ($oq) {
                         $oq->where(
-                            "order_number",
-                            "like",
+                            'order_number',
+                            'like',
                             "%{$this->search}%",
-                        )->orWhereHas("user", function ($uq) {
+                        )->orWhereHas('user', function ($uq) {
                             $uq->where(
-                                "name",
-                                "like",
+                                'name',
+                                'like',
                                 "%{$this->search}%",
-                            )->orWhere("email", "like", "%{$this->search}%");
+                            )->orWhere('email', 'like', "%{$this->search}%");
                         });
                     });
                 });
             })
-            ->latest("invoice_date")
+            ->latest('invoice_date')
             ->paginate(10);
     }
 
     public function render()
     {
-        return view("livewire.admin.invoices.index", [
-            "invoices" => $this->invoices,
+        return view('livewire.admin.invoices.index', [
+            'invoices' => $this->invoices,
         ]);
     }
 }

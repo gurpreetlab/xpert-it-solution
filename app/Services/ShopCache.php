@@ -7,29 +7,28 @@ namespace App\Services;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Support\Facades\Cache;
 
 final class ShopCache
 {
     public static function categories()
     {
         return Category::query()
-            ->select("id", "name", "slug")
+            ->select('id', 'name', 'slug')
             ->withCount([
-                "products" => fn($query) => $query->where("is_active", true),
+                'products' => fn ($query) => $query->where('is_active', true),
             ])
-            ->orderBy("name")
+            ->orderBy('name')
             ->get();
     }
 
     public static function brands()
     {
         return Brand::query()
-            ->select("id", "name", "slug", "logo")
+            ->select('id', 'name', 'slug', 'logo')
             ->withCount([
-                "products" => fn($query) => $query->where("is_active", true),
+                'products' => fn ($query) => $query->where('is_active', true),
             ])
-            ->orderBy("name")
+            ->orderBy('name')
             ->get();
     }
 
@@ -37,25 +36,25 @@ final class ShopCache
     {
         return Product::query()
             ->select([
-                "id",
-                "category_id",
-                "brand_id",
-                "name",
-                "slug",
-                "sale_price",
-                "mrp",
-                "stock",
-                "is_featured",
-                "sku",
-                "short_description"
+                'id',
+                'category_id',
+                'brand_id',
+                'name',
+                'slug',
+                'sale_price',
+                'mrp',
+                'stock',
+                'is_featured',
+                'sku',
+                'short_description',
             ])
             ->with([
-                "category:id,name,slug",
-                "brand:id,name,logo",
-                "primaryImage",
+                'category:id,name,slug',
+                'brand:id,name,logo',
+                'primaryImage',
             ])
-            ->where("is_active", true)
-            ->where("is_featured", true)
+            ->where('is_active', true)
+            ->where('is_featured', true)
             ->latest()
             ->limit(6)
             ->get();
@@ -63,7 +62,7 @@ final class ShopCache
 
     public static function totalProductsCount(): int
     {
-        return Product::query()->where("is_active", true)->count();
+        return Product::query()->where('is_active', true)->count();
     }
 
     public static function productsListKey(
@@ -72,7 +71,7 @@ final class ShopCache
         string $sort,
         int $page,
     ): string {
-        return "";
+        return '';
     }
 
     public static function rememberProducts(

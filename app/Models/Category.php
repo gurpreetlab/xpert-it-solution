@@ -10,29 +10,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
-    "parent_id",
-    "name",
-    "slug",
-    "description",
-    "image",
-    "icecat_category_id",
-    "sort_order",
-    "is_active"
+    'parent_id',
+    'name',
+    'slug',
+    'description',
+    'image',
+    'icecat_category_id',
+    'sort_order',
+    'is_active',
 ])]
 class Category extends Model
 {
-    use SoftDeletes, HasSlug;
+    use HasSlug, SoftDeletes;
 
     protected $casts = [
-        "product_count" => "integer",
+        'product_count' => 'integer',
     ];
 
     /**
      * Scope a query to search for categories by name.
-     *
-     * @param Builder $query
-     * @param string|null $search
-     * @return Builder
      */
     public function scopeSearch(Builder $query, ?string $search): Builder
     {

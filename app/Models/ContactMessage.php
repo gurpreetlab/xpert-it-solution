@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['name', 'email', 'phone', 'subject', 'message', 'user_id', 'read_at'])]
 class ContactMessage extends Model
 {
+    #[\Override]
     protected function casts(): array
     {
         return [

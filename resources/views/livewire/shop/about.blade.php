@@ -22,7 +22,7 @@
                 Building Reliable IT Infrastructure for Growing Businesses
             </h1>
             <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
-                {{ config('shop.company.name', 'Xpert IT Solution') }} is a premium supplier of IT infrastructure, CCTV surveillance and networking systems, enterprise back-ups, and storage solutions — trusted by businesses who need equipment that just works.
+                {{ shop()->name }} is a premium supplier of IT infrastructure, CCTV surveillance and networking systems, enterprise back-ups, and storage solutions — trusted by businesses who need equipment that just works.
             </p>
         </div>
     </section>
