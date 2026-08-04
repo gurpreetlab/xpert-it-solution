@@ -65,7 +65,7 @@ class Create extends Component
     public function mount(): void
     {
         $this->specifications = [
-            ['key' => '', 'value' => ''],
+            ['group_name' => '', 'key' => '', 'value' => ''],
         ];
     }
 
@@ -104,6 +104,7 @@ class Create extends Component
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:2048'],
 
+            'specifications.*.group_name' => ['nullable', 'string', 'max:255'],
             'specifications.*.key' => ['nullable', 'string', 'max:255', 'required_with:specifications.*.value'],
             'specifications.*.value' => ['nullable', 'string', 'required_with:specifications.*.key'],
         ];
@@ -211,7 +212,7 @@ class Create extends Component
 
     public function addSpecification(): void
     {
-        $this->specifications[] = ['key' => '', 'value' => ''];
+        $this->specifications[] = ['group_name' => '', 'key' => '', 'value' => ''];
     }
 
     public function removeSpecification(int $index): void
@@ -220,7 +221,7 @@ class Create extends Component
         $this->specifications = array_values($this->specifications);
 
         if (empty($this->specifications)) {
-            $this->specifications = [['key' => '', 'value' => '']];
+            $this->specifications = [['group_name' => '', 'key' => '', 'value' => '']];
         }
     }
 
@@ -358,6 +359,7 @@ class Create extends Component
             $sortOrder = 0;
 
             foreach ($this->specifications as $spec) {
+                $groupName = trim($spec['group_name'] ?? '');
                 $key = $spec['key'];
                 $value = $spec['value'];
 
@@ -366,6 +368,7 @@ class Create extends Component
                 }
 
                 $product->specifications()->create([
+                    'group_name' => $groupName !== '' ? $groupName : null,
                     'key' => $key,
                     'value' => $value,
                     'sort_order' => $sortOrder++,

@@ -76,16 +76,24 @@
             <!-- Specifications -->
             <flux:card class="bg-(--callout-background)">
                 <flux:heading size="lg">Specifications</flux:heading>
-                <div class="mt-4 divide-y divide-zinc-100 dark:divide-zinc-700">
-                    @forelse ($product->specifications as $spec)
-                        <div class="flex items-start justify-between gap-4 py-2.5">
-                            <flux:text>{{ $spec->key }}</flux:text>
-                            <flux:text>{{ $spec->value }}</flux:text>
+
+                @forelse ($product->specifications->groupBy(fn ($spec) => $spec->group_name ?: 'Other') as $groupName => $specs)
+                    <div class="mt-4">
+                        <flux:heading size="sm" class="text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+                            {{ $groupName }}
+                        </flux:heading>
+                        <div class="divide-y divide-zinc-100 dark:divide-zinc-700">
+                            @foreach ($specs as $spec)
+                                <div class="flex items-start justify-between gap-4 py-2.5">
+                                    <flux:text>{{ $spec->key }}</flux:text>
+                                    <flux:text>{{ $spec->value }}</flux:text>
+                                </div>
+                            @endforeach
                         </div>
-                    @empty
-                        <flux:text class="mt-4">No specifications added.</flux:text>
-                    @endforelse
-                </div>
+                    </div>
+                @empty
+                    <flux:text class="mt-4">No specifications added.</flux:text>
+                @endforelse
             </flux:card>
         </div>
 

@@ -139,11 +139,11 @@
                             Add Row
                         </flux:button>
                     </div>
-                    <flux:text class="text-zinc-500">Extra attributes like Material, Size, Weight, Color, etc.</flux:text>
+                    <flux:text class="text-zinc-500">Extra attributes like Material, Size, Weight, Color, etc. Group related specs together (e.g. "General", "Connectivity", "Power") — rows left blank are grouped as "Other".</flux:text>
 
                     <div class="space-y-3">
                         @foreach ($specifications as $index => $spec)
-                            <div wire:key="spec-{{ $index }}" class="flex items-start gap-2">
+                            <div wire:key="spec-{{ $index }}" class="flex items-start gap-2 rounded-lg border border-zinc-200 dark:border-zinc-700 p-3">
                                 <div class="flex flex-col">
                                     <flux:button
                                         size="sm" class="h-5!" variant="ghost" icon="chevron-up"
@@ -157,14 +157,21 @@
                                     />
                                 </div>
 
-                                <div class="flex-1">
-                                    <flux:input wire:model="specifications.{{ $index }}.key" placeholder="e.g. Material" />
-                                    <flux:error name="specifications.{{ $index }}.key" class="mt-1!" />
-                                </div>
+                                <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <div>
+                                        <flux:input wire:model="specifications.{{ $index }}.group_name" placeholder="Group (e.g. General)" />
+                                        <flux:error name="specifications.{{ $index }}.group_name" class="mt-1!" />
+                                    </div>
 
-                                <div class="flex-1">
-                                    <flux:input wire:model="specifications.{{ $index }}.value" placeholder="e.g. 100% Cotton" />
-                                    <flux:error name="specifications.{{ $index }}.value" class="mt-1!" />
+                                    <div>
+                                        <flux:input wire:model="specifications.{{ $index }}.key" placeholder="e.g. Material" />
+                                        <flux:error name="specifications.{{ $index }}.key" class="mt-1!" />
+                                    </div>
+
+                                    <div>
+                                        <flux:input wire:model="specifications.{{ $index }}.value" placeholder="e.g. 100% Cotton" />
+                                        <flux:error name="specifications.{{ $index }}.value" class="mt-1!" />
+                                    </div>
                                 </div>
 
                                 <flux:button

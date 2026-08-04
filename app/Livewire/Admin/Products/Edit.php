@@ -128,9 +128,13 @@ class Edit extends Component
 
         $this->specifications = $product->specifications->isNotEmpty()
             ? $product->specifications
-                ->map(fn ($spec) => $spec instanceof ProductSpecification ? ['key' => $spec->key, 'value' => $spec->value] : ['key' => '', 'value' => ''])
+                ->map(fn ($spec) => $spec instanceof ProductSpecification ? [
+                    'group_name' => $spec->group_name ?? '',
+                    'key' => $spec->key,
+                    'value' => $spec->value,
+                ] : ['group_name' => '', 'key' => '', 'value' => ''])
                 ->toArray()
-            : [['key' => '', 'value' => '']];
+            : [['group_name' => '', 'key' => '', 'value' => '']];
     }
 
     /** @return array<string, mixed> */
@@ -168,6 +172,7 @@ class Edit extends Component
             'newImages' => ['nullable', 'array'],
             'newImages.*' => ['image', 'max:2048'],
 
+            'specifications.*.group_name' => ['nullable', 'string', 'max:255'],
             'specifications.*.key' => ['nullable', 'string', 'max:255', 'required_with:specifications.*.value'],
             'specifications.*.value' => ['nullable', 'string', 'required_with:specifications.*.key'],
         ];
@@ -271,7 +276,7 @@ class Edit extends Component
 
     public function addSpecification(): void
     {
-        $this->specifications[] = ['key' => '', 'value' => ''];
+        $this->specifications[] = ['group_name' => '', 'key' => '', 'value' => ''];
     }
 
     public function removeSpecification(int $index): void
@@ -280,7 +285,7 @@ class Edit extends Component
         $this->specifications = array_values($this->specifications);
 
         if (empty($this->specifications)) {
-            $this->specifications = [['key' => '', 'value' => '']];
+            $this->specifications = [['group_name' => '', 'key' => '', 'value' => '']];
         }
     }
 
@@ -499,6 +504,7 @@ class Edit extends Component
             $sortOrder = 0;
 
             foreach ($this->specifications as $spec) {
+                $groupName = trim($spec['group_name'] ?? '');
                 $key = $spec['key'];
                 $value = $spec['value'];
 
@@ -507,6 +513,7 @@ class Edit extends Component
                 }
 
                 $this->product->specifications()->create([
+                    'group_name' => $groupName !== '' ? $groupName : null,
                     'key' => $key,
                     'value' => $value,
                     'sort_order' => $sortOrder++,
