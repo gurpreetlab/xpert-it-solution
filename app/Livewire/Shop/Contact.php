@@ -3,6 +3,7 @@
 namespace App\Livewire\Shop;
 
 use App\Models\ContactMessage;
+use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -18,6 +19,9 @@ class Contact extends Component
 
     public string $message = '';
 
+    /**
+     * @return array<string, array<int, string>|string>
+     */
     protected function rules(): array
     {
         return [
@@ -29,6 +33,9 @@ class Contact extends Component
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function messages(): array
     {
         return [
@@ -51,7 +58,7 @@ class Contact extends Component
     }
 
     #[Layout('layouts.blank')]
-    public function render()
+    public function render(): View
     {
         return view('livewire.shop.contact');
     }

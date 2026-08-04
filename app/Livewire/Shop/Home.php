@@ -3,8 +3,9 @@
 namespace App\Livewire\Shop;
 
 use App\Livewire\Shop\Concerns\HandlesProductCatalog;
+use App\Models\Product;
 use App\Services\ShopCache;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -16,8 +17,11 @@ class Home extends Component
 {
     use HandlesProductCatalog, WithPagination;
 
+    /**
+     * @return EloquentCollection<int, Product>
+     */
     #[Computed]
-    public function featuredProducts(): Collection
+    public function featuredProducts(): EloquentCollection
     {
         return ShopCache::featuredProducts();
     }

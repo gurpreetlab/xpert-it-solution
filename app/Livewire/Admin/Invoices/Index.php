@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Invoices;
 
 use App\Models\Invoice;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -27,6 +28,7 @@ class Index extends Component
         $this->resetPage();
     }
 
+    /** @return LengthAwarePaginator<int, Invoice> */
     #[Computed]
     public function invoices(): LengthAwarePaginator
     {
@@ -57,10 +59,10 @@ class Index extends Component
             ->paginate(10);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.invoices.index', [
-            'invoices' => $this->invoices,
+            'invoices' => $this->invoices(),
         ]);
     }
 }

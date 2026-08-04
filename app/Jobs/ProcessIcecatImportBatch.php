@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Category;
 use App\Models\IcecatImportBatch;
 use App\Services\IcecatProductImporter;
 use Illuminate\Bus\Queueable;
@@ -34,6 +35,12 @@ class ProcessIcecatImportBatch implements ShouldQueue
         }
 
         $lines = array_values(array_filter(array_map(trim(...), explode("\n", $batch->raw_input))));
+
+        if (! $batch->category instanceof Category) {
+            $batch->update(['status' => 'failed', 'error' => 'Batch category was not found.']);
+
+            return;
+        }
 
         $batch->update([
             'status' => 'processing',

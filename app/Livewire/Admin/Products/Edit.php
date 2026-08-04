@@ -10,7 +10,9 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductSpecification;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -65,9 +67,11 @@ class Edit extends Component
     // Already-persisted images, loaded from the product. Each entry:
     // ['id' => int, 'path' => string]. Reordering/removal here only
     // changes this array — nothing touches the database until save().
+    /** @var array<int, array{id: int, path: string}> */
     public array $existingImages = [];
 
     // IDs of existing images the user removed, actually deleted on save().
+    /** @var array<int, int> */
     public array $removedImageIds = [];
 
     // Newly staged uploads, not yet persisted.
@@ -78,6 +82,7 @@ class Edit extends Component
     public ?string $primaryImageKey = null;
 
     // ---- Specifications (key/value repeater) ----
+    /** @var array<int, array{key: string, value: string}> */
     public array $specifications = [];
 
     public function mount(Product $product): void
@@ -104,11 +109,16 @@ class Edit extends Component
         $this->is_featured = $product->is_featured;
         $this->is_active = $product->is_active;
 
-        $this->existingImages = $product->images->map(fn ($image) => [
-            'id' => $image->id,
-            'path' => $image->path,
-        ])->toArray();
+        $this->existingImages = $product->images
+            ->map(fn ($image) => $image instanceof ProductImage ? [
+                'id' => $image->id,
+                'path' => $image->path,
+            ] : null)
+            ->filter()
+            ->values()
+            ->toArray();
 
+        /** @var ProductImage|null $primary */
         $primary = $product->images->firstWhere('is_primary', true);
         $this->primaryImageKey = match (true) {
             $primary !== null => "existing-{$primary->id}",
@@ -117,10 +127,13 @@ class Edit extends Component
         };
 
         $this->specifications = $product->specifications->isNotEmpty()
-            ? $product->specifications->map(fn ($spec) => ['key' => $spec->key, 'value' => $spec->value])->toArray()
+            ? $product->specifications
+                ->map(fn ($spec) => $spec instanceof ProductSpecification ? ['key' => $spec->key, 'value' => $spec->value] : ['key' => '', 'value' => ''])
+                ->toArray()
             : [['key' => '', 'value' => '']];
     }
 
+    /** @return array<string, mixed> */
     protected function rules(): array
     {
         return [
@@ -160,6 +173,7 @@ class Edit extends Component
         ];
     }
 
+    /** @return array<string, string> */
     protected function validationAttributes(): array
     {
         return [
@@ -179,6 +193,7 @@ class Edit extends Component
         ];
     }
 
+    /** @return array<string, string> */
     protected function messages(): array
     {
         return [
@@ -420,7 +435,7 @@ class Edit extends Component
 
     // ---- Save ----
 
-    public function save()
+    public function save(): mixed
     {
         // Guarantee the slug is fresh and unique right before validating.
         $this->slug = $this->generateUniqueSlug($this->name);
@@ -484,13 +499,16 @@ class Edit extends Component
             $sortOrder = 0;
 
             foreach ($this->specifications as $spec) {
-                if (trim($spec['key'] ?? '') === '' || trim($spec['value'] ?? '') === '') {
+                $key = $spec['key'];
+                $value = $spec['value'];
+
+                if (trim($key) === '' || trim($value) === '') {
                     continue;
                 }
 
                 $this->product->specifications()->create([
-                    'key' => $spec['key'],
-                    'value' => $spec['value'],
+                    'key' => $key,
+                    'value' => $value,
                     'sort_order' => $sortOrder++,
                 ]);
             }
@@ -501,7 +519,7 @@ class Edit extends Component
         return $this->redirect(route('dashboard.products.index'), navigate: true);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.products.edit', [
             'categories' => Category::orderBy('name')->get(['id', 'name']),

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Orders;
 
 use App\Models\Order;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class Show extends Component
@@ -29,7 +30,7 @@ class Show extends Component
         Flux::toast('Order status updated successfully!');
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.orders.show');
     }

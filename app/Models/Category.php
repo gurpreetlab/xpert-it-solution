@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int|null $products_count
+ */
 #[Fillable([
     'parent_id',
     'name',
@@ -25,10 +28,14 @@ class Category extends Model
 
     protected $casts = [
         'product_count' => 'integer',
+        'products_count' => 'integer',
     ];
 
     /**
      * Scope a query to search for categories by name.
+     *
+     * @param  Builder<Category>  $query
+     * @return Builder<Category>
      */
     public function scopeSearch(Builder $query, ?string $search): Builder
     {
@@ -39,6 +46,8 @@ class Category extends Model
 
     /**
      * Get the products that belong to this category.
+     *
+     * @return HasMany<Product, $this>
      */
     public function products(): HasMany
     {

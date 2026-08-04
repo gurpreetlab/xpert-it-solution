@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -13,10 +14,13 @@ class Dashboard extends Component
 {
     protected int $lowStockThreshold = 10;
 
+    /**
+     * @return array<string, int|float>
+     */
     #[Computed]
     public function stats(): array
     {
-        $totalRevenue = Order::where('payment_status', 'paid')->sum('total');
+        $totalRevenue = (float) Order::where('payment_status', 'paid')->sum('total');
 
         $thisMonthRevenue = Order::where('payment_status', 'paid')
             ->whereMonth('created_at', now()->month)
@@ -85,6 +89,9 @@ class Dashboard extends Component
     /**
      * Paid revenue for the trailing 6 months, oldest first, for the trend chart.
      */
+    /**
+     * @return array{labels: array<int, string>, data: array<int, float>}
+     */
     #[Computed]
     public function revenueTrend(): array
     {
@@ -105,6 +112,7 @@ class Dashboard extends Component
         return ['labels' => $labels, 'data' => $data];
     }
 
+    /** @return Collection<string, int> */
     #[Computed]
     public function ordersByStatus(): Collection
     {
@@ -113,12 +121,18 @@ class Dashboard extends Component
             ->pluck('count', 'status');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Order>
+     */
     #[Computed]
     public function recentOrders(): Collection
     {
         return Order::with('user:id,name,email')->latest()->limit(8)->get();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, OrderItem>
+     */
     #[Computed]
     public function topProducts(): Collection
     {
@@ -132,6 +146,9 @@ class Dashboard extends Component
             ->get();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Product>
+     */
     #[Computed]
     public function lowStockProducts(): Collection
     {
@@ -142,7 +159,7 @@ class Dashboard extends Component
             ->get(['id', 'name', 'sku', 'stock']);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.dashboard');
     }

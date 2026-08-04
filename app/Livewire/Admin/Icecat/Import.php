@@ -6,6 +6,8 @@ use App\Jobs\ProcessIcecatImportBatch;
 use App\Models\Category;
 use App\Models\IcecatImportBatch;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
@@ -17,6 +19,8 @@ class Import extends Component
      * Each row is an independent category + line-list pair, so one
      * submission can queue several categories at once instead of the
      * CLI's one-category-per-run limitation.
+     *
+     * @var array<int, array{key: string, category_id: string, input: string}>
      */
     public array $rows = [];
 
@@ -25,6 +29,7 @@ class Import extends Component
         $this->rows = [$this->blankRow()];
     }
 
+    /** @return array{key: string, category_id: string, input: string} */
     protected function blankRow(): array
     {
         return ['key' => (string) Str::uuid(), 'category_id' => '', 'input' => ''];
@@ -81,14 +86,20 @@ class Import extends Component
         Flux::toast(variant: 'success', text: "{$queued} import batch(es) queued. Track progress below.");
     }
 
+    /**
+     * @return Collection<int, Category>
+     */
     #[Computed]
-    public function categories()
+    public function categories(): Collection
     {
         return Category::orderBy('name')->get(['id', 'name']);
     }
 
+    /**
+     * @return Collection<int, IcecatImportBatch>
+     */
     #[Computed]
-    public function recentBatches()
+    public function recentBatches(): Collection
     {
         return IcecatImportBatch::with(['category:id,name', 'createdBy:id,name'])
             ->latest()
@@ -99,10 +110,12 @@ class Import extends Component
     #[Computed]
     public function hasActiveBatches(): bool
     {
-        return $this->recentBatches->contains(fn ($batch) => ! $batch->isFinished());
+        $recentBatches = $this->recentBatches();
+
+        return $recentBatches->contains(fn (IcecatImportBatch $batch) => ! $batch->isFinished());
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.icecat.import');
     }

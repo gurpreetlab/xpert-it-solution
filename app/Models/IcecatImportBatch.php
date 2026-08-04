@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable(['category_id', 'created_by', 'raw_input', 'status', 'total', 'imported', 'skipped', 'failures', 'error', 'started_at', 'finished_at'])]
 class IcecatImportBatch extends Model
@@ -14,12 +15,24 @@ class IcecatImportBatch extends Model
         'finished_at' => 'datetime',
     ];
 
-    public function category()
+    /**
+     * @return BelongsTo<Category, IcecatImportBatch>
+     */
+    /**
+     * @return BelongsTo<Category, IcecatImportBatch>
+     */
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function createdBy()
+    /**
+     * @return BelongsTo<User, IcecatImportBatch>
+     */
+    /**
+     * @return BelongsTo<User, IcecatImportBatch>
+     */
+    public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }

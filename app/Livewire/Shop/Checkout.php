@@ -3,9 +3,14 @@
 namespace App\Livewire\Shop;
 
 use App\Models\Address;
+use App\Models\CartItem;
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Notifications\OrderConfirmed;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
@@ -14,7 +19,19 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Razorpay\Api\Api;
 use Razorpay\Api\Errors\SignatureVerificationError;
+use Razorpay\Api\Order as RazorpayOrder;
+use Razorpay\Api\Utility as RazorpayUtility;
 
+/**
+ * @property-read Collection<int, Address> $addresses
+ * @property-read Collection<int, CartItem> $cartItems
+ * @property-read float $mrp
+ * @property-read float $subtotal
+ * @property-read float $savings
+ * @property-read int $shippingFee
+ * @property-read float $taxAmount
+ * @property-read float $total
+ */
 class Checkout extends Component
 {
     public ?int $selectedAddressId = null;
@@ -42,7 +59,7 @@ class Checkout extends Component
     #[Validate('required|string|max:10')]
     public string $pincode = '';
 
-    public function mount()
+    public function mount(): void
     {
         if ($this->cartItems->isEmpty()) {
             $this->redirect(route('shop.cart'), navigate: true);
@@ -60,19 +77,21 @@ class Checkout extends Component
         }
     }
 
+    /** @return EloquentCollection<int, Address> */
     #[Computed]
-    public function addresses()
+    public function addresses(): EloquentCollection
     {
         return Auth::user()->addresses()->latest()->get();
     }
 
+    /** @return EloquentCollection<int, CartItem> */
     #[Computed]
-    public function cartItems()
+    public function cartItems(): EloquentCollection
     {
         $cart = Auth::user()->cart;
 
         if (! $cart) {
-            return collect();
+            return new EloquentCollection;
         }
 
         return $cart
@@ -85,7 +104,7 @@ class Checkout extends Component
     public function mrp(): float
     {
         return $this->cartItems->sum(
-            fn ($item) => $item->product->mrp * $item->quantity ?? 0,
+            fn ($item) => ($item->product->mrp ?? 0) * $item->quantity,
         );
     }
 
@@ -148,8 +167,12 @@ class Checkout extends Component
         return $this->subtotal * (shop()->gst_rate / 100);
     }
 
-    public function selectAddress($addressId): void
+    public function selectAddress(int|string $addressId): void
     {
+        if (is_string($addressId)) {
+            $addressId = (int) $addressId;
+        }
+
         $this->selectedAddressId = $addressId;
         $this->showAddressForm = false;
     }
@@ -190,7 +213,7 @@ class Checkout extends Component
      * Creates a pending local Order + Razorpay order, then hands off to
      * the browser to open the Razorpay Checkout modal via a dispatched event.
      */
-    public function placeOrder()
+    public function placeOrder(): void
     {
         if (! $this->selectedAddressId) {
             $this->dispatch(
@@ -281,7 +304,9 @@ class Checkout extends Component
                 config('services.razorpay.secret'),
             );
 
-            $razorpayOrder = $api->order->create([
+            $razorpayOrderEntity = new RazorpayOrder;
+
+            $razorpayOrder = $razorpayOrderEntity->create([
                 'receipt' => $order->order_number,
                 'amount' => $amountInPaise,
                 'currency' => 'INR',
@@ -315,10 +340,10 @@ class Checkout extends Component
      * trusting anything the client sent.
      */
     public function verifyPayment(
-        $razorpayPaymentId,
-        $razorpayOrderId,
-        $razorpaySignature,
-    ) {
+        string $razorpayPaymentId,
+        string $razorpayOrderId,
+        string $razorpaySignature,
+    ): void {
         $order = Order::where('razorpay_order_id', $razorpayOrderId)
             ->where('user_id', Auth::id())
             ->firstOrFail();
@@ -329,7 +354,9 @@ class Checkout extends Component
         );
 
         try {
-            $api->utility->verifyPaymentSignature([
+            $utility = new RazorpayUtility;
+
+            $utility->verifyPaymentSignature([
                 'razorpay_order_id' => $razorpayOrderId,
                 'razorpay_payment_id' => $razorpayPaymentId,
                 'razorpay_signature' => $razorpaySignature,
@@ -357,6 +384,7 @@ class Checkout extends Component
                 'razorpay_signature' => $razorpaySignature,
             ]);
 
+            /** @var OrderItem $item */
             foreach ($order->items as $item) {
                 if ($item->product) {
                     $item->product->decrement('stock', $item->quantity);
@@ -385,7 +413,7 @@ class Checkout extends Component
      * payment attempt fails. Order stays pending/failed; cart is untouched
      * so the customer can retry.
      */
-    public function paymentFailed($razorpayOrderId)
+    public function paymentFailed(string $razorpayOrderId): void
     {
         Order::where('razorpay_order_id', $razorpayOrderId)
             ->where('user_id', Auth::id())
@@ -399,7 +427,7 @@ class Checkout extends Component
     }
 
     #[Layout('layouts.blank')]
-    public function render()
+    public function render(): View
     {
         return view('livewire.shop.checkout');
     }

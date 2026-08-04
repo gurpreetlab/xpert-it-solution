@@ -4,8 +4,8 @@ namespace App\Livewire\Admin\Brands;
 
 use App\Models\Brand;
 use Flux\Flux;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
@@ -32,6 +32,8 @@ class Index extends Component
 
     /**
      * Get the validation rules for the category name.
+     *
+     * @return array<string, mixed>
      */
     protected function rules(): array
     {
@@ -44,6 +46,8 @@ class Index extends Component
 
     /**
      * Get the custom validation messages for the brand name
+     *
+     * @return array<string, string>
      */
     protected function messages(): array
     {
@@ -121,6 +125,9 @@ class Index extends Component
         Flux::toast('Brand deleted successfully!');
     }
 
+    /**
+     * @return LengthAwarePaginator<int, Brand>
+     */
     #[Computed]
     private function brands(): LengthAwarePaginator
     {
@@ -137,10 +144,8 @@ class Index extends Component
 
     /**
      * Get the brands based on the search query
-     *
-     * @return View
      */
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.brands.index', [
             'brands' => $this->brands(),

@@ -15,7 +15,7 @@ class ImportIcecatProducts extends Command
     /**
      * Execute the console command.
      */
-    public function handle(IcecatProductImporter $importer)
+    public function handle(IcecatProductImporter $importer): int
     {
         $filePath = $this->option('file');
         $categorySlug = $this->option('category');
@@ -42,6 +42,13 @@ class ImportIcecatProducts extends Command
         // Lines are either a bare GTIN, or "ProductCode,BrandName" - Icecat
         // requires the brand whenever you're not searching by GTIN.
         $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        if ($lines === false) {
+            $this->error('Unable to read the provided input file.');
+
+            return 1;
+        }
+
         $total = count($lines);
 
         $this->info("Starting import of {$total} items into category: {$category->name}");

@@ -17,6 +17,12 @@ class ContactMessage extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<User, ContactMessage>
+     */
+    /**
+     * @return BelongsTo<User, ContactMessage>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -4,8 +4,8 @@ namespace App\Livewire\Admin\Categories;
 
 use App\Models\Category;
 use Flux\Flux;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -25,6 +25,8 @@ class Index extends Component
 
     /**
      * Get the validation rules for the category name.
+     *
+     * @return array<string, mixed>
      */
     protected function rules(): array
     {
@@ -35,6 +37,8 @@ class Index extends Component
 
     /**
      * Get the custom validation messages for the category name
+     *
+     * @return array<string, string>
      */
     protected function messages(): array
     {
@@ -99,6 +103,9 @@ class Index extends Component
         Flux::toast('Category deleted successfully!');
     }
 
+    /**
+     * @return LengthAwarePaginator<int, Category>
+     */
     #[Computed]
     private function categories(): LengthAwarePaginator
     {

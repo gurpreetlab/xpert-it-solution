@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int|null $products_count
+ */
 #[Fillable([
     'name',
     'slug',
@@ -27,6 +30,9 @@ class Brand extends Model
 
     /**
      * Scope a query to search for brands by name.
+     *
+     * @param  Builder<Brand>  $query
+     * @return Builder<Brand>
      */
     public function scopeSearch(Builder $query, ?string $search): Builder
     {
@@ -37,6 +43,8 @@ class Brand extends Model
 
     /**
      * Get the products that belong to this brand.
+     *
+     * @return HasMany<Product, $this>
      */
     public function products(): HasMany
     {

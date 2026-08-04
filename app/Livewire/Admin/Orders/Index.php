@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Orders;
 
 use App\Models\Order;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -35,6 +36,7 @@ class Index extends Component
         $this->resetPage();
     }
 
+    /** @return LengthAwarePaginator<int, Order> */
     #[Computed]
     public function orders(): LengthAwarePaginator
     {
@@ -71,7 +73,7 @@ class Index extends Component
             ->paginate(10);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.orders.index', [
             'orders' => $this->orders(),

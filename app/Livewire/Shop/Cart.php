@@ -3,7 +3,9 @@
 namespace App\Livewire\Shop;
 
 use App\Models\CartItem;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -11,13 +13,21 @@ use Livewire\Component;
 
 class Cart extends Component
 {
+    /** @var EloquentCollection<int, CartItem>|null */
+    protected ?EloquentCollection $cartItems = null;
+
+    protected ?float $subtotal = null;
+
+    protected ?float $savings = null;
+
+    /** @return EloquentCollection<int, CartItem> */
     #[Computed]
-    public function cartItems(): Collection
+    public function cartItems(): EloquentCollection
     {
         $cart = Auth::user()->cart;
 
         if (! $cart) {
-            return collect();
+            return new EloquentCollection;
         }
 
         return $cart
@@ -36,7 +46,7 @@ class Cart extends Component
     public function mrp(): float
     {
         return $this->cartItems->sum(
-            fn ($item) => $item->product->mrp * $item->quantity ?? 0,
+            fn ($item) => ($item->product->mrp ?? 0) * $item->quantity,
         );
     }
 
@@ -81,7 +91,9 @@ class Cart extends Component
         $item->increment('quantity');
 
         $this->dispatch('cart-updated');
-        unset($this->cartItems, $this->subtotal, $this->savings);
+        $this->cartItems = null;
+        $this->subtotal = null;
+        $this->savings = null;
     }
 
     public function decrementQuantity(int $itemId): void
@@ -101,10 +113,12 @@ class Cart extends Component
         $item->decrement('quantity');
 
         $this->dispatch('cart-updated');
-        unset($this->cartItems, $this->subtotal, $this->savings);
+        $this->cartItems = null;
+        $this->subtotal = null;
+        $this->savings = null;
     }
 
-    public function removeItem(int $itemId)
+    public function removeItem(int $itemId): void
     {
         $item = $this->findOwnedItem($itemId);
 
@@ -120,10 +134,12 @@ class Cart extends Component
             message: 'Item removed from cart',
             variant: 'success',
         );
-        unset($this->cartItems, $this->subtotal, $this->savings);
+        $this->cartItems = null;
+        $this->subtotal = null;
+        $this->savings = null;
     }
 
-    public function clearCart()
+    public function clearCart(): void
     {
         $cart = Auth::user()->cart;
 
@@ -135,13 +151,15 @@ class Cart extends Component
             message: 'Cart cleared',
             variant: 'success',
         );
-        unset($this->cartItems, $this->subtotal, $this->savings);
+        $this->cartItems = null;
+        $this->subtotal = null;
+        $this->savings = null;
     }
 
-    public function checkout()
+    public function checkout(): ?RedirectResponse
     {
         if ($this->cartItems->isEmpty()) {
-            return;
+            return null;
         }
 
         // Re-validate stock right before handing off to checkout,
@@ -154,7 +172,7 @@ class Cart extends Component
                     variant: 'danger',
                 );
 
-                return;
+                return null;
             }
         }
 
@@ -173,7 +191,7 @@ class Cart extends Component
     }
 
     #[Layout('layouts.blank')]
-    public function render()
+    public function render(): View
     {
         return view('livewire.shop.cart');
     }

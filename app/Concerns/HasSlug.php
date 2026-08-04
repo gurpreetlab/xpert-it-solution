@@ -6,7 +6,7 @@ use App\Actions\GenerateUniqueSlug;
 
 trait HasSlug
 {
-    protected static function bootHasSlug()
+    protected static function bootHasSlug(): void
     {
         static::creating(function ($model) {
             $model->slug = app(GenerateUniqueSlug::class)->handle(

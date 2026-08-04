@@ -4,6 +4,7 @@ namespace App\Livewire\Shop;
 
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -19,7 +20,7 @@ class OrderConfirmation extends Component
     }
 
     #[Layout('layouts.blank')]
-    public function render()
+    public function render(): View
     {
         return view('livewire.shop.order-confirmation');
     }

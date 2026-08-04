@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Review;
 use Flux\Flux;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -27,6 +28,9 @@ class ProductDetail extends Component
 
     public string $editComment = '';
 
+    /**
+     * @return array<string, string|array<int, string>>
+     */
     protected function rules(): array
     {
         return [
@@ -269,7 +273,7 @@ class ProductDetail extends Component
     }
 
     #[Layout('layouts.blank')]
-    public function render()
+    public function render(): View
     {
         return view('livewire.shop.product-detail', [
             'product' => $this->product(),

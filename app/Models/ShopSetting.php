@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable(
     'name', 'gstin', 'address_line1', 'address_line2', 'state', 'state_code',
@@ -31,10 +32,29 @@ class ShopSetting extends Model
             : null;
     }
 
+    public static function current(): self
+    {
+        return static::query()->firstOrCreate([]);
+    }
+
     public static function refreshCache(): void
     {
         Cache::forget(self::CACHE_KEY);
 
         Cache::rememberForever(self::CACHE_KEY, fn () => self::query()->first());
+    }
+
+    public function logoUrl(): ?string
+    {
+        return $this->logo_path
+            ? Storage::disk('public')->url($this->logo_path)
+            : null;
+    }
+
+    public function signatureUrl(): ?string
+    {
+        return $this->signature_path
+            ? Storage::disk('public')->url($this->signature_path)
+            : null;
     }
 }

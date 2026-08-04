@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Flux\Flux;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -61,18 +62,21 @@ class Index extends Component
         $this->resetPage();
     }
 
+    /** @return Collection<int, Category> */
     #[Computed]
     public function categories(): Collection
     {
         return Category::orderBy('name')->get(['id', 'name']);
     }
 
+    /** @return Collection<int, Brand> */
     #[Computed]
     public function brands(): Collection
     {
         return Brand::orderBy('name')->get(['id', 'name']);
     }
 
+    /** @return LengthAwarePaginator<int, Product> */
     #[Computed]
     public function products(): LengthAwarePaginator
     {
@@ -91,10 +95,10 @@ class Index extends Component
             ->paginate(10);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.products.index', [
-            'products' => $this->products,
+            'products' => $this->products(),
         ]);
     }
 }

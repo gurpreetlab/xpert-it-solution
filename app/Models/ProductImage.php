@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $path
+ */
 #[Fillable([
     'product_id',
     'path',
@@ -20,6 +23,8 @@ class ProductImage extends Model
 {
     /**
      * Get the product that this image belongs to.
+     *
+     * @return BelongsTo<Product, $this>
      */
     public function product(): BelongsTo
     {

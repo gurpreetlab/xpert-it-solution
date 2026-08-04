@@ -4,10 +4,12 @@ namespace App\Livewire\Settings;
 
 use App\Models\ShopSetting;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 #[Title('Shop settings')]
@@ -42,9 +44,9 @@ class ShopSettings extends Component
 
     public float $gst_rate = 18;
 
-    public $logo;
+    public ?TemporaryUploadedFile $logo = null;
 
-    public $signature;
+    public ?TemporaryUploadedFile $signature = null;
 
     public ?string $existingLogoUrl = null;
 
@@ -64,6 +66,10 @@ class ShopSettings extends Component
         $this->existingSignatureUrl = $settings->signatureUrl();
     }
 
+    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     protected function rules(): array
     {
         return [
@@ -117,7 +123,7 @@ class ShopSettings extends Component
         Flux::toast(variant: 'success', text: __('Shop settings updated.'));
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.settings.shop-settings');
     }

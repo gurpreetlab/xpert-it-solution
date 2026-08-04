@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -58,6 +59,7 @@ class Create extends Component
     public int $primaryImageIndex = 0;
 
     // ---- Specifications (key/value repeater) ----
+    /** @var array<int, array{key: string, value: string}> */
     public array $specifications = [];
 
     public function mount(): void
@@ -67,6 +69,7 @@ class Create extends Component
         ];
     }
 
+    /** @return array<string, mixed> */
     protected function rules(): array
     {
         return [
@@ -110,6 +113,7 @@ class Create extends Component
      * Friendly, human-readable names used in place of raw property names
      * (e.g. "Sale Price" instead of "sale_price") inside validation messages.
      */
+    /** @return array<string, string> */
     protected function validationAttributes(): array
     {
         return [
@@ -129,6 +133,7 @@ class Create extends Component
         ];
     }
 
+    /** @return array<string, string> */
     protected function messages(): array
     {
         return [
@@ -314,7 +319,7 @@ class Create extends Component
 
     // ---- Save ----
 
-    public function save()
+    public function save(): mixed
     {
         // Guarantee the slug is fresh and unique right before validating,
         // in case another product was created since the name was last typed.
@@ -353,13 +358,16 @@ class Create extends Component
             $sortOrder = 0;
 
             foreach ($this->specifications as $spec) {
-                if (trim($spec['key'] ?? '') === '' || trim($spec['value'] ?? '') === '') {
+                $key = $spec['key'];
+                $value = $spec['value'];
+
+                if (trim($key) === '' || trim($value) === '') {
                     continue;
                 }
 
                 $product->specifications()->create([
-                    'key' => $spec['key'],
-                    'value' => $spec['value'],
+                    'key' => $key,
+                    'value' => $value,
                     'sort_order' => $sortOrder++,
                 ]);
             }
@@ -372,7 +380,7 @@ class Create extends Component
         return $this->redirect(route('dashboard.products.index'), navigate: true);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.products.create', [
             'categories' => Category::orderBy('name')->get(['id', 'name']),

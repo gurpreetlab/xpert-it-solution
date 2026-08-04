@@ -4,6 +4,8 @@ namespace App\Livewire\Admin\Products;
 
 use App\Models\Product;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Livewire\Component;
 
 class Show extends Component
@@ -50,10 +52,10 @@ class Show extends Component
         $this->deletingProduct = $product;
     }
 
-    public function delete()
+    public function delete(): ?RedirectResponse
     {
         if (! $this->deletingProduct) {
-            return;
+            return null;
         }
 
         $this->deletingProduct->delete();
@@ -64,7 +66,7 @@ class Show extends Component
         return $this->redirect(route('dashboard.products.index'), navigate: true);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.products.show');
     }

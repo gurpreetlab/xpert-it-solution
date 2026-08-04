@@ -6,10 +6,14 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Livewire\Attributes\Computed;
 
+/**
+ * @property-read Collection<int, Category> $categories
+ * @property-read Collection<int, Brand> $brands
+ */
 trait HandlesProductCatalog
 {
     public string $search = '';
@@ -85,6 +89,8 @@ trait HandlesProductCatalog
 
     /**
      * DRY helper to construct base Scout builder queries with active state and category/brand filters.
+     *
+     * @return ScoutBuilder<Product>
      */
     protected function getSearchBuilder(?string $categoryId = null, ?string $brandId = null): ScoutBuilder
     {
@@ -106,6 +112,8 @@ trait HandlesProductCatalog
 
     /**
      * Fetch categories from Meilisearch with dynamic product counts using facet distribution (cached for blazing performance).
+     *
+     * @return Collection<int, Category>
      */
     #[Computed]
     public function categories(): Collection
@@ -122,15 +130,15 @@ trait HandlesProductCatalog
 
         return Category::whereIn('id', $categoryIds)
             ->get()
-            ->map(function ($category) use ($distribution) {
+            ->each(function ($category) use ($distribution) {
                 $category->products_count = $distribution[$category->id] ?? 0;
-
-                return $category;
             });
     }
 
     /**
      * Fetch brands dynamically from Meilisearch based on active category/search filters, with counts.
+     *
+     * @return Collection<int, Brand>
      */
     #[Computed]
     public function brands(): Collection
@@ -156,10 +164,8 @@ trait HandlesProductCatalog
 
         return Brand::whereIn('id', $brandIds)
             ->get()
-            ->map(function ($brand) use ($distribution) {
+            ->each(function ($brand) use ($distribution) {
                 $brand->products_count = $distribution[$brand->id] ?? 0;
-
-                return $brand;
             });
     }
 
@@ -184,6 +190,9 @@ trait HandlesProductCatalog
             : $this->categories->firstWhere('id', (int) $this->selectedCategoryId)?->products_count;
     }
 
+    /**
+     * @return LengthAwarePaginator<int, Product>
+     */
     #[Computed]
     public function products(): LengthAwarePaginator
     {
