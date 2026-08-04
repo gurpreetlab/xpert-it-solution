@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 #[Fillable(
@@ -23,13 +24,17 @@ class ShopSetting extends Model
         'gst_rate' => 'float',
     ];
 
-    public static function getCached(): ?self
+    public static function getCached(): self
     {
+        if (! Schema::hasTable((new static)->getTable())) {
+            return static::fromConfig();
+        }
+
         $attributes = Cache::rememberForever(self::CACHE_KEY, fn () => self::query()->first()?->getAttributes());
 
         return $attributes
             ? (new static)->forceFill($attributes)
-            : null;
+            : static::fromConfig();
     }
 
     public static function current(): self
@@ -41,7 +46,32 @@ class ShopSetting extends Model
     {
         Cache::forget(self::CACHE_KEY);
 
-        Cache::rememberForever(self::CACHE_KEY, fn () => self::query()->first());
+        Cache::rememberForever(self::CACHE_KEY, fn () => self::query()->first()?->getAttributes());
+    }
+
+    public static function fromConfig(): self
+    {
+        $company = config('shop.company', []);
+        $logoPath = $company['logo_path'] ?? null;
+        $signaturePath = $company['signature_path'] ?? null;
+
+        return (new static)->forceFill([
+            'name' => $company['name'] ?? '',
+            'gstin' => $company['gstin'] ?? '',
+            'address_line1' => $company['address_line1'] ?? '',
+            'address_line2' => $company['address_line2'] ?? null,
+            'state' => $company['state'] ?? '',
+            'state_code' => $company['state_code'] ?? '',
+            'phone' => $company['phone'] ?? '',
+            'email' => $company['email'] ?? '',
+            'bank_account_number' => $company['bank_account_number'] ?? null,
+            'bank_ifsc' => $company['bank_ifsc'] ?? null,
+            'signature_path' => $signaturePath ?? null,
+            'logo_path' => $logoPath ?? null,
+            'cgst_rate' => config('shop.cgst_rate', 9.0),
+            'sgst_rate' => config('shop.sgst_rate', 9.0),
+            'gst_rate' => config('shop.gst_rate', 18.0),
+        ]);
     }
 
     public function logoUrl(): ?string
