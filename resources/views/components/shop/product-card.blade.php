@@ -62,7 +62,15 @@
                 <span class="text-base font-extrabold text-zinc-950 dark:text-white">₹{{ number_format($product->sale_price, 2) }}</span>
             </div>
 
-            <div class="flex gap-1.5">
+            <div class="flex gap-1.5 items-center">
+                @auth
+                    @role('customer')
+                        <button type="button" wire:click="toggleWishlist({{ $product->id }})" class="p-1.5 text-zinc-400 hover:text-rose-500 dark:hover:text-rose-400 cursor-pointer" title="Toggle Wishlist">
+                            <flux:icon icon="heart" class="size-5 {{ auth()->user()->wishlistProducts()->where('product_id', $product->id)->exists() ? 'fill-current text-rose-500' : '' }}" />
+                        </button>
+                    @endrole
+                @endauth
+
                 <a href="{{ route('shop.product.details', $product->slug) }}" wire:navigate>
                     <flux:button variant="ghost" size="sm" class="cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
                         View

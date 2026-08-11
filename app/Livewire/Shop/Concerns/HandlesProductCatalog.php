@@ -210,4 +210,31 @@ trait HandlesProductCatalog
             ->query(fn ($query) => $query->with(['category:id,name', 'brand:id,name,logo', 'primaryImage']))
             ->paginate(12);
     }
+
+    /**
+     * Toggle a product in/out of the user's wishlist.
+     */
+    public function toggleWishlist(int $productId): void
+    {
+        if (! auth()->check()) {
+            \Flux\Flux::toast(
+                text: 'Please login to manage your wishlist.',
+                variant: 'danger',
+            );
+
+            return;
+        }
+
+        $user = auth()->user();
+
+        if ($user->wishlistProducts()->where('product_id', $productId)->exists()) {
+            $user->wishlistProducts()->detach($productId);
+            \Flux\Flux::toast(text: 'Removed from wishlist.', variant: 'success');
+        } else {
+            $user->wishlistProducts()->attach($productId);
+            \Flux\Flux::toast(text: 'Added to wishlist.', variant: 'success');
+        }
+
+        $this->dispatch('wishlist-updated');
+    }
 }

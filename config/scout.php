@@ -57,7 +57,7 @@ return [
     |
     */
 
-    'after_commit' => true,
+    'after_commit' => env('SCOUT_AFTER_COMMIT', true),
 
     /*
     |--------------------------------------------------------------------------

@@ -13,6 +13,19 @@ test('returns a successful response for the home page', function () {
     $response->assertSee('Xpert');
 });
 
+function waitForMeilisearch(): void
+{
+    $client = app(\Meilisearch\Client::class);
+    $query = new \Meilisearch\Contracts\TasksQuery();
+    $query->setStatuses(['enqueued', 'processing']);
+
+    $tasks = $client->getTasks($query)->getResults();
+    $uids = array_column($tasks, 'uid');
+    if (!empty($uids)) {
+        $client->waitForTasks($uids);
+    }
+}
+
 test('can search products', function () {
     $category = Category::create(['name' => 'Networking']);
     $brand = Brand::create(['name' => 'Netgear']);
@@ -34,6 +47,8 @@ test('can search products', function () {
         'sale_price' => 8000,
         'mrp' => 9000,
     ]);
+
+    waitForMeilisearch();
 
     Livewire::test(Home::class)
         ->set('search', 'Nighthawk')
@@ -62,6 +77,8 @@ test('can filter products by category', function () {
         'sale_price' => 4000,
     ]);
 
+    waitForMeilisearch();
+
     Livewire::test(Home::class)
         ->set('selectedCategoryId', $category1->id)
         ->assertSee($product1->name)
@@ -88,6 +105,8 @@ test('can filter products by brand', function () {
         'is_active' => true,
         'sale_price' => 2500,
     ]);
+
+    waitForMeilisearch();
 
     Livewire::test(Home::class)
         ->set('selectedBrandId', $brand1->id)
