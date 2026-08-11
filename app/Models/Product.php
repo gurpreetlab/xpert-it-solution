@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -174,5 +175,16 @@ class Product extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class)->latest();
+    }
+
+    /**
+     * Get the users who wishlisted the product.
+     *
+     * @return BelongsToMany<User, $this>
+     */
+    public function wishlistedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'wishlist_items')
+            ->withTimestamps();
     }
 }

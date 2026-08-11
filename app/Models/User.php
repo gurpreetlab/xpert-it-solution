@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -81,5 +82,16 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the user's wishlist products.
+     *
+     * @return BelongsToMany<Product, $this>
+     */
+    public function wishlistProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'wishlist_items')
+            ->withTimestamps();
     }
 }
