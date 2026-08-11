@@ -28,12 +28,18 @@ class Index extends Component
     }
 
     /**
-     * Show detail of a message.
+     * Show detail of a message and mark it as read.
      */
     public function viewMessage(int $id): void
     {
         $this->selectedMessageId = $id;
         $this->showMessageModal = true;
+
+        $message = ContactMessage::find($id);
+        if ($message && ! $message->is_read) {
+            $message->update(['is_read' => true]);
+            $this->dispatch('contact-messages-updated');
+        }
     }
 
     /**

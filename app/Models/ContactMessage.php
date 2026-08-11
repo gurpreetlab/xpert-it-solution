@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['name', 'email', 'phone', 'subject', 'message', 'user_id', 'read_at'])]
+#[Fillable(['name', 'email', 'phone', 'subject', 'message', 'user_id', 'read_at', 'is_read'])]
 class ContactMessage extends Model
 {
     #[\Override]
@@ -14,6 +14,7 @@ class ContactMessage extends Model
     {
         return [
             'read_at' => 'datetime',
+            'is_read' => 'boolean',
         ];
     }
 

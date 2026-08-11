@@ -23,6 +23,7 @@ use App\Livewire\Shop\Home;
 use App\Livewire\Shop\OrderConfirmation as ShopOrderConfirmation;
 use App\Livewire\Shop\Orders as ShopOrders;
 use App\Livewire\Shop\ProductDetail;
+use App\Livewire\Shop\Compare as ShopCompare;
 use App\Livewire\Shop\Products as ShopProducts;
 use App\Livewire\Shop\Wishlist;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,8 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     )->name('shop.order.confirmation');
 
     Route::get('/wishlist', Wishlist::class)->name('shop.wishlist');
+
+    Route::get('/compare', ShopCompare::class)->name('shop.compare');
 });
 
 // super-admin routes

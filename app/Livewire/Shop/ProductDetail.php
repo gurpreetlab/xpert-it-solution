@@ -240,6 +240,12 @@ class ProductDetail extends Component
         $this->dispatch('wishlist-updated');
     }
 
+    public function toggleComparison(): void
+    {
+        \App\Livewire\Shop\Compare::toggleComparisonStatic($this->product()->id);
+        $this->dispatch('compare-updated');
+    }
+
     public function addToCart(): void
     {
         if (! auth()->check()) {

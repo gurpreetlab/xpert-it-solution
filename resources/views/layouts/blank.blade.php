@@ -37,6 +37,14 @@
                             @auth
 
                                 @role('customer')
+                                    <a href="{{ route('shop.compare') }}" class="relative text-zinc-600 dark:text-zinc-400 hover:text-blue-500 transition cursor-pointer mr-1" title="Compare Products" wire:navigate>
+                                        <flux:icon icon="scale" class="size-6" />
+                                        @if(count(session()->get('compared_product_ids', [])) > 0)
+                                            <span class="-right-2 -top-2 absolute bg-blue-600 flex h-4 w-4 items-center justify-center rounded-full text-[10px] text-white font-bold">
+                                                {{ count(session()->get('compared_product_ids', [])) }}
+                                            </span>
+                                        @endif
+                                    </a>
                                     <livewire:shop.partials.wishlist-count />
                                     <livewire:shop._partials.cart-count />
                                 @endrole
@@ -50,6 +58,7 @@
                                         @endrole
 
                                         @role('customer')
+                                            <flux:navmenu.item href="{{ route('shop.compare') }}" icon="scale" wire:navigate>{{ __('Compare Products') }}</flux:navmenu.item>
                                             <flux:navmenu.item href="{{ route('shop.wishlist') }}" icon="heart" wire:navigate>{{ __('My Wishlist') }}</flux:navmenu.item>
                                             <flux:navmenu.item href="{{ route('shop.orders') }}" icon="shopping-bag" wire:navigate>{{ __('My Orders') }}</flux:navmenu.item>
                                         @endrole

@@ -164,12 +164,38 @@
                             <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($this->subtotal, 2) }}</span>
                         </div>
 
+                        @if($couponDiscountPercent > 0)
+                            <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
+                                <span>Promo Discount ({{ $couponDiscountPercent }}%)</span>
+                                <span class="font-semibold">- ₹{{ number_format($this->couponDiscountAmount, 2) }}</span>
+                            </div>
+                        @endif
+
                         <div class="flex items-center justify-between text-zinc-600 dark:text-zinc-300">
                             <span>Shipping</span>
                             <span class="font-semibold text-emerald-600 dark:text-emerald-400">
                                 {{ $this->shippingFee > 0 ? '₹' . number_format($this->shippingFee, 2) : 'Free' }}
                             </span>
                         </div>
+                    </div>
+
+                    <!-- Coupon Input Form -->
+                    <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
+                        <label class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">Promo Code</label>
+                        @if($appliedCouponId)
+                            <div class="flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-2.5">
+                                <div class="flex items-center gap-1.5 text-xs text-emerald-800 dark:text-emerald-400 font-semibold">
+                                    <flux:icon icon="tag" class="size-4" />
+                                    <span>{{ strtoupper($couponCode) }} applied</span>
+                                </div>
+                                <button type="button" wire:click="removeCoupon" class="text-xs text-rose-500 hover:text-rose-600 font-medium">Remove</button>
+                            </div>
+                        @else
+                            <div class="flex gap-2">
+                                <input type="text" wire:model.defer="couponCode" placeholder="WELCOME10, XPERT20" class="flex-1 h-9 px-3 rounded-lg text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-blue-500" />
+                                <flux:button size="sm" variant="outline" wire:click="applyCoupon" class="cursor-pointer">Apply</flux:button>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
