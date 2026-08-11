@@ -38,6 +38,12 @@ class Checkout extends Component
 
     public bool $showAddressForm = false;
 
+    public string $couponCode = '';
+
+    public ?int $appliedCouponId = null;
+
+    public int $couponDiscountPercent = 0;
+
     #[Validate('required|string|max:255')]
     public string $full_name = '';
 
@@ -129,6 +135,14 @@ class Checkout extends Component
     }
 
     #[Computed]
+    public function couponDiscountAmount(): float
+    {
+        return $this->couponDiscountPercent > 0
+            ? round($this->subtotal * ($this->couponDiscountPercent / 100), 2)
+            : 0.0;
+    }
+
+    #[Computed]
     public function shippingFee(): int
     {
         return 0; // free shipping for now — adjust if you introduce thresholds/zones
@@ -143,7 +157,42 @@ class Checkout extends Component
     #[Computed]
     public function total(): float
     {
-        return $this->subtotal + $this->shippingFee;
+        return $this->subtotal + $this->shippingFee - $this->couponDiscountAmount();
+    }
+
+    /**
+     * Apply active promo/coupon code to checkout.
+     */
+    public function applyCoupon(): void
+    {
+        if ($this->couponCode === '') {
+            $this->dispatch('cart-toast', message: 'Please enter a coupon code.', variant: 'warning');
+            return;
+        }
+
+        $coupon = \App\Models\Coupon::findActive($this->couponCode);
+
+        if (! $coupon) {
+            $this->dispatch('cart-toast', message: 'Invalid or inactive coupon code.', variant: 'danger');
+            return;
+        }
+
+        $this->appliedCouponId = $coupon->id;
+        $this->couponDiscountPercent = $coupon->discount_percent;
+
+        $this->dispatch('cart-toast', message: "Coupon applied! You saved {$coupon->discount_percent}%.", variant: 'success');
+    }
+
+    /**
+     * Remove applied coupon.
+     */
+    public function removeCoupon(): void
+    {
+        $this->couponCode = '';
+        $this->appliedCouponId = null;
+        $this->couponDiscountPercent = 0;
+
+        $this->dispatch('cart-toast', message: 'Coupon removed.', variant: 'info');
     }
 
     #[Computed]
@@ -263,7 +312,7 @@ class Checkout extends Component
                 'shipping_pincode' => $address->pincode,
                 'shipping_country' => $address->country,
                 'subtotal' => $this->subtotal,
-                'discount' => $this->savings,
+                'discount' => $this->savings + $this->couponDiscountAmount(),
                 'shipping_fee' => $this->shippingFee,
                 'tax_amount' => $this->taxAmount,
                 'total' => $this->total,
@@ -354,7 +403,7 @@ class Checkout extends Component
         );
 
         try {
-            $utility = new RazorpayUtility;
+            $utility = app(RazorpayUtility::class);
 
             $utility->verifyPaymentSignature([
                 'razorpay_order_id' => $razorpayOrderId,
@@ -401,6 +450,11 @@ class Checkout extends Component
         $this->dispatch('cart-updated');
 
         Auth::user()->notify(new OrderConfirmed($order));
+
+        $admin = \App\Models\User::role('super-admin')->first();
+        if ($admin) {
+            $admin->notify(new \App\Notifications\AdminNewOrderNotification($order));
+        }
 
         $this->redirect(
             route('shop.order.confirmation', $order->order_number),

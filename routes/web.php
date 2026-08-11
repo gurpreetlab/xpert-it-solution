@@ -6,6 +6,7 @@ use App\Livewire\Admin\Brands\Index as BrandIndex;
 use App\Livewire\Admin\Categories\Index as CategoryIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Icecat\Import as IcecatImport;
+use App\Livewire\Admin\ContactMessages\Index as ContactMessagesIndex;
 use App\Livewire\Admin\Invoices\Index as InvoiceIndex;
 use App\Livewire\Admin\Orders\Index as OrderIndex;
 use App\Livewire\Admin\Orders\Show as OrderShow;
@@ -22,7 +23,9 @@ use App\Livewire\Shop\Home;
 use App\Livewire\Shop\OrderConfirmation as ShopOrderConfirmation;
 use App\Livewire\Shop\Orders as ShopOrders;
 use App\Livewire\Shop\ProductDetail;
+use App\Livewire\Shop\Compare as ShopCompare;
 use App\Livewire\Shop\Products as ShopProducts;
+use App\Livewire\Shop\Wishlist;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
@@ -44,6 +47,10 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
         '/order/{order:order_number}/confirmation',
         ShopOrderConfirmation::class,
     )->name('shop.order.confirmation');
+
+    Route::get('/wishlist', Wishlist::class)->name('shop.wishlist');
+
+    Route::get('/compare', ShopCompare::class)->name('shop.compare');
 });
 
 // super-admin routes
@@ -103,6 +110,10 @@ Route::middleware(['auth', 'verified', 'role:super-admin'])
 
         Route::prefix('icecat')->group(function () {
             Route::get('/', IcecatImport::class)->name('dashboard.icecat.import');
+        });
+
+        Route::prefix('contact-messages')->group(function () {
+            Route::get('/', ContactMessagesIndex::class)->name('dashboard.contact-messages.index');
         });
     });
 

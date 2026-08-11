@@ -66,6 +66,17 @@ class Dashboard extends Component
                     ? 100.0
                     : 0.0);
 
+        $totalUsers = \App\Models\User::count();
+        $usersThisMonth = \App\Models\User::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        $usersLastMonth = \App\Models\User::whereMonth('created_at', now()->subMonthNoOverflow()->month)
+            ->whereYear('created_at', now()->subMonthNoOverflow()->year)
+            ->count();
+        $userGrowth = $usersLastMonth > 0
+            ? round((($usersThisMonth - $usersLastMonth) / $usersLastMonth) * 100, 1)
+            : ($usersThisMonth > 0 ? 100.0 : 0.0);
+
         return [
             'total_revenue' => $totalRevenue,
             'revenue_growth' => $revenueGrowth,
@@ -83,7 +94,82 @@ class Dashboard extends Component
             'low_stock_count' => Product::where('is_active', true)
                 ->where('stock', '<=', $this->lowStockThreshold)
                 ->count(),
+            'total_users' => $totalUsers,
+            'user_growth' => $userGrowth,
+            'total_inquiries' => \App\Models\ContactMessage::count(),
         ];
+    }
+
+    /**
+     * Get most frequently wishlisted products.
+     */
+    #[Computed]
+    public function topWishlisted(): Collection
+    {
+        return \Illuminate\Support\Facades\DB::table('wishlist_items')
+            ->selectRaw('product_id, products.name as product_name, COUNT(*) as wishlist_count')
+            ->join('products', 'products.id', '=', 'wishlist_items.product_id')
+            ->groupBy('product_id', 'products.name')
+            ->orderByDesc('wishlist_count')
+            ->limit(5)
+            ->get();
+    }
+
+    /**
+     * Get the recent contact inquiries.
+     */
+    #[Computed]
+    public function recentInquiries(): Collection
+    {
+        return \App\Models\ContactMessage::latest()->limit(5)->get();
+    }
+
+    /**
+     * Aggregated paid sales revenue grouped by category name.
+     *
+     * @return array{labels: array<int, string>, data: array<int, float>}
+     */
+    #[Computed]
+    public function categorySales(): array
+    {
+        $data = \Illuminate\Support\Facades\DB::table('order_items')
+            ->selectRaw('categories.name as category_name, SUM(order_items.unit_price * order_items.quantity) as total_sales')
+            ->join('products', 'products.id', '=', 'order_items.product_id')
+            ->join('categories', 'categories.id', '=', 'products.category_id')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.payment_status', 'paid')
+            ->groupBy('categories.name')
+            ->orderByDesc('total_sales')
+            ->get();
+
+        return [
+            'labels' => $data->pluck('category_name')->toArray(),
+            'data' => $data->pluck('total_sales')->map(fn($val) => (float)$val)->toArray(),
+        ];
+    }
+
+    /**
+     * Total count of placed orders over the last 6 months.
+     *
+     * @return array{labels: array<int, string>, data: array<int, int>}
+     */
+    #[Computed]
+    public function orderVolumeTrend(): array
+    {
+        $labels = [];
+        $data = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonthsNoOverflow($i);
+
+            $labels[] = $month->format('M Y');
+
+            $data[] = Order::whereMonth('created_at', $month->month)
+                ->whereYear('created_at', $month->year)
+                ->count();
+        }
+
+        return ['labels' => $labels, 'data' => $data];
     }
 
     /**
