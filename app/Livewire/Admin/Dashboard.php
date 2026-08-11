@@ -125,6 +125,54 @@ class Dashboard extends Component
     }
 
     /**
+     * Aggregated paid sales revenue grouped by category name.
+     *
+     * @return array{labels: array<int, string>, data: array<int, float>}
+     */
+    #[Computed]
+    public function categorySales(): array
+    {
+        $data = \Illuminate\Support\Facades\DB::table('order_items')
+            ->selectRaw('categories.name as category_name, SUM(order_items.unit_price * order_items.quantity) as total_sales')
+            ->join('products', 'products.id', '=', 'order_items.product_id')
+            ->join('categories', 'categories.id', '=', 'products.category_id')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.payment_status', 'paid')
+            ->groupBy('categories.name')
+            ->orderByDesc('total_sales')
+            ->get();
+
+        return [
+            'labels' => $data->pluck('category_name')->toArray(),
+            'data' => $data->pluck('total_sales')->map(fn($val) => (float)$val)->toArray(),
+        ];
+    }
+
+    /**
+     * Total count of placed orders over the last 6 months.
+     *
+     * @return array{labels: array<int, string>, data: array<int, int>}
+     */
+    #[Computed]
+    public function orderVolumeTrend(): array
+    {
+        $labels = [];
+        $data = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonthsNoOverflow($i);
+
+            $labels[] = $month->format('M Y');
+
+            $data[] = Order::whereMonth('created_at', $month->month)
+                ->whereYear('created_at', $month->year)
+                ->count();
+        }
+
+        return ['labels' => $labels, 'data' => $data];
+    }
+
+    /**
      * Paid revenue for the trailing 6 months, oldest first, for the trend chart.
      */
     /**
