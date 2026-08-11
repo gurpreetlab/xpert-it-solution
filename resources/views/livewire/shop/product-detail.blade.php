@@ -221,8 +221,8 @@
                             <flux:button wire:click="addToCart" icon="shopping-cart" class="cursor-pointer">
                                 Add to Cart
                             </flux:button>
-                            <flux:button wire:click="toggleWishlist" icon="heart" variant="outline" class="cursor-pointer {{ auth()->user()->wishlistProducts()->where('product_id', $product->id)->exists() ? 'text-rose-500 hover:text-rose-600 [&>svg]:fill-rose-500' : '' }}">
-                                {{ auth()->user()->wishlistProducts()->where('product_id', $product->id)->exists() ? 'Wishlisted' : 'Add to Wishlist' }}
+                            <flux:button wire:click="toggleWishlist" icon="heart" variant="outline" class="cursor-pointer {{ auth()->user()->isProductWishlisted($product->id) ? 'text-rose-500 hover:text-rose-600 [&>svg]:fill-rose-500' : '' }}">
+                                {{ auth()->user()->isProductWishlisted($product->id) ? 'Wishlisted' : 'Add to Wishlist' }}
                             </flux:button>
                         </div>
                         @endrole

@@ -48,6 +48,10 @@
                     Icecat Import
                 </flux:sidebar.item>
 
+                <flux:sidebar.item icon="envelope" :href="route('dashboard.contact-messages.index')" :current="request()->routeIs('dashboard.contact-messages.index')" wire:navigate>
+                    Contact Messages
+                </flux:sidebar.item>
+
             </flux:sidebar.group>
         </flux:sidebar.nav>
 

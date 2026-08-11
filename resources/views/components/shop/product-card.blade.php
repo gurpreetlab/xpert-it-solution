@@ -66,7 +66,7 @@
                 @auth
                     @role('customer')
                         <button type="button" wire:click="toggleWishlist({{ $product->id }})" class="p-1.5 text-zinc-400 hover:text-rose-500 dark:hover:text-rose-400 cursor-pointer" title="Toggle Wishlist">
-                            <flux:icon icon="heart" class="size-5 {{ auth()->user()->wishlistProducts()->where('product_id', $product->id)->exists() ? 'fill-current text-rose-500' : '' }}" />
+                            <flux:icon icon="heart" class="size-5 {{ auth()->user()->isProductWishlisted($product->id) ? 'fill-current text-rose-500' : '' }}" />
                         </button>
                     @endrole
                 @endauth

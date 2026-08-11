@@ -40,6 +40,8 @@ class Wishlist extends Component
 
         auth()->user()->wishlistProducts()->detach($productId);
 
+        $this->dispatch('wishlist-updated');
+
         Flux::toast(text: 'Product removed from your wishlist.', variant: 'success');
     }
 

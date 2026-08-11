@@ -37,9 +37,7 @@
                             @auth
 
                                 @role('customer')
-                                    <a href="{{ route('shop.wishlist') }}" class="relative text-zinc-600 dark:text-zinc-400 hover:text-rose-500 transition cursor-pointer mr-1" title="Wishlist" wire:navigate>
-                                        <flux:icon icon="heart" class="size-6" />
-                                    </a>
+                                    <livewire:shop.partials.wishlist-count />
                                     <livewire:shop._partials.cart-count />
                                 @endrole
 

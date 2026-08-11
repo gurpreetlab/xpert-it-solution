@@ -94,4 +94,18 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         return $this->belongsToMany(Product::class, 'wishlist_items')
             ->withTimestamps();
     }
+
+    protected ?array $memoizedWishlistProductIds = null;
+
+    /**
+     * Check if a product is in the user's wishlist, caching the list of IDs at request-level.
+     */
+    public function isProductWishlisted(int $productId): bool
+    {
+        if ($this->memoizedWishlistProductIds === null) {
+            $this->memoizedWishlistProductIds = $this->wishlistProducts()->pluck('products.id')->toArray();
+        }
+
+        return in_array($productId, $this->memoizedWishlistProductIds, true);
+    }
 }
