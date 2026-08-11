@@ -16,6 +16,10 @@
             $imgUrl = asset('storage/' . $img);
         }
     }
+
+    $reviews = $product->reviews;
+    $reviewCount = $reviews->count();
+    $avgRating = $reviewCount > 0 ? round($reviews->avg('rating'), 1) : 0;
 @endphp
 
 <div class="flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
@@ -40,6 +44,12 @@
         <div class="space-y-2">
             <div class="flex items-center justify-between text-xs">
                 <span class="font-medium text-zinc-500 dark:text-zinc-400">{{ $product->brand?->name }}</span>
+                @if($reviewCount > 0)
+                    <div class="flex items-center gap-1 text-amber-500 font-bold text-[11px]" title="{{ $avgRating }} average rating based on {{ $reviewCount }} reviews">
+                        <flux:icon icon="star" class="size-3 fill-current" />
+                        <span>{{ $avgRating }} <span class="text-zinc-400 dark:text-zinc-600 font-normal">({{ $reviewCount }})</span></span>
+                    </div>
+                @endif
                 <span class="font-semibold {{ $product->stock > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
                     {{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}
                 </span>
@@ -66,7 +76,10 @@
                 @auth
                     @role('customer')
                         <button type="button" wire:click="toggleWishlist({{ $product->id }})" class="p-1.5 text-zinc-400 hover:text-rose-500 dark:hover:text-rose-400 cursor-pointer" title="Toggle Wishlist">
-                            <flux:icon icon="heart" class="size-5 {{ auth()->user()->wishlistProducts()->where('product_id', $product->id)->exists() ? 'fill-current text-rose-500' : '' }}" />
+                            <flux:icon icon="heart" class="size-5 {{ auth()->user()->isProductWishlisted($product->id) ? 'fill-current text-rose-500' : '' }}" />
+                        </button>
+                        <button type="button" wire:click="toggleComparison({{ $product->id }})" class="p-1.5 text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer" title="Compare Product">
+                            <flux:icon icon="scale" class="size-5 {{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'text-blue-500' : '' }}" />
                         </button>
                     @endrole
                 @endauth

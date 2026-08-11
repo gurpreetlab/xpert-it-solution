@@ -237,4 +237,13 @@ trait HandlesProductCatalog
 
         $this->dispatch('wishlist-updated');
     }
+
+    /**
+     * Toggle a product in/out of comparison.
+     */
+    public function toggleComparison(int $productId): void
+    {
+        \App\Livewire\Shop\Compare::toggleComparisonStatic($productId);
+        $this->dispatch('compare-updated');
+    }
 }

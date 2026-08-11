@@ -48,6 +48,20 @@
                     Icecat Import
                 </flux:sidebar.item>
 
+                @php
+                    $unreadInquiries = \App\Models\ContactMessage::where('is_read', false)->count();
+                @endphp
+                <flux:sidebar.item icon="envelope" :href="route('dashboard.contact-messages.index')" :current="request()->routeIs('dashboard.contact-messages.index')" wire:navigate>
+                    <span class="flex items-center justify-between w-full">
+                        <span>Contact Messages</span>
+                        @if($unreadInquiries > 0)
+                            <span class="ml-2 px-1.5 py-0.5 text-[10px] font-bold bg-rose-500 text-white rounded-full">
+                                {{ $unreadInquiries }}
+                            </span>
+                        @endif
+                    </span>
+                </flux:sidebar.item>
+
             </flux:sidebar.group>
         </flux:sidebar.nav>
 

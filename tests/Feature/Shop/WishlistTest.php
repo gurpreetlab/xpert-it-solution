@@ -63,6 +63,10 @@ class WishlistTest extends TestCase
         // Initially wishlist is empty
         $this->assertCount(0, $customer->wishlistProducts);
 
+        // Verify WishlistCount component is 0 initially
+        Livewire::test(\App\Livewire\Shop\Partials\WishlistCount::class)
+            ->assertSet('count', 0);
+
         // Toggle / Add product to wishlist
         Livewire::test(\App\Livewire\Shop\ProductDetail::class, ['slug' => $product->slug])
             ->call('toggleWishlist')
@@ -71,12 +75,20 @@ class WishlistTest extends TestCase
         $this->assertCount(1, $customer->fresh()->wishlistProducts);
         $this->assertTrue($customer->fresh()->wishlistProducts->contains($product->id));
 
+        // Verify WishlistCount component is 1
+        Livewire::test(\App\Livewire\Shop\Partials\WishlistCount::class)
+            ->assertSet('count', 1);
+
         // Toggle again to remove
         Livewire::test(\App\Livewire\Shop\ProductDetail::class, ['slug' => $product->slug])
             ->call('toggleWishlist')
             ->assertDispatched('wishlist-updated');
 
         $this->assertCount(0, $customer->fresh()->wishlistProducts);
+
+        // Verify WishlistCount component is 0 again
+        Livewire::test(\App\Livewire\Shop\Partials\WishlistCount::class)
+            ->assertSet('count', 0);
     }
 
     public function test_customers_can_add_wishlisted_product_to_cart(): void

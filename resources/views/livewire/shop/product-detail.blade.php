@@ -217,12 +217,15 @@
                         <!-- Buttons Row -->
                         @auth
                         @role('customer')
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <flux:button wire:click="addToCart" icon="shopping-cart" class="cursor-pointer">
                                 Add to Cart
                             </flux:button>
-                            <flux:button wire:click="toggleWishlist" icon="heart" variant="outline" class="cursor-pointer {{ auth()->user()->wishlistProducts()->where('product_id', $product->id)->exists() ? 'text-rose-500 hover:text-rose-600 [&>svg]:fill-rose-500' : '' }}">
-                                {{ auth()->user()->wishlistProducts()->where('product_id', $product->id)->exists() ? 'Wishlisted' : 'Add to Wishlist' }}
+                            <flux:button wire:click="toggleWishlist" icon="heart" variant="outline" class="cursor-pointer {{ auth()->user()->isProductWishlisted($product->id) ? 'text-rose-500 hover:text-rose-600 [&>svg]:fill-rose-500' : '' }}">
+                                {{ auth()->user()->isProductWishlisted($product->id) ? 'Wishlisted' : 'Add to Wishlist' }}
+                            </flux:button>
+                            <flux:button wire:click="toggleComparison" icon="scale" variant="outline" class="cursor-pointer {{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'text-blue-500 hover:text-blue-600' : '' }}">
+                                {{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'Compared' : 'Compare' }}
                             </flux:button>
                         </div>
                         @endrole
