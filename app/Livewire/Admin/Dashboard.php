@@ -66,6 +66,17 @@ class Dashboard extends Component
                     ? 100.0
                     : 0.0);
 
+        $totalUsers = \App\Models\User::count();
+        $usersThisMonth = \App\Models\User::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        $usersLastMonth = \App\Models\User::whereMonth('created_at', now()->subMonthNoOverflow()->month)
+            ->whereYear('created_at', now()->subMonthNoOverflow()->year)
+            ->count();
+        $userGrowth = $usersLastMonth > 0
+            ? round((($usersThisMonth - $usersLastMonth) / $usersLastMonth) * 100, 1)
+            : ($usersThisMonth > 0 ? 100.0 : 0.0);
+
         return [
             'total_revenue' => $totalRevenue,
             'revenue_growth' => $revenueGrowth,
@@ -83,7 +94,34 @@ class Dashboard extends Component
             'low_stock_count' => Product::where('is_active', true)
                 ->where('stock', '<=', $this->lowStockThreshold)
                 ->count(),
+            'total_users' => $totalUsers,
+            'user_growth' => $userGrowth,
+            'total_inquiries' => \App\Models\ContactMessage::count(),
         ];
+    }
+
+    /**
+     * Get most frequently wishlisted products.
+     */
+    #[Computed]
+    public function topWishlisted(): Collection
+    {
+        return \Illuminate\Support\Facades\DB::table('wishlist_items')
+            ->selectRaw('product_id, products.name as product_name, COUNT(*) as wishlist_count')
+            ->join('products', 'products.id', '=', 'wishlist_items.product_id')
+            ->groupBy('product_id', 'products.name')
+            ->orderByDesc('wishlist_count')
+            ->limit(5)
+            ->get();
+    }
+
+    /**
+     * Get the recent contact inquiries.
+     */
+    #[Computed]
+    public function recentInquiries(): Collection
+    {
+        return \App\Models\ContactMessage::latest()->limit(5)->get();
     }
 
     /**
