@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\ShopSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
@@ -14,8 +13,6 @@ class ShopSettingFallbackTest extends TestCase
 
     public function test_returns_fallback_shop_settings_from_config_when_no_database_record_exists(): void
     {
-        Cache::forget(ShopSetting::CACHE_KEY);
-
         Config::set('shop.company.name', 'Config Shop Name');
         Config::set('shop.company.email', 'config@example.com');
         Config::set('shop.company.phone', '1234567890');
