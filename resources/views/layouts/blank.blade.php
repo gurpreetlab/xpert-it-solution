@@ -3,32 +3,32 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 antialiased selection:bg-blue-500 selection:text-white transition-colors duration-300">
+    <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased selection:bg-blue-500 selection:text-white transition-colors duration-300">
 
         <div class="w-full">
             <!-- Navigation Bar -->
-            <header class="sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-white/80 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/80 transition-colors duration-300">
+            <header class="sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-white/80 backdrop-blur-md transition-colors duration-300">
                 <div class="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
                     <div class="flex items-center gap-6">
                         <!-- Brand Logo & Name -->
                         <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
-                            <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-200 text-zinc-800  dark:bg-white dark:text-zinc-950 shadow-md group-hover:scale-105 transition-transform duration-200">
+                            <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-800 shadow-sm group-hover:scale-105 transition-transform duration-200">
                                 <!--<x-app-logo-icon class="size-5 fill-current" />-->
                                 <img src="{{ asset('storage/' . shop()->logo_path) }}" alt="{{ shop()->name }}" />
                             </div>
-                            <span class="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                                Xpert <span class="text-blue-600 dark:text-blue-500 font-semibold">IT Solution</span>
+                            <span class="text-xl font-bold tracking-tight text-zinc-900">
+                                Xpert <span class="text-blue-600 font-semibold">IT Solution</span>
                             </span>
 
                         </a>
                     </div>
 
                     <!-- Main Nav (Anchor links) -->
-                    <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                        <a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Home</a>
-                        <a href="{{ route('shop.products') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Products</a>
-                        <a href="{{ route('about') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">About</a>
-                        <a href="{{ route('contact') }}" class="hover:text-blue-600 dark:hover:text-blue-500 transition duration-200">Contact</a>
+                    <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600">
+                        <a href="{{ route('home') }}" class="hover:text-blue-600 transition duration-200">Home</a>
+                        <a href="{{ route('shop.products') }}" class="hover:text-blue-600 transition duration-200">Products</a>
+                        <a href="{{ route('about') }}" class="hover:text-blue-600 transition duration-200">About</a>
+                        <a href="{{ route('contact') }}" class="hover:text-blue-600 transition duration-200">Contact</a>
                     </nav>
 
                     <!-- Right Buttons (Auth) -->
@@ -37,7 +37,7 @@
                             @auth
 
                                 @role('customer')
-                                    <a href="{{ route('shop.compare') }}" class="relative text-zinc-600 dark:text-zinc-400 hover:text-blue-500 transition cursor-pointer mr-1" title="Compare Products" wire:navigate>
+                                    <a href="{{ route('shop.compare') }}" class="relative text-zinc-600 hover:text-blue-500 transition cursor-pointer mr-1" title="Compare Products" wire:navigate>
                                         <flux:icon icon="scale" class="size-6" />
                                         @if(count(session()->get('compared_product_ids', [])) > 0)
                                             <span class="-right-2 -top-2 absolute bg-blue-600 flex h-4 w-4 items-center justify-center rounded-full text-[10px] text-white font-bold">
@@ -78,7 +78,7 @@
                                 </flux:dropdown>
 
                             @else
-                                <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900" wire:navigate>
+                                <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-zinc-600 hover:bg-zinc-100" wire:navigate>
                                     Log in
                                 </flux:button>
                                 @if (Route::has('register'))
@@ -101,7 +101,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-zinc-800">
                         <div class="space-y-4">
                             <div class="flex items-center gap-2 text-white">
-                                <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-200 text-zinc-800  dark:bg-white dark:text-zinc-950 shadow-md group-hover:scale-105 transition-transform duration-200">
+                                <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-800 shadow-sm group-hover:scale-105 transition-transform duration-200">
                                     <!--<x-app-logo-icon class="size-5 fill-current" />-->
                                     <img src="{{ asset('storage/' . shop()->logo_path) }}" alt="{{ shop()->name }}" />
                                 </div>
