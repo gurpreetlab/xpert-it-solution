@@ -14,8 +14,13 @@ class VerifyEmailResponse implements VerifyEmailResponseContract
      */
     public function toResponse($request): Response
     {
-        return $request->wantsJson()
-            ? response()->json([], 204)
-            : redirect(route('dashboard').'?verified=1');
+        if ($request->wantsJson()) {
+            return response()->json([], 204);
+        }
+
+        $user = auth()->user();
+        $targetRoute = ($user && $user->hasRole('super-admin')) ? route('dashboard') : route('home');
+
+        return redirect($targetRoute.'?verified=1');
     }
 }
