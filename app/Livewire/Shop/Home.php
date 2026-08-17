@@ -4,7 +4,6 @@ namespace App\Livewire\Shop;
 
 use App\Livewire\Shop\Concerns\HandlesProductCatalog;
 use App\Models\Product;
-use App\Services\ShopCache;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -23,7 +22,30 @@ class Home extends Component
     #[Computed]
     public function featuredProducts(): EloquentCollection
     {
-        return ShopCache::featuredProducts();
+        return Product::query()
+            ->select([
+                'id',
+                'category_id',
+                'brand_id',
+                'name',
+                'slug',
+                'sale_price',
+                'mrp',
+                'stock',
+                'is_featured',
+                'sku',
+                'short_description',
+            ])
+            ->with([
+                'category:id,name,slug',
+                'brand:id,name,logo',
+                'primaryImage',
+            ])
+            ->where('is_active', true)
+            ->where('is_featured', true)
+            ->latest()
+            ->limit(6)
+            ->get();
     }
 
     /**

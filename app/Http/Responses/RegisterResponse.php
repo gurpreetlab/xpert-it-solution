@@ -14,8 +14,13 @@ class RegisterResponse implements RegisterResponseContract
      */
     public function toResponse($request): Response
     {
-        return $request->wantsJson()
-            ? response()->json([], 201)
-            : redirect(route('dashboard'));
+        if ($request->wantsJson()) {
+            return response()->json([], 201);
+        }
+
+        $user = auth()->user();
+        $targetRoute = ($user && $user->hasRole('super-admin')) ? route('dashboard') : route('home');
+
+        return redirect($targetRoute);
     }
 }

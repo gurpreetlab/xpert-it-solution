@@ -13,13 +13,6 @@ use Livewire\Component;
 
 class Cart extends Component
 {
-    /** @var EloquentCollection<int, CartItem>|null */
-    protected ?EloquentCollection $cartItems = null;
-
-    protected ?float $subtotal = null;
-
-    protected ?float $savings = null;
-
     /** @return EloquentCollection<int, CartItem> */
     #[Computed]
     public function cartItems(): EloquentCollection
@@ -91,9 +84,6 @@ class Cart extends Component
         $item->increment('quantity');
 
         $this->dispatch('cart-updated');
-        $this->cartItems = null;
-        $this->subtotal = null;
-        $this->savings = null;
     }
 
     public function decrementQuantity(int $itemId): void
@@ -113,9 +103,6 @@ class Cart extends Component
         $item->decrement('quantity');
 
         $this->dispatch('cart-updated');
-        $this->cartItems = null;
-        $this->subtotal = null;
-        $this->savings = null;
     }
 
     public function removeItem(int $itemId): void
@@ -134,9 +121,6 @@ class Cart extends Component
             message: 'Item removed from cart',
             variant: 'success',
         );
-        $this->cartItems = null;
-        $this->subtotal = null;
-        $this->savings = null;
     }
 
     public function clearCart(): void
@@ -151,9 +135,6 @@ class Cart extends Component
             message: 'Cart cleared',
             variant: 'success',
         );
-        $this->cartItems = null;
-        $this->subtotal = null;
-        $this->savings = null;
     }
 
     public function checkout(): ?RedirectResponse

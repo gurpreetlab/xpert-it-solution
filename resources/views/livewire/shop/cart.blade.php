@@ -11,11 +11,11 @@
     <div class="mb-8">
         <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">Your Shopping Cart</h2>
         <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            {{ $this->cartItems->count() }} {{ Str::plural('item', $this->cartItems->count()) }} ready for checkout.
+            {{ $this->cartItems?->count() ?? 0 }} {{ Str::plural('item', $this->cartItems?->count() ?? 0) }} ready for checkout.
         </p>
     </div>
 
-    @if($this->cartItems->isEmpty())
+    @if($this->cartItems?->isEmpty())
 
         <!-- Empty Cart State -->
         <div class="py-20 text-center rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
@@ -96,19 +96,19 @@
                                     </a>
                                     <span class="text-xs text-zinc-400 font-mono">SKU: {{ $product->sku ?? 'N/A' }}</span>
 
-                                    <button type="button" wire:click="removeItem({{ $item->id }})" class="flex items-center gap-1 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition pt-1 cursor-pointer">
+                                    <button type="button" wire:click="removeItem({{ $item->id }})" class="flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-700 transition pt-1 min-w-[44px] min-h-[44px] cursor-pointer" aria-label="Remove item from cart">
                                         <flux:icon icon="trash" class="size-3.5" />
                                         Remove
                                     </button>
                                 </div>
 
                                 <!-- Quantity Control -->
-                                <div class="flex items-center border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 p-1 shadow-sm w-fit">
-                                    <button type="button" wire:click="decrementQuantity({{ $item->id }})" class="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold transition cursor-pointer">
+                                <div class="flex items-center border border-zinc-200 rounded-xl bg-zinc-50 p-1 shadow-sm w-fit">
+                                    <button type="button" wire:click="decrementQuantity({{ $item->id }})" class="size-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 text-zinc-600 font-bold transition cursor-pointer" aria-label="Decrease quantity">
                                         -
                                     </button>
-                                    <span class="w-10 text-center text-sm font-bold text-zinc-900 dark:text-white">{{ $item->quantity }}</span>
-                                    <button type="button" wire:click="incrementQuantity({{ $item->id }})" class="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold transition cursor-pointer">
+                                    <span class="w-10 text-center text-sm font-bold text-zinc-900">{{ $item->quantity }}</span>
+                                    <button type="button" wire:click="incrementQuantity({{ $item->id }})" class="size-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 text-zinc-600 font-bold transition cursor-pointer" aria-label="Increase quantity">
                                         +
                                     </button>
                                 </div>
