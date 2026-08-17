@@ -37,9 +37,10 @@ Route::get('/products/{slug}', ProductDetail::class)->name(
     'shop.product.details',
 );
 
-// Google Socialite Auth Routes
+// Quick Auth Routes (Google & Phone OTP)
 Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/login/phone', \App\Livewire\Auth\PhoneLogin::class)->name('login.phone');
 
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     Route::get('/cart', ShopCart::class)->name('shop.cart');

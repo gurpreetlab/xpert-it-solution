@@ -7,7 +7,7 @@
 
         <x-passkey-verify />
 
-        <div class="space-y-4">
+        <div class="space-y-2.5">
             <a href="{{ route('auth.google.redirect') }}" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-sm font-semibold text-zinc-700 shadow-sm transition">
                 <svg class="size-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -18,7 +18,12 @@
                 <span>Continue with Google</span>
             </a>
 
-            <div class="relative flex items-center justify-center">
+            <a href="{{ route('login.phone') }}" class="flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-sm font-semibold text-zinc-700 shadow-sm transition" wire:navigate>
+                <flux:icon icon="phone" class="size-4 text-emerald-600" />
+                <span>Login with Phone OTP</span>
+            </a>
+
+            <div class="relative flex items-center justify-center pt-1">
                 <div class="border-t border-zinc-200 w-full"></div>
                 <span class="bg-white px-3 text-xs font-medium text-zinc-400 absolute">or</span>
             </div>
