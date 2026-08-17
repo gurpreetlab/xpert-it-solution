@@ -2,7 +2,13 @@
 
 namespace App\Livewire\Shop;
 
+use App\Actions\Cart\ClearCart as ClearCartAction;
+use App\Actions\Cart\DecrementCartItem;
+use App\Actions\Cart\IncrementCartItem;
+use App\Actions\Cart\RemoveCartItem;
+use App\Actions\Cart\ValidateCartForCheckout;
 use App\Models\CartItem;
+use App\Support\Cart\CartTotals;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
@@ -36,34 +42,12 @@ class Cart extends Component
     }
 
     #[Computed]
-    public function mrp(): float
+    public function totals(): CartTotals
     {
-        return $this->cartItems->sum(
-            fn ($item) => ($item->product->mrp ?? 0) * $item->quantity,
-        );
+        return new CartTotals($this->cartItems);
     }
 
-    #[Computed]
-    public function subtotal(): float
-    {
-        return $this->cartItems->sum(
-            fn ($item) => $item->sale_price * $item->quantity,
-        );
-    }
-
-    #[Computed]
-    public function savings(): float
-    {
-        return $this->cartItems->sum(function ($item) {
-            $mrp = $item->product->mrp ?? 0;
-
-            return $mrp > $item->sale_price
-                ? ($mrp - $item->sale_price) * $item->quantity
-                : 0;
-        });
-    }
-
-    public function incrementQuantity(int $itemId): void
+    public function incrementQuantity(int $itemId, IncrementCartItem $action): void
     {
         $item = $this->findOwnedItem($itemId);
 
@@ -71,22 +55,18 @@ class Cart extends Component
             return;
         }
 
-        if ($item->quantity >= $item->product->stock) {
-            $this->dispatch(
-                'cart-toast',
-                message: 'No more stock available',
-                variant: 'warning',
-            );
+        $result = $action($item);
+
+        if ($result->blocked) {
+            $this->dispatch('cart-toast', message: $result->message, variant: 'warning');
 
             return;
         }
 
-        $item->increment('quantity');
-
         $this->dispatch('cart-updated');
     }
 
-    public function decrementQuantity(int $itemId): void
+    public function decrementQuantity(int $itemId, DecrementCartItem $decrement, RemoveCartItem $remove): void
     {
         $item = $this->findOwnedItem($itemId);
 
@@ -95,17 +75,17 @@ class Cart extends Component
         }
 
         if ($item->quantity <= 1) {
-            $this->removeItem($itemId);
+            $this->removeItem($itemId, $remove);
 
             return;
         }
 
-        $item->decrement('quantity');
+        $decrement($item);
 
         $this->dispatch('cart-updated');
     }
 
-    public function removeItem(int $itemId): void
+    public function removeItem(int $itemId, RemoveCartItem $action): void
     {
         $item = $this->findOwnedItem($itemId);
 
@@ -113,7 +93,7 @@ class Cart extends Component
             return;
         }
 
-        $item->delete();
+        $action($item);
 
         $this->dispatch('cart-updated');
         $this->dispatch(
@@ -123,11 +103,9 @@ class Cart extends Component
         );
     }
 
-    public function clearCart(): void
+    public function clearCart(ClearCartAction $action): void
     {
-        $cart = Auth::user()->cart;
-
-        $cart?->items()->delete();
+        $action(Auth::user()->cart);
 
         $this->dispatch('cart-updated');
         $this->dispatch(
@@ -137,24 +115,18 @@ class Cart extends Component
         );
     }
 
-    public function checkout(): ?RedirectResponse
+    public function checkout(ValidateCartForCheckout $validate): ?RedirectResponse
     {
         if ($this->cartItems->isEmpty()) {
             return null;
         }
 
-        // Re-validate stock right before handing off to checkout,
-        // since availability may have changed since items were added.
-        foreach ($this->cartItems as $item) {
-            if ($item->product->stock < $item->quantity) {
-                $this->dispatch(
-                    'cart-toast',
-                    message: "\"{$item->product->name}\" no longer has enough stock",
-                    variant: 'danger',
-                );
+        $result = $validate($this->cartItems);
 
-                return null;
-            }
+        if ($result->blocked) {
+            $this->dispatch('cart-toast', message: $result->message, variant: 'danger');
+
+            return null;
         }
 
         return $this->redirect(route('shop.checkout'), navigate: true);
