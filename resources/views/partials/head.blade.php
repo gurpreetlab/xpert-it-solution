@@ -17,7 +17,7 @@
 @fonts
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-@fluxAppearance
+<!-- @fluxAppearance -->
 
 <script>
     if ('serviceWorker' in navigator) {
