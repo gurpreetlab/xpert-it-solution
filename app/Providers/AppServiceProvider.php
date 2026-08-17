@@ -9,7 +9,6 @@ use App\Models\ShopSetting;
 use App\Observers\BrandObserver;
 use App\Observers\CategoryObserver;
 use App\Observers\ProductObserver;
-use App\Observers\ShopSettingObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -37,9 +36,6 @@ class AppServiceProvider extends ServiceProvider
 	 }
 
         $this->configureDefaults();
-
-        ShopSetting::observe(ShopSettingObserver::class);
-        ShopSetting::getCached();
 
         Brand::observe(BrandObserver::class);
         Category::observe(CategoryObserver::class);
