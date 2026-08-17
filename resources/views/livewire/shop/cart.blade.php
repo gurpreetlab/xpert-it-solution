@@ -11,11 +11,11 @@
     <div class="mb-8">
         <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">Your Shopping Cart</h2>
         <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            {{ $this->cartItems->count() }} {{ Str::plural('item', $this->cartItems->count()) }} ready for checkout.
+            {{ $this->cartItems?->count() ?? 0 }} {{ Str::plural('item', $this->cartItems?->count() ?? 0) }} ready for checkout.
         </p>
     </div>
 
-    @if($this->cartItems->isEmpty())
+    @if($this->cartItems?->isEmpty())
 
         <!-- Empty Cart State -->
         <div class="py-20 text-center rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
