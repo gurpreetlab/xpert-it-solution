@@ -26,6 +26,7 @@ use App\Livewire\Shop\ProductDetail;
 use App\Livewire\Shop\Compare as ShopCompare;
 use App\Livewire\Shop\Products as ShopProducts;
 use App\Livewire\Shop\Wishlist;
+use App\Http\Controllers\Auth\SocialLoginController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
@@ -35,6 +36,10 @@ Route::get('/products', ShopProducts::class)->name('shop.products');
 Route::get('/products/{slug}', ProductDetail::class)->name(
     'shop.product.details',
 );
+
+// Google Socialite Auth Routes
+Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     Route::get('/cart', ShopCart::class)->name('shop.cart');
