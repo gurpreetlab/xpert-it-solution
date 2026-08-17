@@ -175,7 +175,7 @@ new #[Layout('layouts::blank')] class extends Component
             </section>
 
             <!-- Contact Card -->
-            <section id="contact" class="scroll-mt-24 p-6 sm:p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-900 text-white shadow-sm">
+            <section id="contact" class="scroll-mt-24 p-6 sm:p-8 rounded-2xl border border-zinc-200 bg-zinc-900 text-white shadow-sm">
                 <h2 class="text-lg font-bold mb-3 flex items-center gap-2">
                     <flux:icon icon="chat-bubble-left-right" class="size-5 text-blue-400" />
                     10. Contact Us
