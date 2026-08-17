@@ -29,6 +29,24 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
+            ->assertRedirect(route('home', absolute: false));
+
+        $this->assertAuthenticated();
+    }
+
+    public function test_super_admin_redirects_to_dashboard_on_login(): void
+    {
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'super-admin']);
+        $admin = User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        $response = $this->post(route('login.store'), [
+            'email' => $admin->email,
+            'password' => 'password',
+        ]);
+
+        $response
+            ->assertSessionHasNoErrors()
             ->assertRedirect(route('dashboard', absolute: false));
 
         $this->assertAuthenticated();
