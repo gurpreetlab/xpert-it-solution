@@ -123,7 +123,6 @@
                             <ul class="space-y-2 text-xs">
                                 <li><a href="{{ route('shop.privacy-policy') }}" class="hover:text-white transition" wire:navigate>Privacy Policy</a></li>
                                 <li><a href="{{ route('shop.terms-and-conditions') }}" class="hover:text-white transition" wire:navigate>Terms &amp; Conditions</a></li>
-                                <li><a href="{{ route('shop.refund-policy') }}" class="hover:text-white transition" wire:navigate>Refund &amp; Return Policy</a></li>
                                 <li><a href="{{ route('shop.shipping-policy') }}" class="hover:text-white transition" wire:navigate>Shipping Policy</a></li>
                             </ul>
                         </div>
