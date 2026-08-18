@@ -32,8 +32,9 @@ class SocialLoginController extends Controller
             return redirect()->route('login')->with('error', 'Unable to authenticate with Google.');
         }
 
+        $googleEmail = $googleUser->getEmail();
         $user = User::where('google_id', $googleUser->getId())
-            ->orWhere('email', $googleUser->getEmail())
+            ->when($googleEmail, fn ($query) => $query->orWhere('email', $googleEmail))
             ->first();
 
         if ($user) {
@@ -59,7 +60,13 @@ class SocialLoginController extends Controller
 
         Auth::login($user, true);
 
-        $targetRoute = $user->hasRole('super-admin') ? route('dashboard') : route('home');
+        $isSuperAdmin = $user->hasRole('super-admin');
+        $intended = session()->get('url.intended');
+        if (! $isSuperAdmin && $intended && str_contains($intended, '/super-admin')) {
+            session()->forget('url.intended');
+        }
+
+        $targetRoute = $isSuperAdmin ? route('dashboard') : route('home');
 
         return redirect()->intended($targetRoute);
     }
@@ -83,8 +90,9 @@ class SocialLoginController extends Controller
             return redirect()->route('login')->with('error', 'Unable to authenticate with Facebook.');
         }
 
+        $facebookEmail = $facebookUser->getEmail();
         $user = User::where('facebook_id', $facebookUser->getId())
-            ->orWhere('email', $facebookUser->getEmail())
+            ->when($facebookEmail, fn ($query) => $query->orWhere('email', $facebookEmail))
             ->first();
 
         if ($user) {
@@ -110,7 +118,13 @@ class SocialLoginController extends Controller
 
         Auth::login($user, true);
 
-        $targetRoute = $user->hasRole('super-admin') ? route('dashboard') : route('home');
+        $isSuperAdmin = $user->hasRole('super-admin');
+        $intended = session()->get('url.intended');
+        if (! $isSuperAdmin && $intended && str_contains($intended, '/super-admin')) {
+            session()->forget('url.intended');
+        }
+
+        $targetRoute = $isSuperAdmin ? route('dashboard') : route('home');
 
         return redirect()->intended($targetRoute);
     }

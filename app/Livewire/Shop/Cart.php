@@ -20,26 +20,10 @@ class Cart extends Component
 
     protected ?float $savings = null;
 
-    /** @return EloquentCollection<int, CartItem> */
     #[Computed]
-    public function cartItems(): EloquentCollection
+    public function cartItems()
     {
-        $cart = Auth::user()->cart;
-
-        if (! $cart) {
-            return new EloquentCollection;
-        }
-
-        return $cart
-            ->items()
-            ->with([
-                'product.category',
-                'product.brand',
-                'product.images',
-                'product.primaryImage',
-            ])
-            ->latest()
-            ->get();
+        return \App\Support\CartManager::getCartItems();
     }
 
     #[Computed]
@@ -70,15 +54,16 @@ class Cart extends Component
         });
     }
 
-    public function incrementQuantity(int $itemId): void
+    public function incrementQuantity(int|string $itemId): void
     {
-        $item = $this->findOwnedItem($itemId);
-
+        $item = $this->cartItems->firstWhere('id', $itemId);
         if (! $item) {
             return;
         }
 
-        if ($item->quantity >= $item->product->stock) {
+        $success = \App\Support\CartManager::updateQuantity($itemId, $item->quantity + 1);
+
+        if (! $success) {
             $this->dispatch(
                 'cart-toast',
                 message: 'No more stock available',
@@ -88,17 +73,15 @@ class Cart extends Component
             return;
         }
 
-        $item->increment('quantity');
-
         $this->dispatch('cart-updated');
         $this->cartItems = null;
         $this->subtotal = null;
         $this->savings = null;
     }
 
-    public function decrementQuantity(int $itemId): void
+    public function decrementQuantity(int|string $itemId): void
     {
-        $item = $this->findOwnedItem($itemId);
+        $item = $this->cartItems->firstWhere('id', $itemId);
 
         if (! $item) {
             return;
@@ -110,7 +93,7 @@ class Cart extends Component
             return;
         }
 
-        $item->decrement('quantity');
+        \App\Support\CartManager::updateQuantity($itemId, $item->quantity - 1);
 
         $this->dispatch('cart-updated');
         $this->cartItems = null;
@@ -118,15 +101,9 @@ class Cart extends Component
         $this->savings = null;
     }
 
-    public function removeItem(int $itemId): void
+    public function removeItem(int|string $itemId): void
     {
-        $item = $this->findOwnedItem($itemId);
-
-        if (! $item) {
-            return;
-        }
-
-        $item->delete();
+        \App\Support\CartManager::removeItem($itemId);
 
         $this->dispatch('cart-updated');
         $this->dispatch(
@@ -141,9 +118,7 @@ class Cart extends Component
 
     public function clearCart(): void
     {
-        $cart = Auth::user()->cart;
-
-        $cart?->items()->delete();
+        \App\Support\CartManager::clear();
 
         $this->dispatch('cart-updated');
         $this->dispatch(

@@ -20,13 +20,7 @@ class Wishlist extends Component
     #[Computed]
     public function wishlistItems(): Collection
     {
-        if (! auth()->check()) {
-            return new Collection();
-        }
-
-        return auth()->user()->wishlistProducts()
-            ->with(['brand', 'primaryImage', 'images', 'category'])
-            ->get();
+        return \App\Support\WishlistManager::getProducts();
     }
 
     /**
@@ -34,11 +28,7 @@ class Wishlist extends Component
      */
     public function removeFromWishlist(int $productId): void
     {
-        if (! auth()->check()) {
-            return;
-        }
-
-        auth()->user()->wishlistProducts()->detach($productId);
+        \App\Support\WishlistManager::remove($productId);
 
         $this->dispatch('wishlist-updated');
 
@@ -50,38 +40,20 @@ class Wishlist extends Component
      */
     public function addToCart(int $productId): void
     {
-        if (! auth()->check()) {
-            Flux::toast(text: 'Please login to add items to your cart.', variant: 'danger');
-            return;
-        }
-
         $product = Product::findOrFail($productId);
 
-        // Check stock
         if ($product->stock <= 0) {
             Flux::toast(text: 'Product is out of stock.', variant: 'danger');
             return;
         }
 
-        $cart = auth()->user()->cart()->firstOrCreate();
+        $success = \App\Support\CartManager::add($productId, 1);
 
-        $item = $cart->items()->where('product_id', $productId)->first();
-
-        if ($item) {
-            if ($item->quantity >= $product->stock) {
-                Flux::toast(text: 'Not enough stock available.', variant: 'warning');
-                return;
-            }
-            $item->increment('quantity');
-        } else {
-            $cart->items()->create([
-                'product_id' => $productId,
-                'quantity' => 1,
-                'sale_price' => $product->sale_price,
-            ]);
+        if (! $success) {
+            Flux::toast(text: 'Not enough stock available.', variant: 'warning');
+            return;
         }
 
-        // Keep it in wishlist or remove? Normally we keep it, but let's just toast and dispatch update
         $this->dispatch('cart-updated');
         Flux::toast(text: "Added {$product->name} to cart.", variant: 'success');
     }

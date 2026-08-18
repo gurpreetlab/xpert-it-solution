@@ -18,9 +18,7 @@ class WishlistCount extends Component
     #[On('wishlist-updated')]
     public function refreshCount(): void
     {
-        $this->count = auth()->check()
-            ? auth()->user()->wishlistProducts()->count()
-            : 0;
+        $this->count = \App\Support\WishlistManager::count();
     }
 
     public function render(): View

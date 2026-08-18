@@ -18,9 +18,7 @@ class CartCount extends Component
     #[On('cart-updated')]
     public function refreshCount(): void
     {
-        $this->count = auth()->check()
-            ? auth()->user()->cart?->items()->count() ?? 0
-            : 0;
+        $this->count = \App\Support\CartManager::count();
     }
 
     public function render(): View
