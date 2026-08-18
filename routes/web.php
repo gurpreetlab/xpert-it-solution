@@ -37,9 +37,11 @@ Route::get('/products/{slug}', ProductDetail::class)->name(
     'shop.product.details',
 );
 
-// Google Socialite Auth Routes
+// Social Auth Routes (Google & Facebook)
 Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/auth/facebook/redirect', [SocialLoginController::class, 'redirectToFacebook'])->name('auth.facebook.redirect');
+Route::get('/auth/facebook/callback', [SocialLoginController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
 
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     Route::get('/cart', ShopCart::class)->name('shop.cart');
