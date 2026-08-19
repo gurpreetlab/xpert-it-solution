@@ -3,14 +3,11 @@
 namespace App\Livewire\Shop;
 
 use App\Actions\Cart\ClearCart as ClearCartAction;
-use App\Actions\Cart\DecrementCartItem;
-use App\Actions\Cart\IncrementCartItem;
-use App\Actions\Cart\RemoveCartItem;
 use App\Actions\Cart\ValidateCartForCheckout;
 use App\Models\CartItem;
 use App\Support\Cart\CartTotals;
+use App\Support\CartManager; // TODO: confirm this is CartTotals' actual namespace
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -19,26 +16,10 @@ use Livewire\Component;
 
 class Cart extends Component
 {
-    /** @return EloquentCollection<int, CartItem> */
     #[Computed]
-    public function cartItems(): EloquentCollection
+    public function cartItems()
     {
-        $cart = Auth::user()->cart;
-
-        if (! $cart) {
-            return new EloquentCollection;
-        }
-
-        return $cart
-            ->items()
-            ->with([
-                'product.category',
-                'product.brand',
-                'product.images',
-                'product.primaryImage',
-            ])
-            ->latest()
-            ->get();
+        return CartManager::getCartItems();
     }
 
     #[Computed]
@@ -47,18 +28,41 @@ class Cart extends Component
         return new CartTotals($this->cartItems);
     }
 
-    public function incrementQuantity(int $itemId, IncrementCartItem $action): void
+    #[Computed]
+    public function subtotal(): float
     {
-        $item = $this->findOwnedItem($itemId);
+        return $this->cartItems->sum(
+            fn ($item) => $item->sale_price * $item->quantity,
+        );
+    }
 
+    #[Computed]
+    public function savings(): float
+    {
+        return $this->cartItems->sum(function ($item) {
+            $mrp = $item->product->mrp ?? 0;
+
+            return $mrp > $item->sale_price
+                ? ($mrp - $item->sale_price) * $item->quantity
+                : 0;
+        });
+    }
+
+    public function incrementQuantity(int|string $itemId): void
+    {
+        $item = $this->cartItems->firstWhere('id', $itemId);
         if (! $item) {
             return;
         }
 
-        $result = $action($item);
+        $success = CartManager::updateQuantity($itemId, $item->quantity + 1);
 
-        if ($result->blocked) {
-            $this->dispatch('cart-toast', message: $result->message, variant: 'warning');
+        if (! $success) {
+            $this->dispatch(
+                'cart-toast',
+                message: 'No more stock available',
+                variant: 'warning',
+            );
 
             return;
         }
@@ -66,34 +70,28 @@ class Cart extends Component
         $this->dispatch('cart-updated');
     }
 
-    public function decrementQuantity(int $itemId, DecrementCartItem $decrement, RemoveCartItem $remove): void
+    public function decrementQuantity(int|string $itemId): void
     {
-        $item = $this->findOwnedItem($itemId);
+        $item = $this->cartItems->firstWhere('id', $itemId);
 
         if (! $item) {
             return;
         }
 
         if ($item->quantity <= 1) {
-            $this->removeItem($itemId, $remove);
+            $this->removeItem($itemId);
 
             return;
         }
 
-        $decrement($item);
+        CartManager::updateQuantity($itemId, $item->quantity - 1);
 
         $this->dispatch('cart-updated');
     }
 
-    public function removeItem(int $itemId, RemoveCartItem $action): void
+    public function removeItem(int|string $itemId): void
     {
-        $item = $this->findOwnedItem($itemId);
-
-        if (! $item) {
-            return;
-        }
-
-        $action($item);
+        CartManager::removeItem($itemId);
 
         $this->dispatch('cart-updated');
         $this->dispatch(
@@ -105,7 +103,10 @@ class Cart extends Component
 
     public function clearCart(ClearCartAction $action): void
     {
-        $action(Auth::user()->cart);
+        // TODO: $action is injected but never invoked — decide whether this
+        // should replace the CartManager::clear() call below (check
+        // ClearCartAction's __invoke signature first).
+        CartManager::clear();
 
         $this->dispatch('cart-updated');
         $this->dispatch(

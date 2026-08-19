@@ -128,9 +128,7 @@ new #[Layout('layouts::blank')] class extends Component
                     6. Cancellations &amp; Returns
                 </h2>
                 <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                    Order cancellations, returns, and refunds are governed by our
-                    <a href="{{ route('shop.refund-policy') }}" class="text-blue-600 dark:text-blue-400 hover:underline" wire:navigate>Refund &amp; Return Policy</a>,
-                    which forms part of these Terms &amp; Conditions.
+                    Order cancellations and returns are subject to review and confirmation by our support team prior to dispatch or upon inspection.
                 </p>
             </section>
 

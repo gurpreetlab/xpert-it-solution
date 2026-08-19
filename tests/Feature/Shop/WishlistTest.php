@@ -23,10 +23,38 @@ class WishlistTest extends TestCase
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
     }
 
-    public function test_guests_cannot_access_wishlist_page(): void
+    public function test_guests_can_access_and_manage_wishlist_page(): void
     {
+        $category = Category::create(['name' => 'Networking']);
+        $brand = Brand::create(['name' => 'Netgear']);
+
+        $product = Product::create([
+            'name' => 'Netgear Wi-Fi Router',
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'is_active' => true,
+            'sale_price' => 5000,
+            'mrp' => 6000,
+            'stock' => 10,
+        ]);
+
         $response = $this->get(route('shop.wishlist'));
-        $response->assertRedirect(route('login'));
+        $response->assertOk();
+
+        // Guest toggle wishlist item
+        Livewire::test(\App\Livewire\Shop\ProductDetail::class, ['slug' => $product->slug])
+            ->call('toggleWishlist')
+            ->assertDispatched('wishlist-updated');
+
+        $this->assertTrue(\App\Support\WishlistManager::contains($product->id));
+        $this->assertEquals(1, \App\Support\WishlistManager::count());
+
+        // Guest add to cart from wishlist
+        Livewire::test(Wishlist::class)
+            ->call('addToCart', $product->id)
+            ->assertDispatched('cart-updated');
+
+        $this->assertEquals(1, \App\Support\CartManager::count());
     }
 
     public function test_customers_can_render_wishlist_page(): void

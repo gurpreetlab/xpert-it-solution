@@ -19,7 +19,14 @@ class LoginResponse implements LoginResponseContract
         }
 
         $user = auth()->user();
-        $targetRoute = ($user && $user->hasRole('super-admin')) ? route('dashboard') : route('home');
+        $isSuperAdmin = $user && $user->hasRole('super-admin');
+
+        $intended = session()->get('url.intended');
+        if (! $isSuperAdmin && $intended && str_contains($intended, '/super-admin')) {
+            session()->forget('url.intended');
+        }
+
+        $targetRoute = $isSuperAdmin ? route('dashboard') : route('home');
 
         return redirect()->intended($targetRoute);
     }

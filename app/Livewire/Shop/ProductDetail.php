@@ -217,24 +217,13 @@ class ProductDetail extends Component
 
     public function toggleWishlist(): void
     {
-        if (! auth()->check()) {
-            Flux::toast(
-                text: 'Please login to manage your wishlist.',
-                variant: 'danger',
-            );
-
-            return;
-        }
-
-        $user = auth()->user();
         $productId = $this->product()->id;
+        $added = \App\Support\WishlistManager::toggle($productId);
 
-        if ($user->wishlistProducts()->where('product_id', $productId)->exists()) {
-            $user->wishlistProducts()->detach($productId);
-            Flux::toast(text: 'Removed from wishlist.', variant: 'success');
-        } else {
-            $user->wishlistProducts()->attach($productId);
+        if ($added) {
             Flux::toast(text: 'Added to wishlist.', variant: 'success');
+        } else {
+            Flux::toast(text: 'Removed from wishlist.', variant: 'success');
         }
 
         $this->dispatch('wishlist-updated');
@@ -248,52 +237,23 @@ class ProductDetail extends Component
 
     public function addToCart(): void
     {
-        if (! auth()->check()) {
-            Flux::toast(
-                text: 'Please login to add items to your cart.',
-                variant: 'danger',
-            );
+        $product = $this->product();
 
-            return;
-        }
-
-        // Check if product is out of stock
-        if ($this->product()->stock <= 0) {
+        if ($product->stock <= 0) {
             Flux::toast(text: 'Product is out of stock.', variant: 'danger');
-
             return;
         }
 
-        // Check if quantity exceeds stock
-        if ($this->quantity > $this->product()->stock) {
-            Flux::toast(
-                text: "Only {$this->product()->stock} unit(s) available in stock.",
-                variant: 'warning',
-            );
+        $success = \App\Support\CartManager::add($product->id, $this->quantity);
 
+        if (! $success) {
+            Flux::toast(text: "Only {$product->stock} unit(s) available in stock.", variant: 'warning');
             return;
-        }
-
-        $cart = auth()->user()->cart()->firstOrCreate();
-
-        $item = $cart
-            ->items()
-            ->where('product_id', $this->product()->id)
-            ->first();
-
-        if ($item) {
-            $item->increment('quantity', $this->quantity);
-        } else {
-            $cart->items()->create([
-                'product_id' => $this->product()->id,
-                'quantity' => $this->quantity,
-                'sale_price' => $this->product()->sale_price,
-            ]);
         }
 
         $this->dispatch('cart-updated');
         Flux::toast(
-            text: "Added {$this->quantity} unit(s) of {$this->product()->name} to cart.",
+            text: "Added {$this->quantity} unit(s) of {$product->name} to cart.",
             variant: 'success',
         );
     }
