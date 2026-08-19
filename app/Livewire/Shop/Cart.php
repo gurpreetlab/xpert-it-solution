@@ -5,7 +5,6 @@ namespace App\Livewire\Shop;
 use App\Models\CartItem;
 use App\Support\CartManager;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -14,13 +13,6 @@ use Livewire\Component;
 
 class Cart extends Component
 {
-    /** @var EloquentCollection<int, CartItem>|null */
-    protected ?EloquentCollection $cartItems = null;
-
-    protected ?float $subtotal = null;
-
-    protected ?float $savings = null;
-
     #[Computed]
     public function cartItems()
     {
