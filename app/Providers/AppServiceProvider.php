@@ -23,7 +23,15 @@ class AppServiceProvider extends ServiceProvider
     #[\Override]
     public function register(): void
     {
-        //
+        $this->app->bind(
+            \App\Contracts\WishlistServiceInterface::class,
+            \App\Support\WishlistManager::class
+        );
+
+        $this->app->bind(
+            \App\Contracts\CartServiceInterface::class,
+            \App\Support\CartManager::class
+        );
     }
 
     /**
@@ -40,6 +48,11 @@ class AppServiceProvider extends ServiceProvider
         Brand::observe(BrandObserver::class);
         Category::observe(CategoryObserver::class);
         Product::observe(ProductObserver::class);
+
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\OrderPlaced::class,
+            \App\Listeners\SendAdminOrderNotificationListener::class
+        );
     }
 
     /**
