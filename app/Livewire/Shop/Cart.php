@@ -3,6 +3,7 @@
 namespace App\Livewire\Shop;
 
 use App\Models\CartItem;
+use App\Support\CartManager;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
@@ -13,26 +14,17 @@ use Livewire\Component;
 
 class Cart extends Component
 {
-    /** @return EloquentCollection<int, CartItem> */
+    /** @var EloquentCollection<int, CartItem>|null */
+    protected ?EloquentCollection $cartItems = null;
+
+    protected ?float $subtotal = null;
+
+    protected ?float $savings = null;
+
     #[Computed]
-    public function cartItems(): EloquentCollection
+    public function cartItems()
     {
-        $cart = Auth::user()->cart;
-
-        if (! $cart) {
-            return new EloquentCollection;
-        }
-
-        return $cart
-            ->items()
-            ->with([
-                'product.category',
-                'product.brand',
-                'product.images',
-                'product.primaryImage',
-            ])
-            ->latest()
-            ->get();
+        return CartManager::getCartItems();
     }
 
     #[Computed]
@@ -63,15 +55,16 @@ class Cart extends Component
         });
     }
 
-    public function incrementQuantity(int $itemId): void
+    public function incrementQuantity(int|string $itemId): void
     {
-        $item = $this->findOwnedItem($itemId);
-
+        $item = $this->cartItems->firstWhere('id', $itemId);
         if (! $item) {
             return;
         }
 
-        if ($item->quantity >= $item->product->stock) {
+        $success = CartManager::updateQuantity($itemId, $item->quantity + 1);
+
+        if (! $success) {
             $this->dispatch(
                 'cart-toast',
                 message: 'No more stock available',
@@ -81,14 +74,12 @@ class Cart extends Component
             return;
         }
 
-        $item->increment('quantity');
-
         $this->dispatch('cart-updated');
     }
 
-    public function decrementQuantity(int $itemId): void
+    public function decrementQuantity(int|string $itemId): void
     {
-        $item = $this->findOwnedItem($itemId);
+        $item = $this->cartItems->firstWhere('id', $itemId);
 
         if (! $item) {
             return;
@@ -100,20 +91,14 @@ class Cart extends Component
             return;
         }
 
-        $item->decrement('quantity');
+        CartManager::updateQuantity($itemId, $item->quantity - 1);
 
         $this->dispatch('cart-updated');
     }
 
-    public function removeItem(int $itemId): void
+    public function removeItem(int|string $itemId): void
     {
-        $item = $this->findOwnedItem($itemId);
-
-        if (! $item) {
-            return;
-        }
-
-        $item->delete();
+        CartManager::removeItem($itemId);
 
         $this->dispatch('cart-updated');
         $this->dispatch(
@@ -125,9 +110,7 @@ class Cart extends Component
 
     public function clearCart(): void
     {
-        $cart = Auth::user()->cart;
-
-        $cart?->items()->delete();
+        CartManager::clear();
 
         $this->dispatch('cart-updated');
         $this->dispatch(

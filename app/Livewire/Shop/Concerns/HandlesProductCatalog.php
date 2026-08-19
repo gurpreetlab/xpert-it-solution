@@ -216,23 +216,12 @@ trait HandlesProductCatalog
      */
     public function toggleWishlist(int $productId): void
     {
-        if (! auth()->check()) {
-            \Flux\Flux::toast(
-                text: 'Please login to manage your wishlist.',
-                variant: 'danger',
-            );
+        $added = \App\Support\WishlistManager::toggle($productId);
 
-            return;
-        }
-
-        $user = auth()->user();
-
-        if ($user->wishlistProducts()->where('product_id', $productId)->exists()) {
-            $user->wishlistProducts()->detach($productId);
-            \Flux\Flux::toast(text: 'Removed from wishlist.', variant: 'success');
-        } else {
-            $user->wishlistProducts()->attach($productId);
+        if ($added) {
             \Flux\Flux::toast(text: 'Added to wishlist.', variant: 'success');
+        } else {
+            \Flux\Flux::toast(text: 'Removed from wishlist.', variant: 'success');
         }
 
         $this->dispatch('wishlist-updated');

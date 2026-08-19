@@ -32,8 +32,9 @@ class SocialLoginController extends Controller
             return redirect()->route('login')->with('error', 'Unable to authenticate with Google.');
         }
 
+        $googleEmail = $googleUser->getEmail();
         $user = User::where('google_id', $googleUser->getId())
-            ->orWhere('email', $googleUser->getEmail())
+            ->when($googleEmail, fn ($query) => $query->orWhere('email', $googleEmail))
             ->first();
 
         if ($user) {
@@ -59,59 +60,15 @@ class SocialLoginController extends Controller
 
         Auth::login($user, true);
 
-        $targetRoute = $user->hasRole('super-admin') ? route('dashboard') : route('home');
+        $isSuperAdmin = $user->hasRole('super-admin');
+        $intended = session()->get('url.intended');
+        if (! $isSuperAdmin && $intended && str_contains($intended, '/super-admin')) {
+            session()->forget('url.intended');
+        }
+
+        $targetRoute = $isSuperAdmin ? route('dashboard') : route('home');
 
         return redirect()->intended($targetRoute);
     }
 
-    /**
-     * Redirect the user to the Facebook authentication page.
-     */
-    public function redirectToFacebook(): RedirectResponse
-    {
-        return Socialite::driver('facebook')->redirect();
-    }
-
-    /**
-     * Obtain the user information from Facebook.
-     */
-    public function handleFacebookCallback(): RedirectResponse
-    {
-        try {
-            $facebookUser = Socialite::driver('facebook')->user();
-        } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Unable to authenticate with Facebook.');
-        }
-
-        $user = User::where('facebook_id', $facebookUser->getId())
-            ->orWhere('email', $facebookUser->getEmail())
-            ->first();
-
-        if ($user) {
-            if (!$user->facebook_id) {
-                $user->update([
-                    'facebook_id' => $facebookUser->getId(),
-                    'avatar' => $facebookUser->getAvatar(),
-                ]);
-            }
-        } else {
-            $user = User::create([
-                'name' => $facebookUser->getName() ?? $facebookUser->getNickname() ?? 'Facebook User',
-                'email' => $facebookUser->getEmail() ?? ($facebookUser->getId() . '@facebook.xpertit.loc'),
-                'facebook_id' => $facebookUser->getId(),
-                'avatar' => $facebookUser->getAvatar(),
-                'password' => Hash::make(Str::random(24)),
-                'email_verified_at' => now(),
-            ]);
-
-            Role::firstOrCreate(['name' => 'customer']);
-            $user->assignRole('customer');
-        }
-
-        Auth::login($user, true);
-
-        $targetRoute = $user->hasRole('super-admin') ? route('dashboard') : route('home');
-
-        return redirect()->intended($targetRoute);
-    }
 }

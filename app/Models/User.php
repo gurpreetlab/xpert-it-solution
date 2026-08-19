@@ -100,6 +100,14 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     /**
      * Check if a product is in the user's wishlist, caching the list of IDs at request-level.
      */
+    public function clearWishlistMemoization(): void
+    {
+        $this->memoizedWishlistProductIds = null;
+    }
+
+    /**
+     * Check if a product is in the user's wishlist, caching the list of IDs at request-level.
+     */
     public function isProductWishlisted(int $productId): bool
     {
         if ($this->memoizedWishlistProductIds === null) {

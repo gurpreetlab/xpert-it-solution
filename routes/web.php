@@ -37,15 +37,17 @@ Route::get('/products/{slug}', ProductDetail::class)->name(
     'shop.product.details',
 );
 
-// Social Auth Routes (Google & Facebook)
+// Social Auth Routes (Google)
 Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
-Route::get('/auth/facebook/redirect', [SocialLoginController::class, 'redirectToFacebook'])->name('auth.facebook.redirect');
-Route::get('/auth/facebook/callback', [SocialLoginController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
 
+// Public Shopping Utility Routes (Accessible to guests & authenticated users)
+Route::get('/cart', ShopCart::class)->name('shop.cart');
+Route::get('/wishlist', Wishlist::class)->name('shop.wishlist');
+Route::get('/compare', ShopCompare::class)->name('shop.compare');
+
+// Authenticated Customer Checkout & Order History Routes
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
-    Route::get('/cart', ShopCart::class)->name('shop.cart');
-
     Route::get('/cart/checkout', Checkout::class)->name('shop.checkout');
 
     Route::get('/orders', ShopOrders::class)->name('shop.orders');
@@ -54,10 +56,6 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
         '/order/{order:order_number}/confirmation',
         ShopOrderConfirmation::class,
     )->name('shop.order.confirmation');
-
-    Route::get('/wishlist', Wishlist::class)->name('shop.wishlist');
-
-    Route::get('/compare', ShopCompare::class)->name('shop.compare');
 });
 
 // super-admin routes
