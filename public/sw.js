@@ -1,8 +1,9 @@
-const CACHE_NAME = 'xpert-it-v1';
+const CACHE_NAME = 'xpert-it-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/favicon.ico',
-  '/manifest.json'
+  '/manifest.json',
+  '/offline.html'
 ];
 
 self.addEventListener('install', (event) => {
@@ -29,7 +30,14 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
     fetch(event.request).catch(() => {
-      return caches.match(event.request);
+      return caches.match(event.request).then((response) => {
+        if (response) {
+          return response;
+        }
+        if (event.request.mode === 'navigate') {
+          return caches.match('/offline.html');
+        }
+      });
     })
   );
 });

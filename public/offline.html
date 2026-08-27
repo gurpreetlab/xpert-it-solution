@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're Offline - Xpert IT Solution</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-zinc-100 min-h-screen flex flex-col items-center justify-between p-6 text-zinc-800">
+    <!-- Top Bar -->
+    <header class="w-full max-w-md pt-4 flex justify-between items-center text-zinc-500 text-xs">
+        <span class="font-semibold text-zinc-900">Xpert IT Solution</span>
+        <span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-[11px] font-medium px-2.5 py-1 rounded-full">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Offline Mode
+        </span>
+    </header>
+
+    <!-- Content Card -->
+    <main class="w-full max-w-md my-auto flex flex-col items-center text-center p-8 bg-white rounded-3xl shadow-sm border border-zinc-200/80">
+        <div class="w-24 h-24 bg-zinc-100 rounded-full flex items-center justify-center mb-6 text-zinc-600 shadow-inner">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+            </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-zinc-900 mb-2">No Internet Connection</h1>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6">
+            You are currently offline. Please check your network connection and try again to browse our catalog.
+        </p>
+        <button onclick="window.location.reload()" class="w-full py-3.5 bg-zinc-900 hover:bg-zinc-800 active:scale-[0.98] text-white font-semibold rounded-2xl transition duration-150 shadow-md">
+            Retry Connection
+        </button>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-md pb-4 text-center text-zinc-400 text-xs">
+        &copy; Xpert IT Solution. Native PWA Fallback.
+    </footer>
+</body>
+</html>

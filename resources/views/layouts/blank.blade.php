@@ -3,27 +3,29 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased selection:bg-blue-500 selection:text-white transition-colors duration-300">
+    <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased selection:bg-blue-500 selection:text-white transition-colors duration-300 pb-24 md:pb-0">
 
         <div class="w-full">
             <!-- Navigation Bar -->
-            <header class="sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-white/80 backdrop-blur-md transition-colors duration-300">
+            <header class="sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-white/95 backdrop-blur-md transition-colors duration-300">
                 <div class="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-                    <div class="flex items-center gap-6">
-                        <!-- Brand Logo & Name -->
+                    <div class="flex items-center gap-4">
+                        <!-- Mobile Back or Brand Logo -->
                         <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
-                            <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-800 shadow-sm group-hover:scale-105 transition-transform duration-200">
-                                <!--<x-app-logo-icon class="size-5 fill-current" />-->
-                                <img src="{{ asset('storage/' . shop()->logo_path) }}" alt="{{ shop()->name }}" />
+                            <div class="flex aspect-square size-9 items-center justify-center rounded-xl bg-zinc-100 text-zinc-800 shadow-sm group-hover:scale-105 transition-transform duration-200 overflow-hidden shrink-0">
+                                @if(shop()->logo_path && file_exists(public_path('storage/' . shop()->logo_path)))
+                                    <img src="{{ asset('storage/' . shop()->logo_path) }}" alt="" class="max-h-6 max-w-6 object-contain" onError="this.style.display='none'" />
+                                @else
+                                    <flux:icon icon="bolt" class="size-5 text-blue-600" />
+                                @endif
                             </div>
                             <span class="text-xl font-bold tracking-tight text-zinc-900">
                                 Xpert <span class="text-blue-600 font-semibold">IT Solution</span>
                             </span>
-
                         </a>
                     </div>
 
-                    <!-- Main Nav (Anchor links) -->
+                    <!-- Main Nav (Desktop) -->
                     <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600">
                         <a href="{{ route('home') }}" class="hover:text-blue-600 transition duration-200">Home</a>
                         <a href="{{ route('shop.products') }}" class="hover:text-blue-600 transition duration-200">Products</a>
@@ -32,8 +34,8 @@
                     </nav>
 
                     <!-- Right Utility Links (Compare, Wishlist, Cart) & Auth -->
-                    <div class="flex items-center gap-4">
-                        <a href="{{ route('shop.compare') }}" class="relative text-zinc-600 hover:text-blue-500 transition cursor-pointer mr-1" title="Compare Products" wire:navigate aria-label="Compare Products">
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <a href="{{ route('shop.compare') }}" class="relative text-zinc-600 hover:text-blue-500 transition cursor-pointer" title="Compare Products" wire:navigate aria-label="Compare Products">
                             <flux:icon icon="scale" class="size-6" />
                             @if(count(session()->get('compared_product_ids', [])) > 0)
                                 <span class="-right-2 -top-2 absolute bg-blue-600 flex h-4 w-4 items-center justify-center rounded-full text-[10px] text-white font-bold">
@@ -41,12 +43,16 @@
                                 </span>
                             @endif
                         </a>
-                        <livewire:shop.partials.wishlist-count />
-                        <livewire:shop._partials.cart-count />
+
+                        <div class="hidden md:block">
+                            <livewire:shop.partials.wishlist-count />
+                        </div>
+                        <div class="hidden md:block">
+                            <livewire:shop._partials.cart-count />
+                        </div>
 
                         @if (Route::has('login'))
                             @auth
-
                                 <flux:dropdown>
                                     <flux:profile avatar="" name="{{ Auth::user()->name }}" />
 
@@ -74,13 +80,12 @@
                                         </form>
                                     </flux:navmenu>
                                 </flux:dropdown>
-
                             @else
                                 <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-zinc-600 hover:bg-zinc-100" wire:navigate>
                                     Log in
                                 </flux:button>
                                 @if (Route::has('register'))
-                                    <flux:button href="{{ route('register') }}" variant="filled" size="sm" class="bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium" wire:navigate>
+                                    <flux:button href="{{ route('register') }}" variant="filled" size="sm" class="hidden sm:inline-flex bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium" wire:navigate>
                                         Register
                                     </flux:button>
                                 @endif
@@ -90,8 +95,11 @@
                 </div>
             </header>
 
-            <!--  -->
+            <!-- Main Page Slot -->
             {{ $slot }}
+
+            <!-- Mobile Bottom Navigation Bar -->
+            @include('layouts.partials.mobile-bottom-nav')
 
             <!-- Footer -->
             <footer id="contact" class="bg-zinc-900 text-zinc-400 border-t border-zinc-800 py-12 mt-12 transition-colors duration-300">
@@ -100,7 +108,6 @@
                         <div class="space-y-4">
                             <div class="flex items-center gap-2 text-white">
                                 <div class="flex aspect-square size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-800 shadow-sm group-hover:scale-105 transition-transform duration-200">
-                                    <!--<x-app-logo-icon class="size-5 fill-current" />-->
                                     <img src="{{ asset('storage/' . shop()->logo_path) }}" alt="{{ shop()->name }}" />
                                 </div>
                                 <span class="text-lg font-bold">Xpert IT Solution</span>
