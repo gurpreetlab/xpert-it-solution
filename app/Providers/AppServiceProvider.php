@@ -38,6 +38,11 @@ class AppServiceProvider extends ServiceProvider
             CartServiceInterface::class,
             CartManager::class
         );
+
+        $this->app->bind(
+            \App\Contracts\PaymentGatewayInterface::class,
+            \App\Services\Payment\RazorpayPaymentGateway::class
+        );
     }
 
     /**
