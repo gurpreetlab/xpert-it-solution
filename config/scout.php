@@ -143,17 +143,26 @@ return [
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
             Product::class => [
-                'filterableAttributes' => ['is_active', 'category_id', 'brand_id', 'category_name', 'brand_name'],
-                'sortableAttributes' => ['is_featured', 'name', 'sale_price', 'created_at'],
+                // Sirf wahi attributes jo filtering aur faceting ke liye use ho rahe hain
+                'filterableAttributes' => [
+                    'is_active',
+                    'category_id',
+                    'brand_id'
+                ],
+
+                // Sirf wahi attributes jin par sorting allowed karni hai
+                'sortableAttributes' => [
+                    'name',
+                    'sale_price',
+                    'created_at'
+                ],
+
+                // Sirf wahi attributes jo actual search (keyword matching) mein use honge
                 'searchableAttributes' => [
                     'name',
                     'sku',
-                    'mpn',
-                    'gtin',
                     'category_name',
                     'brand_name',
-                    'short_description',
-                    'description',
                 ],
             ],
         ],
