@@ -152,6 +152,7 @@ return [
 
                 // Sirf wahi attributes jin par sorting allowed karni hai
                 'sortableAttributes' => [
+                    'is_featured',
                     'name',
                     'sale_price',
                     'created_at'
