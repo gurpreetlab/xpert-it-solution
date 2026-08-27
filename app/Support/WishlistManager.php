@@ -8,6 +8,22 @@ use Illuminate\Database\Eloquent\Collection;
 class WishlistManager
 {
     /**
+     * Merge guest session wishlist items into the user's database wishlist upon login.
+     */
+    public static function syncGuestWishlistToUser(\App\Models\User $user): void
+    {
+        $guestWishlist = session()->get('guest_wishlist', []);
+        if (empty($guestWishlist)) {
+            return;
+        }
+
+        $user->clearWishlistMemoization();
+        $user->wishlistProducts()->syncWithoutDetaching($guestWishlist);
+
+        session()->forget('guest_wishlist');
+    }
+
+    /**
      * Check if a product ID is in the wishlist with O(1) set lookup performance.
      */
     public static function contains(int $productId): bool

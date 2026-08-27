@@ -197,8 +197,7 @@
 
                     <!-- Quantity Control & Enquire CTAs -->
                     <div class="space-y-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-                        @auth
-                        @role('customer')
+                        @unless(auth()->check() && auth()->user()->hasRole('super-admin'))
                         <div class="flex items-center gap-4">
                             <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Quantity</span>
                             <div class="flex items-center border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-1 shadow-sm">
@@ -211,25 +210,22 @@
                                 </button>
                             </div>
                         </div>
-                        @endrole
-                        @endauth
 
-                        <!-- Buttons Row -->
-                        @auth
-                        @role('customer')
+                        <!-- Buttons Row for Guests & Customers -->
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <flux:button wire:click="addToCart" icon="shopping-cart" class="cursor-pointer">
                                 Add to Cart
                             </flux:button>
-                            <flux:button wire:click="toggleWishlist" icon="heart" variant="outline" class="cursor-pointer {{ auth()->user()->isProductWishlisted($product->id) ? 'text-rose-500 hover:text-rose-600 [&>svg]:fill-rose-500' : '' }}">
-                                {{ auth()->user()->isProductWishlisted($product->id) ? 'Wishlisted' : 'Add to Wishlist' }}
+                            <flux:button wire:click="toggleWishlist" icon="heart" variant="outline" class="cursor-pointer {{ \App\Support\WishlistManager::contains($product->id) ? 'text-rose-500 hover:text-rose-600 [&>svg]:fill-rose-500' : '' }}">
+                                {{ \App\Support\WishlistManager::contains($product->id) ? 'Wishlisted' : 'Add to Wishlist' }}
                             </flux:button>
                             <flux:button wire:click="toggleComparison" icon="scale" variant="outline" class="cursor-pointer {{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'text-blue-500 hover:text-blue-600' : '' }}">
                                 {{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'Compared' : 'Compare' }}
                             </flux:button>
                         </div>
-                        @endrole
+                        @endunless
 
+                        @auth
                         @role('super-admin')
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <flux:button href="{{ route('dashboard.products.show', $product->id) }}" class="cursor-pointer" wire:navigate>
@@ -238,14 +234,6 @@
                         </div>
                         @endrole
                         @endauth
-
-                        @guest
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <flux:button href="{{ route('login') }}" icon="arrow-right-end-on-rectangle" class="cursor-pointer" wire:navigate>
-                                Login
-                            </flux:button>
-                        </div>
-                        @endguest
                     </div>
 
                 </div>
