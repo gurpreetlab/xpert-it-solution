@@ -262,7 +262,7 @@ class Checkout extends Component
      * Creates a pending local Order + Razorpay order, then hands off to
      * the browser to open the Razorpay Checkout modal via a dispatched event.
      */
-    public function placeOrder(): void
+    public function placeOrder(\App\Contracts\PaymentGatewayInterface $gateway): void
     {
         if (! $this->selectedAddressId) {
             $this->dispatch(
@@ -280,8 +280,7 @@ class Checkout extends Component
             return;
         }
 
-        // Re-validate stock right before charging — availability may have
-        // changed since items were added to the cart.
+        // Re-validate stock right before charging
         foreach ($this->cartItems as $item) {
             if ($item->product->stock < $item->quantity) {
                 $this->dispatch(
@@ -299,7 +298,7 @@ class Checkout extends Component
             $this->selectedAddressId,
         );
 
-        DB::transaction(function () use ($address) {
+        DB::transaction(function () use ($address, $gateway) {
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'address_id' => $address->id,
@@ -322,12 +321,6 @@ class Checkout extends Component
             ]);
 
             foreach ($this->cartItems as $item) {
-                $lineTaxable = $item->sale_price * $item->quantity;
-                $lineTax = round(
-                    $lineTaxable * (shop()->gst_rate / 100),
-                    2,
-                );
-
                 $order->items()->create([
                     'product_id' => $item->product_id,
                     'product_name' => $item->product->name,
@@ -345,72 +338,32 @@ class Checkout extends Component
                 ]);
             }
 
-            // Razorpay works in the smallest currency unit (paise for INR).
-            $amountInPaise = (int) round($order->total * 100);
+            $checkoutPayload = $gateway->createOrder($order);
 
-            $api = new Api(
-                config('services.razorpay.key'),
-                config('services.razorpay.secret'),
-            );
-
-            $razorpayOrderEntity = new RazorpayOrder;
-
-            $razorpayOrder = $razorpayOrderEntity->create([
-                'receipt' => $order->order_number,
-                'amount' => $amountInPaise,
-                'currency' => 'INR',
-                'notes' => [
-                    'order_id' => $order->id,
-                    'user_id' => Auth::id(),
-                ],
-            ]);
-
-            $order->update(['razorpay_order_id' => $razorpayOrder->id]);
-
-            $this->dispatch('razorpay-checkout', [
-                'key' => config('services.razorpay.key'),
-                'amount' => $amountInPaise,
-                'currency' => 'INR',
-                'razorpayOrderId' => $razorpayOrder->id,
-                'orderNumber' => $order->order_number,
-                'name' => 'Xpert IT Solution',
-                'prefill' => [
-                    'name' => $address->full_name,
-                    'contact' => $address->phone,
-                    'email' => Auth::user()->email,
-                ],
-            ]);
+            $this->dispatch('razorpay-checkout', $checkoutPayload);
         });
     }
 
     /**
-     * Called from the browser after Razorpay Checkout returns a successful
-     * payment handler response. Verifies the signature server-side before
-     * trusting anything the client sent.
+     * Verifies payment signature sent from payment gateway handler.
      */
     public function verifyPayment(
         string $razorpayPaymentId,
         string $razorpayOrderId,
         string $razorpaySignature,
+        \App\Contracts\PaymentGatewayInterface $gateway,
     ): void {
         $order = Order::where('razorpay_order_id', $razorpayOrderId)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        $api = new Api(
-            config('services.razorpay.key'),
-            config('services.razorpay.secret'),
-        );
+        $verified = $gateway->verifyPayment([
+            'razorpay_order_id' => $razorpayOrderId,
+            'razorpay_payment_id' => $razorpayPaymentId,
+            'razorpay_signature' => $razorpaySignature,
+        ]);
 
-        try {
-            $utility = app(RazorpayUtility::class);
-
-            $utility->verifyPaymentSignature([
-                'razorpay_order_id' => $razorpayOrderId,
-                'razorpay_payment_id' => $razorpayPaymentId,
-                'razorpay_signature' => $razorpaySignature,
-            ]);
-        } catch (SignatureVerificationError) {
+        if (! $verified) {
             $order->update(['payment_status' => 'failed']);
             $this->dispatch(
                 'cart-toast',
@@ -443,18 +396,13 @@ class Checkout extends Component
             Auth::user()->cart?->items()->delete();
         });
 
-        // Invoice numbers must be issued sequentially at the moment
-        // of sale — generated here, not lazily on first PDF download.
         Invoice::generateForOrder($order);
 
         $this->dispatch('cart-updated');
 
         Auth::user()->notify(new OrderConfirmed($order));
 
-        $admin = \App\Models\User::role('super-admin')->first();
-        if ($admin) {
-            $admin->notify(new \App\Notifications\AdminNewOrderNotification($order));
-        }
+        \App\Events\OrderPlaced::dispatch($order);
 
         $this->redirect(
             route('shop.order.confirmation', $order->order_number),
@@ -463,15 +411,11 @@ class Checkout extends Component
     }
 
     /**
-     * Called from the browser if the Razorpay modal is dismissed or the
-     * payment attempt fails. Order stays pending/failed; cart is untouched
-     * so the customer can retry.
+     * Called from the browser if the gateway modal is dismissed or payment attempt fails.
      */
-    public function paymentFailed(string $razorpayOrderId): void
+    public function paymentFailed(string $razorpayOrderId, \App\Contracts\PaymentGatewayInterface $gateway): void
     {
-        Order::where('razorpay_order_id', $razorpayOrderId)
-            ->where('user_id', Auth::id())
-            ->update(['payment_status' => 'failed']);
+        $gateway->handlePaymentFailure($razorpayOrderId);
 
         $this->dispatch(
             'cart-toast',
