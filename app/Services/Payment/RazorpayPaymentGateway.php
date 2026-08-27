@@ -67,6 +67,8 @@ class RazorpayPaymentGateway implements PaymentGatewayInterface
     public function verifyPayment(array $paymentData): bool
     {
         try {
+            new Api($this->key, $this->secret);
+
             $utility = app(RazorpayUtility::class);
 
             $utility->verifyPaymentSignature([
