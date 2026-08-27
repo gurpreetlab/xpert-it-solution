@@ -53,6 +53,16 @@ class AppServiceProvider extends ServiceProvider
             \App\Events\OrderPlaced::class,
             \App\Listeners\SendAdminOrderNotificationListener::class
         );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Login::class,
+            \App\Listeners\MergeGuestCartAndWishlistOnLogin::class
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Authenticated::class,
+            \App\Listeners\MergeGuestCartAndWishlistOnLogin::class
+        );
     }
 
     /**

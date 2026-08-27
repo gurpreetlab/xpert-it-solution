@@ -9,6 +9,40 @@ use Illuminate\Support\Fluent;
 class CartManager
 {
     /**
+     * Merge guest session cart items into the user's database cart upon login.
+     */
+    public static function syncGuestCartToUser(\App\Models\User $user): void
+    {
+        $guestCart = session()->get('guest_cart', []);
+        if (empty($guestCart)) {
+            return;
+        }
+
+        $cart = $user->cart()->firstOrCreate();
+
+        foreach ($guestCart as $productId => $qty) {
+            $product = Product::find($productId);
+            if (!$product || $product->stock <= 0) {
+                continue;
+            }
+
+            $item = $cart->items()->where('product_id', $productId)->first();
+            if ($item) {
+                $mergedQty = min($item->quantity + $qty, $product->stock);
+                $item->update(['quantity' => $mergedQty]);
+            } else {
+                $cart->items()->create([
+                    'product_id' => $productId,
+                    'quantity' => min($qty, $product->stock),
+                    'sale_price' => $product->sale_price,
+                ]);
+            }
+        }
+
+        session()->forget('guest_cart');
+    }
+
+    /**
      * Add a product to the cart with the given quantity.
      */
     public static function add(int $productId, int $quantity = 1): bool

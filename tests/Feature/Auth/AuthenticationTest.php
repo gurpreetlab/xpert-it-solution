@@ -96,4 +96,42 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
     }
+
+    public function test_guest_cart_and_wishlist_are_merged_upon_login(): void
+    {
+        $category = \App\Models\Category::create(['name' => 'Networking']);
+        $brand = \App\Models\Brand::create(['name' => 'Cisco']);
+        $product = \App\Models\Product::create([
+            'name' => 'Cisco Catalyst Switch',
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'is_active' => true,
+            'sale_price' => 25000,
+            'mrp' => 30000,
+            'stock' => 10,
+        ]);
+
+        // Guest adds product to session cart and wishlist
+        \App\Support\CartManager::add($product->id, 2);
+        \App\Support\WishlistManager::toggle($product->id);
+
+        $this->assertEquals(2, \App\Support\CartManager::count());
+        $this->assertEquals(1, \App\Support\WishlistManager::count());
+
+        $user = User::factory()->create();
+
+        $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+
+        // Verify items were merged into user's DB cart & wishlist
+        $this->assertEquals(2, \App\Support\CartManager::count());
+        $this->assertEquals(1, \App\Support\WishlistManager::count());
+        $this->assertTrue($user->fresh()->wishlistProducts->contains($product->id));
+        $this->assertNotNull($user->fresh()->cart);
+        $this->assertEquals(2, $user->fresh()->cart->items->first()->quantity);
+    }
 }
