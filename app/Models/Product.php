@@ -57,6 +57,7 @@ class Product extends Model
             'brand_name' => $this->brand?->name,
             'sale_price' => (float) $this->sale_price,
             'stock' => (int) ($this->stock ?? 0),
+            'is_featured' => (bool) $this->is_featured,
             'is_active' => (bool) $this->is_active,
             'created_at' => $this->created_at?->timestamp,
         ];
