@@ -73,16 +73,12 @@
             </div>
 
             <div class="flex gap-1.5 items-center">
-                @auth
-                    @role('customer')
-                        <button type="button" wire:click="toggleWishlist({{ $product->id }})" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-rose-500 cursor-pointer" title="Toggle Wishlist" aria-label="Toggle Wishlist">
-                            <flux:icon icon="heart" class="size-5 {{ auth()->user()->isProductWishlisted($product->id) ? 'fill-current text-rose-500' : '' }}" />
-                        </button>
-                        <button type="button" wire:click="toggleComparison({{ $product->id }})" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-blue-500 cursor-pointer" title="Compare Product" aria-label="Toggle Comparison">
-                            <flux:icon icon="scale" class="size-5 {{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'text-blue-500' : '' }}" />
-                        </button>
-                    @endrole
-                @endauth
+                <button type="button" wire:click="toggleWishlist({{ $product->id }})" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-rose-500 cursor-pointer" title="Toggle Wishlist" aria-label="Toggle Wishlist">
+                    <flux:icon icon="heart" class="size-5 {{ \App\Support\WishlistManager::contains($product->id) ? 'fill-current text-rose-500' : '' }}" />
+                </button>
+                <button type="button" wire:click="toggleComparison({{ $product->id }})" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-blue-500 cursor-pointer" title="Compare Product" aria-label="Toggle Comparison">
+                    <flux:icon icon="scale" class="size-5 {{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'text-blue-500' : '' }}" />
+                </button>
 
                 <a href="{{ route('shop.product.details', $product->slug) }}" wire:navigate aria-label="View {{ $product->name }} details">
                     <flux:button variant="ghost" size="sm" class="cursor-pointer text-zinc-500 hover:text-zinc-900">

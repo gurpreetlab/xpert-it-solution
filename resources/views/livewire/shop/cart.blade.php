@@ -151,19 +151,19 @@
                         <div class="space-y-3 text-sm">
                             <div class="flex items-center justify-between text-zinc-600 dark:text-zinc-300">
                                 <span>MRP</span>
-                                <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($this->mrp, 2) }}</span>
+                                <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($this->totals->mrp, 2) }}</span>
                             </div>
 
-                            @if($this->savings > 0)
+                            @if($this->totals->savings > 0)
                                 <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
                                     <span>Savings</span>
-                                    <span class="font-semibold">- ₹{{ number_format($this->savings, 2) }}</span>
+                                    <span class="font-semibold">- ₹{{ number_format($this->totals->savings, 2) }}</span>
                                 </div>
                             @endif
 
                             <div class="flex items-center justify-between text-zinc-600 dark:text-zinc-300">
                                 <span>Subtotal ({{ $this->cartItems->sum('quantity') }} items)</span>
-                                <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($this->subtotal, 2) }}</span>
+                                <span class="font-semibold text-zinc-900 dark:text-white">₹{{ number_format($this->totals->subtotal, 2) }}</span>
                             </div>
 
                             <div class="flex items-center justify-between text-zinc-600 dark:text-zinc-300">
@@ -177,7 +177,7 @@
 
                         <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                             <span class="text-sm font-bold text-zinc-900 dark:text-white">Total</span>
-                            <span class="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">₹{{ number_format($this->subtotal, 2) }}</span>
+                            <span class="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">₹{{ number_format($this->totals->subtotal, 2) }}</span>
                         </div>
 
                         <flux:button wire:click="checkout" icon="lock-closed" variant="filled" class="w-full bg-blue-600 hover:bg-blue-700 text-white border-0 font-medium cursor-pointer">
