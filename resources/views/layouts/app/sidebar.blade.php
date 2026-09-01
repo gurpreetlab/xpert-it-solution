@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    @include('partials.head')
+</head>
+
+<body class="min-h-screen bg-white">
+    <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50">
+        <flux:sidebar.header>
+            <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+            <flux:sidebar.collapse class="lg:hidden" />
+        </flux:sidebar.header>
+
+        <flux:sidebar.nav>
+            <flux:sidebar.group :heading="__('Platform')" class="grid">
+                <!-- Dashboard -->
+                <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                    Dashboard
+                </flux:sidebar.item>
+
+                <!-- Categories -->
+                <flux:sidebar.item icon="square-3-stack-3d" :href="route('dashboard.categories.index')" :current="request()->routeIs('dashboard.categories.index')" wire:navigate>
+                    Categories
+                </flux:sidebar.item>
+
+                <!-- Brands -->
+                <flux:sidebar.item icon="book-open-text" :href="route('dashboard.brands.index')" :current="request()->routeIs('dashboard.brands.index')" wire:navigate>
+                    Brands
+                </flux:sidebar.item>
+
+                <!-- Products -->
+                <flux:sidebar.item icon="cube" :href="route('dashboard.products.index')" :current="request()->routeIs('dashboard.products.index', 'dashboard.products.show', 'dashboard.products.create', 'dashboard.products.edit')" wire:navigate>
+                    Products
+                </flux:sidebar.item>
+
+                <!-- Orders -->
+                <flux:sidebar.item icon="shopping-bag" :href="route('dashboard.orders.index')" :current="request()->routeIs('dashboard.orders.index')" wire:navigate>
+                    Orders
+                </flux:sidebar.item>
+
+                <!-- Invoices -->
+                <flux:sidebar.item icon="clipboard" :href="route('dashboard.invoices.index')" :current="request()->routeIs('dashboard.invoices.index')" wire:navigate>
+                    Invoices
+                </flux:sidebar.item>
+
+                <flux:sidebar.item icon="arrow-down-tray" :href="route('dashboard.icecat.import')" :current="request()->routeIs('dashboard.icecat.import')" wire:navigate>
+                    Icecat Import
+                </flux:sidebar.item>
+
+                @php
+                    $unreadInquiries = \App\Models\ContactMessage::where('is_read', false)->count();
+                @endphp
+                <flux:sidebar.item icon="envelope" :href="route('dashboard.contact-messages.index')" :current="request()->routeIs('dashboard.contact-messages.index')" wire:navigate>
+                    <span class="flex items-center justify-between w-full">
+                        <span>Contact Messages</span>
+                        @if($unreadInquiries > 0)
+                            <span class="ml-2 px-1.5 py-0.5 text-[10px] font-bold bg-rose-500 text-white rounded-full">
+                                {{ $unreadInquiries }}
+                            </span>
+                        @endif
+                    </span>
+                </flux:sidebar.item>
+
+            </flux:sidebar.group>
+        </flux:sidebar.nav>
+
+        <flux:spacer />
+
+        <flux:sidebar.nav>
+            <flux:sidebar.item icon="globe-alt" href="{{ route('home') }}" wire:navigate>
+                {{ __('Back to Website') }}
+            </flux:sidebar.item>
+        </flux:sidebar.nav>
+
+        <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
+    </flux:sidebar>
+
+    <!-- Mobile User Menu -->
+    <flux:header class="lg:hidden">
+        <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+
+        <flux:spacer />
+
+        <flux:dropdown position="top" align="end">
+            <flux:profile
+                :initials="auth()->user()->initials()"
+                icon-trailing="chevron-down" />
+
+            <flux:menu>
+                <flux:menu.radio.group>
+                    <div class="p-0 text-sm font-normal">
+                        <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
+                            <flux:avatar
+                                :name="auth()->user()->name"
+                                :initials="auth()->user()->initials()" />
+
+                            <div class="grid flex-1 text-start text-sm leading-tight">
+                                <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
+                                <flux:text class="truncate">{{ auth()->user()->email }}</flux:text>
+                            </div>
+                        </div>
+                    </div>
+                </flux:menu.radio.group>
+
+                <flux:menu.separator />
+
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <flux:menu.item
+                        as="button"
+                        type="submit"
+                        icon="arrow-right-start-on-rectangle"
+                        class="w-full cursor-pointer"
+                        data-test="logout-button">
+                        {{ __('Log out') }}
+                    </flux:menu.item>
+                </form>
+            </flux:menu>
+        </flux:dropdown>
+    </flux:header>
+
+    {{ $slot }}
+
+    @persist('toast')
+    <flux:toast.group>
+        <flux:toast />
+    </flux:toast.group>
+    @endpersist
+
+    @fluxScripts
+</body>
+
+</html>
