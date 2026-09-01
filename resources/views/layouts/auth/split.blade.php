@@ -5,34 +5,49 @@
     </head>
     <body class="min-h-screen bg-white antialiased">
         <div class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div class="bg-neutral-900 relative hidden h-full flex-col p-10 text-white lg:flex border-e border-neutral-200">
-                <div class="absolute inset-0 bg-neutral-900"></div>
-                <a href="{{ route('home') }}" class="relative z-20 flex items-center text-lg font-medium" wire:navigate>
-                    <span class="flex h-10 w-10 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="me-2 h-7 fill-current text-white" />
-                    </span>
-                    {{ config('app.name', 'Laravel') }}
+            <div class="bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-50 relative hidden h-full flex-col p-10 text-zinc-900 lg:flex border-r border-border">
+                <a href="{{ route('home') }}" class="relative z-20 flex items-center gap-3 font-bold text-lg" wire:navigate>
+                    <img src="{{ asset('logo-xpert-it-solution.png') }}" alt="{{ shop()->name }}" class="h-10 w-auto object-contain" />
                 </a>
 
-                @php
-                    [$message, $author] = str(Illuminate\Foundation\Inspiring::quotes()->random())->explode('-');
-                @endphp
+                <div class="relative z-20 my-auto space-y-6 max-w-md">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
+                        <flux:icon icon="shield-check" class="size-4" />
+                        <span>Verified IT Hardware Marketplace</span>
+                    </div>
 
-                <div class="relative z-20 mt-auto">
-                    <blockquote class="space-y-2">
-                        <flux:heading size="lg">&ldquo;{{ trim($message) }}&rdquo;</flux:heading>
-                        <footer><flux:heading>{{ trim($author) }}</flux:heading></footer>
-                    </blockquote>
+                    <h2 class="text-3xl font-extrabold tracking-tight text-zinc-900 leading-tight">
+                        Enterprise Networking, Storage & Surveillance Solutions
+                    </h2>
+
+                    <p class="text-xs text-zinc-600 leading-relaxed">
+                        Access official manufacturer warranties, instant GST invoices for corporate billing, and nationwide fast shipping.
+                    </p>
+
+                    <div class="space-y-3 pt-4 border-t border-border/80">
+                        <div class="flex items-center gap-3 text-xs text-zinc-700 font-semibold">
+                            <flux:icon icon="check-circle" class="size-4 text-emerald-600 shrink-0" />
+                            <span>100% Authentic Brand Products</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-zinc-700 font-semibold">
+                            <flux:icon icon="document-text" class="size-4 text-primary shrink-0" />
+                            <span>B2B GST Invoicing & Corporate Purchase Support</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-zinc-700 font-semibold">
+                            <flux:icon icon="truck" class="size-4 text-indigo-600 shrink-0" />
+                            <span>Same-Day & Express Dispatch</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative z-20 text-xs text-zinc-400 font-medium">
+                    &copy; {{ date('Y') }} Xpert IT Solution. All rights reserved.
                 </div>
             </div>
             <div class="w-full lg:p-8">
-                <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <a href="{{ route('home') }}" class="z-20 flex flex-col items-center gap-2 font-medium lg:hidden" wire:navigate>
-                        <span class="flex h-9 w-9 items-center justify-center rounded-md">
-                            <x-app-logo-icon class="size-9 fill-current text-black" />
-                        </span>
-
-                        <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+                <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[380px]">
+                    <a href="{{ route('home') }}" class="z-20 flex flex-col items-center gap-2 font-medium lg:hidden mb-2" wire:navigate>
+                        <img src="{{ asset('logo-xpert-it-solution.png') }}" alt="{{ shop()->name }}" class="h-10 w-auto object-contain" />
                     </a>
                     {{ $slot }}
                 </div>

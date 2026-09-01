@@ -120,16 +120,19 @@
                     @php
                         $reviews = $product->reviews;
                         $totalReviews = count($reviews);
-                        $averageRating = $totalReviews > 0 ? round($reviews->avg('rating'), 1) : 4.6;
-                        if ($totalReviews === 0) { $totalReviews = rand(15, 60); }
+                        $averageRating = $totalReviews > 0 ? round($reviews->avg('rating'), 1) : null;
                     @endphp
                     <div class="flex items-center gap-2 text-xs">
-                        <div class="flex items-center gap-1 text-amber-500 font-bold">
-                            <flux:icon icon="star" class="size-4 fill-current" />
-                            <span>{{ $averageRating }}</span>
-                        </div>
-                        <span class="text-zinc-400">•</span>
-                        <a href="#reviews" class="text-zinc-500 hover:text-primary font-medium">{{ $totalReviews }} Verified Reviews</a>
+                        @if($totalReviews > 0)
+                            <div class="flex items-center gap-1 text-amber-500 font-bold">
+                                <flux:icon icon="star" class="size-4 fill-current" />
+                                <span>{{ $averageRating }}</span>
+                            </div>
+                            <span class="text-zinc-400">•</span>
+                            <a href="#reviews" class="text-zinc-500 hover:text-primary font-medium">{{ $totalReviews }} {{ Str::plural('Verified Review', $totalReviews) }}</a>
+                        @else
+                            <a href="#reviews" class="text-zinc-400 hover:text-primary font-medium">No reviews yet</a>
+                        @endif
                     </div>
 
                     <!-- Pricing Box -->
@@ -151,13 +154,15 @@
                         </div>
                     </div>
 
-                    <!-- Short Specs / Highlights -->
-                    <div class="space-y-2 pt-2">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Highlights</h3>
-                        <p class="text-xs sm:text-sm text-zinc-600 leading-relaxed">
-                            {{ $product->short_description ?? 'Authentic IT hardware solution built for enterprise reliability and ultra-fast throughput.' }}
-                        </p>
-                    </div>
+                    @if($product->short_description || $product->description)
+                        <!-- Short Specs / Highlights -->
+                        <div class="space-y-2 pt-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Highlights</h3>
+                            <p class="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                                {{ $product->short_description ?? Str::limit(strip_tags($product->description), 200) }}
+                            </p>
+                        </div>
+                    @endif
 
                     <!-- Quantity & Primary CTA Actions -->
                     <div class="space-y-4 pt-4 border-t border-border">
@@ -193,21 +198,13 @@
                             </a>
                         </div>
 
-                        <div class="flex items-center justify-between text-xs pt-2">
+                        <div class="flex items-center justify-start text-xs pt-2">
                             <button
                                 type="button"
                                 wire:click="toggleWishlist"
                                 class="text-zinc-600 hover:text-rose-500 font-semibold flex items-center gap-1.5 cursor-pointer">
                                 <flux:icon icon="heart" class="size-4 {{ \App\Support\WishlistManager::contains($product->id) ? 'fill-current text-rose-500' : '' }}" />
                                 <span>{{ \App\Support\WishlistManager::contains($product->id) ? 'Wishlisted' : 'Add to Wishlist' }}</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                wire:click="toggleComparison"
-                                class="text-zinc-600 hover:text-primary font-semibold flex items-center gap-1.5 cursor-pointer">
-                                <flux:icon icon="scale" class="size-4 {{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'text-primary' : '' }}" />
-                                <span>{{ in_array($product->id, session()->get('compared_product_ids', []), true) ? 'Compared' : 'Compare' }}</span>
                             </button>
                         </div>
                     </div>

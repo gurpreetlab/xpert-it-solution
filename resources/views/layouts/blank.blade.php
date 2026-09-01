@@ -12,12 +12,7 @@
                     <div class="flex items-center gap-6">
                         <!-- Brand Logo & Name -->
                         <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
-                            <div class="flex aspect-square size-9 items-center justify-center rounded-xl bg-primary text-white shadow-2xs group-hover:scale-105 transition-transform duration-200 font-black text-sm">
-                                IT
-                            </div>
-                            <span class="text-lg sm:text-xl font-extrabold tracking-tight text-zinc-900">
-                                Xpert <span class="text-primary">IT Solution</span>
-                            </span>
+                            <img src="{{ asset('logo-xpert-it-solution.png') }}" alt="{{ shop()->name }}" class="h-9 w-auto object-contain" />
                         </a>
                     </div>
 
@@ -25,22 +20,12 @@
                     <nav class="hidden md:flex items-center gap-6 text-xs font-bold text-zinc-600">
                         <a href="{{ route('home') }}" class="hover:text-primary transition" wire:navigate>Home</a>
                         <a href="{{ route('shop.products') }}" class="hover:text-primary transition" wire:navigate>Catalog</a>
-                        <a href="{{ route('shop.bulk-orders') }}" class="hover:text-primary transition" wire:navigate>Bulk Quotes</a>
-                        <a href="{{ route('about') }}" class="hover:text-primary transition" wire:navigate>About</a>
+                        <a href="{{ route('about') }}" class="hover:text-primary transition" wire:navigate>About Us</a>
                         <a href="{{ route('contact') }}" class="hover:text-primary transition" wire:navigate>Contact</a>
                     </nav>
 
                     <!-- Utility Actions & Profile -->
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('shop.compare') }}" class="relative text-zinc-600 hover:text-primary transition cursor-pointer p-1.5 rounded-lg hover:bg-surface-muted" title="Compare Products" wire:navigate aria-label="Compare Products">
-                            <flux:icon icon="scale" class="size-5" />
-                            @if(count(session()->get('compared_product_ids', [])) > 0)
-                                <span class="-right-1 -top-1 absolute bg-primary text-white text-[9px] font-extrabold flex h-4 w-4 items-center justify-center rounded-full">
-                                    {{ count(session()->get('compared_product_ids', [])) }}
-                                </span>
-                            @endif
-                        </a>
-
                         <livewire:shop.partials.wishlist-count />
                         <livewire:shop._partials.cart-count />
 
@@ -57,7 +42,6 @@
                                         @role('customer')
                                             <flux:navmenu.item href="{{ route('shop.orders') }}" icon="shopping-bag" wire:navigate>{{ __('My Orders') }}</flux:navmenu.item>
                                             <flux:navmenu.item href="{{ route('shop.wishlist') }}" icon="heart" wire:navigate>{{ __('My Wishlist') }}</flux:navmenu.item>
-                                            <flux:navmenu.item href="{{ route('shop.compare') }}" icon="scale" wire:navigate>{{ __('Compare List') }}</flux:navmenu.item>
                                         @endrole
 
                                         <flux:navmenu.item href="{{ route('profile.edit') }}" icon="user-circle">{{ __('Profile') }}</flux:navmenu.item>
@@ -73,7 +57,7 @@
                                     </flux:navmenu>
                                 </flux:dropdown>
                             @else
-                                <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-xs font-bold text-zinc-600 hover:bg-surface-muted" wire:navigate>
+                                <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-xs font-bold text-zinc-700 hover:bg-surface-muted border border-border" wire:navigate>
                                     Log in
                                 </flux:button>
                                 @if (Route::has('register'))
@@ -104,10 +88,6 @@
                     <flux:icon icon="heart" class="size-4" />
                     <span class="text-[9px] font-bold mt-0.5">Wishlist</span>
                 </a>
-                <a href="{{ route('shop.compare') }}" wire:navigate class="flex flex-col items-center justify-center text-zinc-600 hover:text-primary transition p-1">
-                    <flux:icon icon="scale" class="size-4" />
-                    <span class="text-[9px] font-bold mt-0.5">Compare</span>
-                </a>
                 <a href="{{ route('shop.orders') }}" wire:navigate class="flex flex-col items-center justify-center text-zinc-600 hover:text-primary transition p-1">
                     <flux:icon icon="user" class="size-4" />
                     <span class="text-[9px] font-bold mt-0.5">Account</span>
@@ -120,10 +100,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-border">
                         <div class="space-y-3">
                             <div class="flex items-center gap-2 text-zinc-900">
-                                <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-white font-black text-xs">
-                                    IT
-                                </div>
-                                <span class="text-base font-bold">Xpert IT Solution</span>
+                                <img src="{{ asset('logo-xpert-it-solution.png') }}" alt="{{ shop()->name }}" class="h-8 w-auto object-contain" />
                             </div>
                             <p class="text-xs leading-relaxed text-zinc-500">Premium IT Infrastructure, CCTV surveillance, enterprise storage, and networking hardware provider.</p>
                         </div>
@@ -137,9 +114,10 @@
                             </ul>
                         </div>
                         <div>
-                            <h5 class="text-zinc-900 text-xs font-bold uppercase tracking-wider mb-3">Corporate Services</h5>
+                            <h5 class="text-zinc-900 text-xs font-bold uppercase tracking-wider mb-3">Company Information</h5>
                             <ul class="space-y-2 text-xs">
-                                <li><a href="{{ route('shop.bulk-orders') }}" class="hover:text-primary transition" wire:navigate>Bulk Orders & Quotes</a></li>
+                                <li><a href="{{ route('about') }}" class="hover:text-primary transition" wire:navigate>About Us</a></li>
+                                <li><a href="{{ route('contact') }}" class="hover:text-primary transition" wire:navigate>Contact Us</a></li>
                                 <li><a href="{{ route('shop.privacy-policy') }}" class="hover:text-primary transition" wire:navigate>Privacy Policy</a></li>
                                 <li><a href="{{ route('shop.terms-and-conditions') }}" class="hover:text-primary transition" wire:navigate>Terms &amp; Conditions</a></li>
                                 <li><a href="{{ route('shop.shipping-policy') }}" class="hover:text-primary transition" wire:navigate>Shipping & Warranty Policy</a></li>

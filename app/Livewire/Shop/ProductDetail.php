@@ -28,9 +28,6 @@ class ProductDetail extends Component
 
     public string $editComment = '';
 
-    /**
-     * @return array<string, string|array<int, string>>
-     */
     protected function rules(): array
     {
         return [
@@ -39,9 +36,6 @@ class ProductDetail extends Component
         ];
     }
 
-    /**
-     * Initialize the component with the given slug.
-     */
     public function mount(string $slug): void
     {
         $this->slug = $slug;
@@ -63,7 +57,7 @@ class ProductDetail extends Component
             'category',
             'brand',
             'primaryImage',
-            'reviews.user', // Eager load reviews and review authors
+            'reviews.user',
         ])
             ->where('slug', $this->slug)
             ->where('is_active', true)
@@ -74,7 +68,6 @@ class ProductDetail extends Component
     {
         if (! auth()->check()) {
             Flux::toast(text: 'Please login to write a review.', variant: 'danger');
-
             return;
         }
 
@@ -82,12 +75,10 @@ class ProductDetail extends Component
 
         $product = $this->product();
 
-        // Check if user already reviewed this product
         $existingReview = $product->reviews()->where('user_id', auth()->id())->first();
 
         if ($existingReview) {
             Flux::toast(text: 'You have already reviewed this product.', variant: 'warning');
-
             return;
         }
 
@@ -138,7 +129,6 @@ class ProductDetail extends Component
 
         if (! $review) {
             Flux::toast(text: 'Unauthorized or review not found.', variant: 'danger');
-
             return;
         }
 
@@ -159,7 +149,6 @@ class ProductDetail extends Component
 
         if (! $review) {
             Flux::toast(text: 'Unauthorized or review not found.', variant: 'danger');
-
             return;
         }
 
@@ -172,11 +161,6 @@ class ProductDetail extends Component
         Flux::toast(text: 'Review deleted successfully.', variant: 'success');
     }
 
-    /**
-     * Get the related products for the current product.
-     *
-     * @return Collection<int, Product>
-     */
     public function relatedProducts(): Collection
     {
         $currentProduct = $this->product();
@@ -229,12 +213,6 @@ class ProductDetail extends Component
         $this->dispatch('wishlist-updated');
     }
 
-    public function toggleComparison(): void
-    {
-        \App\Livewire\Shop\Compare::toggleComparisonStatic($this->product()->id);
-        $this->dispatch('compare-updated');
-    }
-
     public function addToCart(): void
     {
         $product = $this->product();
@@ -256,11 +234,6 @@ class ProductDetail extends Component
             text: "Added {$this->quantity} unit(s) of {$product->name} to cart.",
             variant: 'success',
         );
-    }
-
-    public function placeOrder(): void
-    {
-        //
     }
 
     #[Layout('layouts.blank')]

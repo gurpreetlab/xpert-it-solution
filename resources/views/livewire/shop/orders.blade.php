@@ -30,16 +30,6 @@
                 <span>Wishlist</span>
             </a>
 
-            <a href="{{ route('shop.compare') }}" wire:navigate class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-surface-muted transition">
-                <flux:icon icon="scale" class="size-4" />
-                <span>Product Comparison</span>
-            </a>
-
-            <a href="{{ route('shop.bulk-orders') }}" wire:navigate class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-surface-muted transition">
-                <flux:icon icon="document-text" class="size-4" />
-                <span>Bulk Quotes</span>
-            </a>
-
             <a href="{{ route('profile.edit') }}" wire:navigate class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-surface-muted transition">
                 <flux:icon icon="user-circle" class="size-4" />
                 <span>Account Profile</span>

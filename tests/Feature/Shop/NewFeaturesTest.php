@@ -3,7 +3,6 @@
 namespace Tests\Feature\Shop;
 
 use App\Livewire\Shop\Checkout;
-use App\Livewire\Shop\Compare;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Coupon;
@@ -46,8 +45,8 @@ class NewFeaturesTest extends TestCase
         ]);
 
         $view = $this->view('components.shop.product-card', ['product' => $product]);
-        $view->assertSee('4'); // avg rating
-        $view->assertSee('(1)'); // count of reviews
+        $view->assertSee('4');
+        $view->assertSee('(1)');
     }
 
     public function test_coupon_discount_applied_on_checkout(): void
@@ -88,39 +87,11 @@ class NewFeaturesTest extends TestCase
             ->call('applyCoupon')
             ->assertSet('couponDiscountPercent', 30)
             ->assertSet('appliedCouponId', $coupon->id)
-            ->assertSet('total', 700) // 1000 - 30% discount
+            ->assertSet('total', 700)
             ->call('removeCoupon')
             ->assertSet('couponDiscountPercent', 0)
             ->assertSet('appliedCouponId', null)
             ->assertSet('total', 1000);
-    }
-
-    public function test_product_comparison_session_state(): void
-    {
-        $customer = User::factory()->create();
-        $customer->assignRole('customer');
-
-        $category = Category::create(['name' => 'Networking']);
-        $brand = Brand::create(['name' => 'Netgear']);
-        $product = Product::create([
-            'name' => 'Router X',
-            'category_id' => $category->id,
-            'brand_id' => $brand->id,
-            'is_active' => true,
-            'sale_price' => 500,
-        ]);
-
-        $this->actingAs($customer);
-
-        Livewire::test(Compare::class)
-            ->call('toggleComparison', $product->id);
-
-        $this->assertEquals([$product->id], session()->get('compared_product_ids'));
-
-        Livewire::test(Compare::class)
-            ->call('toggleComparison', $product->id);
-
-        $this->assertEquals([], session()->get('compared_product_ids'));
     }
 
     public function test_contact_messages_read_unread_indicator(): void
@@ -208,7 +179,6 @@ class NewFeaturesTest extends TestCase
             'quantity' => 1,
         ]);
 
-        // Add to cart so Checkout can mount successfully
         $cart = $customer->cart()->create();
         $cart->items()->create([
             'product_id' => $product->id,

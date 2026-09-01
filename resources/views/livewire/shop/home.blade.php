@@ -1,6 +1,5 @@
 <div>
-    <x-layouts.app>
-        <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-10">
+    <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-10">
 
             <!-- Search & Quick Category Shortcuts Bar -->
             <section class="bg-surface rounded-2xl p-5 border border-border shadow-2xs space-y-4">
@@ -107,42 +106,54 @@
                 :columns="4" />
 
             <!-- Category Specific Shelves (Only show categories with products) -->
-            @php $netProducts = $this->getCategoryProducts('Networking', 4); @endphp
+            @php
+                $netCat = $this->activeCategoriesWithProducts->first(fn($c) => Str::contains($c->name, 'Networking', true));
+                $netProducts = $this->getCategoryProducts('Networking', 4);
+            @endphp
             @if(count($netProducts) > 0)
                 <x-product.shelf
                     title="Networking & Connectivity"
                     subtitle="Wi-Fi 6 routers, managed switches, access points, and SFP fiber modules"
-                    viewAllUrl="{{ route('shop.products') }}"
+                    viewAllUrl="{{ route('shop.products') . ($netCat ? '?category='.$netCat->id : '') }}"
                     :products="$netProducts"
                     :columns="4" />
             @endif
 
-            @php $cctvProducts = $this->getCategoryProducts('CCTV', 4); @endphp
+            @php
+                $cctvCat = $this->activeCategoriesWithProducts->first(fn($c) => Str::contains($c->name, 'CCTV', true) || Str::contains($c->name, 'Security', true));
+                $cctvProducts = $this->getCategoryProducts('CCTV', 4);
+            @endphp
             @if(count($cctvProducts) > 0)
                 <x-product.shelf
                     title="CCTV & Surveillance Systems"
                     subtitle="4K IP cameras, NVRs, surveillance hard drives, and PoE power supplies"
-                    viewAllUrl="{{ route('shop.products') }}"
+                    viewAllUrl="{{ route('shop.products') . ($cctvCat ? '?category='.$cctvCat->id : '') }}"
                     :products="$cctvProducts"
                     :columns="4" />
             @endif
 
-            @php $storageProducts = $this->getCategoryProducts('Storage', 4); @endphp
+            @php
+                $storageCat = $this->activeCategoriesWithProducts->first(fn($c) => Str::contains($c->name, 'Storage', true));
+                $storageProducts = $this->getCategoryProducts('Storage', 4);
+            @endphp
             @if(count($storageProducts) > 0)
                 <x-product.shelf
                     title="High-Speed Storage Solutions"
                     subtitle="NVMe M.2 SSDs, internal HDDs, external portable drives, and USB flash storage"
-                    viewAllUrl="{{ route('shop.products') }}"
+                    viewAllUrl="{{ route('shop.products') . ($storageCat ? '?category='.$storageCat->id : '') }}"
                     :products="$storageProducts"
                     :columns="4" />
             @endif
 
-            @php $periProducts = $this->getCategoryProducts('Peripheral', 4); @endphp
+            @php
+                $periCat = $this->activeCategoriesWithProducts->first(fn($c) => Str::contains($c->name, 'Peripheral', true));
+                $periProducts = $this->getCategoryProducts('Peripheral', 4);
+            @endphp
             @if(count($periProducts) > 0)
                 <x-product.shelf
                     title="Computer Peripherals & Office Gear"
                     subtitle="Mechanical keyboards, ergonomic mice, 4K webcams, and USB-C docking stations"
-                    viewAllUrl="{{ route('shop.products') }}"
+                    viewAllUrl="{{ route('shop.products') . ($periCat ? '?category='.$periCat->id : '') }}"
                     :products="$periProducts"
                     :columns="4" />
             @endif
@@ -173,5 +184,4 @@
 
             <x-shop.trust-banner />
         </main>
-    </x-layouts.app>
 </div>

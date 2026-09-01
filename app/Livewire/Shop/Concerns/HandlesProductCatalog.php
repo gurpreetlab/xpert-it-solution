@@ -288,10 +288,4 @@ trait HandlesProductCatalog
 
         $this->dispatch('wishlist-updated');
     }
-
-    public function toggleComparison(int $productId): void
-    {
-        \App\Livewire\Shop\Compare::toggleComparisonStatic($productId);
-        $this->dispatch('compare-updated');
-    }
 }

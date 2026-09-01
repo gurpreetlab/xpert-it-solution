@@ -15,7 +15,6 @@ use App\Livewire\Admin\Products\Edit as ProductEdit;
 use App\Livewire\Admin\Products\Index as ProductIndex;
 use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Shop\About;
-use App\Livewire\Shop\BulkOrders;
 // Customer
 use App\Livewire\Shop\Cart as ShopCart;
 use App\Livewire\Shop\Checkout;
@@ -24,7 +23,6 @@ use App\Livewire\Shop\Home;
 use App\Livewire\Shop\OrderConfirmation as ShopOrderConfirmation;
 use App\Livewire\Shop\Orders as ShopOrders;
 use App\Livewire\Shop\ProductDetail;
-use App\Livewire\Shop\Compare as ShopCompare;
 use App\Livewire\Shop\Products as ShopProducts;
 use App\Livewire\Shop\Wishlist;
 use App\Http\Controllers\Auth\SocialLoginController;
@@ -38,9 +36,6 @@ Route::get('/products/{slug}', ProductDetail::class)->name(
     'shop.product.details',
 );
 
-Route::get('/bulk-orders', BulkOrders::class)->name('shop.bulk-orders');
-Route::get('/request-quote', BulkOrders::class)->name('shop.request-quote');
-
 // Social Auth Routes (Google)
 Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
@@ -48,7 +43,6 @@ Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogle
 // Public Shopping Utility Routes (Accessible to guests & authenticated users)
 Route::get('/cart', ShopCart::class)->name('shop.cart');
 Route::get('/wishlist', Wishlist::class)->name('shop.wishlist');
-Route::get('/compare', ShopCompare::class)->name('shop.compare');
 
 // Authenticated Customer Checkout & Order History Routes
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {

@@ -6,7 +6,6 @@
     $discount = ($mrp > 0 && $mrp > $salePrice) ? round((($mrp - $salePrice) / $mrp) * 100) : 0;
 
     $categoryIcon = \App\Support\CategoryVisuals::icon($product->category?->name);
-    [$gradientFrom, $gradientTo] = \App\Support\CategoryVisuals::gradient($product->category?->name, muted: true);
 
     $img = $product->primaryImage?->path ?? ($product->images->first()?->path ?? null);
     $imgUrl = null;
@@ -21,14 +20,10 @@
     }
 
     $reviews = $product->reviews ?? collect();
-    $reviewCount = is_countable($reviews) ? count($reviews) : 0;
-    $avgRating = $reviewCount > 0 ? round($reviews->avg('rating'), 1) : 4.5;
-    if ($reviewCount === 0) {
-        $reviewCount = rand(12, 85); // Realistic default review count for product density
-    }
+    $reviewCount = count($reviews);
+    $avgRating = $reviewCount > 0 ? round($reviews->avg('rating'), 1) : 0;
 
     $isWishlisted = \App\Support\WishlistManager::contains($product->id);
-    $isCompared = in_array($product->id, session()->get('compared_product_ids', []), true);
 
     // Extract 2 key specifications if available
     $specs = [];
@@ -67,8 +62,8 @@
             @endif
         </div>
 
-        <!-- Wishlist & Compare Floating Action Buttons -->
-        <div class="absolute top-2.5 right-2.5 flex flex-col gap-1.5 z-10">
+        <!-- Wishlist Floating Action Button -->
+        <div class="absolute top-2.5 right-2.5 z-10">
             <button
                 type="button"
                 wire:click="toggleWishlist({{ $product->id }})"
@@ -76,14 +71,6 @@
                 title="Wishlist"
                 aria-label="Wishlist">
                 <flux:icon icon="heart" class="size-4 {{ $isWishlisted ? 'fill-current text-rose-500' : '' }}" />
-            </button>
-            <button
-                type="button"
-                wire:click="toggleComparison({{ $product->id }})"
-                class="size-8 rounded-full bg-surface/90 backdrop-blur-xs border border-border flex items-center justify-center text-zinc-400 hover:text-primary transition cursor-pointer shadow-xs"
-                title="Compare"
-                aria-label="Compare">
-                <flux:icon icon="scale" class="size-4 {{ $isCompared ? 'text-primary' : '' }}" />
             </button>
         </div>
     </div>
@@ -93,10 +80,12 @@
         <div class="space-y-1.5">
             <div class="flex items-center justify-between text-xs">
                 <span class="font-semibold text-zinc-400 uppercase tracking-wider text-[10px]">{{ $product->brand?->name ?? 'IT Product' }}</span>
-                <div class="flex items-center gap-1 text-amber-500 font-bold text-[11px]">
-                    <flux:icon icon="star" class="size-3 fill-current" />
-                    <span>{{ $avgRating }} <span class="text-zinc-400 font-normal text-[10px]">({{ $reviewCount }})</span></span>
-                </div>
+                @if($reviewCount > 0)
+                    <div class="flex items-center gap-1 text-amber-500 font-bold text-[11px]">
+                        <flux:icon icon="star" class="size-3 fill-current" />
+                        <span>{{ $avgRating }} <span class="text-zinc-400 font-normal text-[10px]">({{ $reviewCount }})</span></span>
+                    </div>
+                @endif
             </div>
 
             <a href="{{ route('shop.product.details', $product->slug) }}" wire:navigate class="block">
@@ -105,7 +94,6 @@
                 </h3>
             </a>
 
-            <!-- Key Specs / Short Description snippet -->
             @if(!empty($specs))
                 <div class="flex flex-wrap gap-1 pt-1">
                     @foreach($specs as $specName => $specVal)
@@ -142,7 +130,7 @@
                 </span>
 
                 <a href="{{ route('shop.product.details', $product->slug) }}" wire:navigate class="font-semibold text-primary hover:underline">
-                    Details →
+                    View Product →
                 </a>
             </div>
         </div>
