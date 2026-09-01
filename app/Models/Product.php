@@ -37,7 +37,31 @@ use Laravel\Scout\Searchable;
  * @property-read ProductImage|null $primaryImage
  * @property-read Collection<int, ProductImage> $images
  */
-#[Fillable(['category_id', 'brand_id', 'type', 'name', 'slug', 'sku', 'mpn', 'gtin', 'hsn_code', 'icecat_id', 'icecat_synced_at', 'mrp', 'purchase_price', 'sale_price', 'stock', 'short_description', 'description', 'weight', 'warranty', 'is_featured', 'is_active'])]
+#[
+    Fillable([
+        "category_id",
+        "brand_id",
+        "type",
+        "name",
+        "slug",
+        "sku",
+        "mpn",
+        "gtin",
+        "hsn_code",
+        "icecat_id",
+        "icecat_synced_at",
+        "mrp",
+        "purchase_price",
+        "sale_price",
+        "stock",
+        "short_description",
+        "description",
+        "weight",
+        "warranty",
+        "is_featured",
+        "is_active",
+    ]),
+]
 class Product extends Model
 {
     use HasSlug, Searchable, SoftDeletes;
@@ -48,18 +72,18 @@ class Product extends Model
     public function toSearchableArray(): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'sku' => $this->sku,
-            'category_id' => $this->category_id,
-            'brand_id' => $this->brand_id,
-            'category_name' => $this->category?->name,
-            'brand_name' => $this->brand?->name,
-            'sale_price' => (float) $this->sale_price,
-            'stock' => (int) ($this->stock ?? 0),
-            'is_featured' => (bool) $this->is_featured,
-            'is_active' => (bool) $this->is_active,
-            'created_at' => $this->created_at?->timestamp,
+            "id" => $this->id,
+            "name" => $this->name,
+            "sku" => $this->sku,
+            "category_id" => $this->category_id,
+            "brand_id" => $this->brand_id,
+            "category_name" => $this->category?->name,
+            "brand_name" => $this->brand?->name,
+            "sale_price" => (float) $this->sale_price,
+            "stock" => (int) ($this->stock ?? 0),
+            "is_featured" => (bool) $this->is_featured,
+            "is_active" => (bool) $this->is_active,
+            "created_at" => $this->created_at?->timestamp,
         ];
     }
 
@@ -84,18 +108,18 @@ class Product extends Model
      */
     public function makeAllSearchableUsing(Builder $query): Builder
     {
-        return $query->with(['category:id,name', 'brand:id,name']);
+        return $query->with(["category:id,name", "brand:id,name"]);
     }
 
     protected $casts = [
-        'category_id' => 'integer',
-        'brand_id' => 'integer',
-        'mrp' => 'decimal:2',
-        'purchase_price' => 'decimal:2',
-        'sale_price' => 'decimal:2',
-        'stock' => 'integer',
-        'is_featured' => 'boolean',
-        'is_active' => 'boolean',
+        "category_id" => "integer",
+        "brand_id" => "integer",
+        "mrp" => "decimal:2",
+        "purchase_price" => "decimal:2",
+        "sale_price" => "decimal:2",
+        "stock" => "integer",
+        "is_featured" => "boolean",
+        "is_active" => "boolean",
     ];
 
     /**
@@ -107,7 +131,7 @@ class Product extends Model
     public function scopeSearch(Builder $query, ?string $search): Builder
     {
         return $query->when($search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where("name", "like", "%{$search}%");
         });
     }
 
@@ -118,7 +142,7 @@ class Product extends Model
      */
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+        return $this->hasMany(ProductImage::class)->orderBy("sort_order");
     }
 
     /**
@@ -128,7 +152,11 @@ class Product extends Model
      */
     public function primaryImage(): HasOne
     {
-        return $this->hasOne(ProductImage::class)->where('is_primary', true);
+        // Pehle is_primary = true dhoondhega, nahi mila toh pehli uploaded image le lega
+        return $this->hasOne(ProductImage::class)->ofMany([
+            "is_primary" => "max",
+            "id" => "min",
+        ]);
     }
 
     /**
@@ -138,7 +166,9 @@ class Product extends Model
      */
     public function specifications(): HasMany
     {
-        return $this->hasMany(ProductSpecification::class)->orderBy('sort_order');
+        return $this->hasMany(ProductSpecification::class)->orderBy(
+            "sort_order",
+        );
     }
 
     /**
@@ -178,7 +208,9 @@ class Product extends Model
      */
     public function wishlistedBy(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'wishlist_items')
-            ->withTimestamps();
+        return $this->belongsToMany(
+            User::class,
+            "wishlist_items",
+        )->withTimestamps();
     }
 }

@@ -1,4 +1,4 @@
-<main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+{{-- <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 
     <x-shop.hero :search="$search" />
 
@@ -123,4 +123,32 @@
 
     <x-shop.trust-banner />
     <x-shop.faq />
-</main>
+</main> --}}
+
+<div>
+    <x-layouts.app>
+
+        <!-- Mobile View -->
+        <x-layouts.mobile title="My Mobile App">
+            <x-banners />
+
+            {{-- categories --}}
+            <x-shop.categories/>
+
+            {{-- Featured Products --}}
+            <x-shop.featured-products />
+        </x-layouts.mobile>
+
+        <!-- Desktop View -->
+        <x-layouts.desktop>
+            <x-banners />
+
+            {{-- categories --}}
+            <x-shop.categories/>
+
+            {{-- Featured Products --}}
+            <x-shop.featured-products />
+        </x-layouts.desktop>
+
+    </x-layouts.app>
+</div>
