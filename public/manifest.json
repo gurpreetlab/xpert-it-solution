@@ -1,10 +1,11 @@
 {
-  "name": "Xpert IT Solution",
+  "name": "Xpert IT Solution - Modern IT Hardware Store",
   "short_name": "Xpert IT",
+  "description": "Minimalist IT Hardware & Technology E-Commerce Store",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
   "orientation": "portrait-primary",
   "icons": [
     {

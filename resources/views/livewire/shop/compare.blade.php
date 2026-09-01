@@ -1,150 +1,131 @@
-<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 min-h-[60vh]">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+<main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-zinc-500 mb-2">
+        <a href="{{ route('home') }}" class="hover:text-primary transition" wire:navigate>Home</a>
+        <flux:icon icon="chevron-right" class="size-3 text-zinc-400" />
+        <span class="text-zinc-900 font-semibold">Compare Products</span>
+    </nav>
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">Product Comparison</h1>
-            <p class="mt-2 text-sm text-zinc-500">Compare specifications, prices, and performance side-by-side to make informed decisions.</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900">Side-by-Side Product Comparison</h1>
+            <p class="text-xs sm:text-sm text-zinc-500 mt-1">Compare technical specifications, prices, and features across IT hardware.</p>
         </div>
+
         @if($this->comparedProducts->isNotEmpty())
-            <flux:button variant="outline" wire:click="clearAll" class="cursor-pointer text-rose-500 hover:text-rose-600 self-start sm:self-auto" icon="trash">
-                Clear All
-            </flux:button>
+            <button
+                type="button"
+                wire:click="clearAll"
+                class="px-3.5 py-2 rounded-xl border border-border text-xs font-semibold text-rose-600 hover:bg-rose-50 transition cursor-pointer self-start sm:self-auto flex items-center gap-1.5">
+                <flux:icon icon="trash" class="size-4" />
+                <span>Clear All</span>
+            </button>
         @endif
     </div>
 
     @if($this->comparedProducts->isEmpty())
-        <div class="flex flex-col items-center justify-center py-16 px-4 text-center bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-            <div class="size-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-600 mb-4">
-                <flux:icon icon="scale" class="size-8" />
+        <div class="flex flex-col items-center justify-center py-16 px-4 text-center bg-surface rounded-2xl border border-border shadow-2xs">
+            <div class="size-14 rounded-full bg-surface-muted flex items-center justify-center text-zinc-400 mb-3">
+                <flux:icon icon="scale" class="size-7 text-primary" />
             </div>
-            <h2 class="text-lg font-bold text-zinc-900 dark:text-white">No products to compare</h2>
-            <p class="text-sm text-zinc-500 mt-1 max-w-xs">Add products from our catalog to compare their specifications side-by-side.</p>
-            <div class="mt-6">
-                <flux:button href="{{ route('shop.products') }}" variant="primary" class="cursor-pointer" wire:navigate>
-                    Browse Products
-                </flux:button>
+            <h2 class="text-base font-bold text-zinc-900">No products selected for comparison</h2>
+            <p class="text-xs text-zinc-500 mt-1 max-w-sm">Click the comparison icon <flux:icon icon="scale" class="size-3.5 inline text-primary" /> on any product card to compare side-by-side.</p>
+            <div class="mt-5">
+                <a href="{{ route('shop.products') }}" wire:navigate class="px-4 py-2.5 rounded-xl bg-primary text-white font-semibold text-xs hover:bg-primary-hover transition inline-block">
+                    Explore IT Products
+                </a>
             </div>
         </div>
     @else
-        <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+        <div class="bg-surface rounded-2xl border border-border shadow-2xs overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
-                        <tr class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-500 font-semibold">
-                            <th class="p-4 w-1/4">Product Specifications</th>
+                        <tr class="border-b border-border bg-surface-muted/50 text-zinc-500 font-bold">
+                            <th class="p-4 w-1/4 min-w-[150px] uppercase text-[10px] tracking-wider">Specifications</th>
                             @foreach($this->comparedProducts as $product)
-                                <th wire:key="header-{{ $product->id }}" class="p-4 w-1/4 min-w-[200px]">
-                                    <div class="flex flex-col space-y-3 relative">
-                                        <!-- Remove Button -->
-                                        <button type="button" wire:click="removeProduct({{ $product->id }})" class="absolute -top-1 -right-1 text-zinc-400 hover:text-rose-500 transition cursor-pointer" title="Remove">
+                                <th wire:key="compare-header-{{ $product->id }}" class="p-4 w-1/4 min-w-[220px] align-top">
+                                    <div class="flex flex-col space-y-2 relative">
+                                        <button
+                                            type="button"
+                                            wire:click="removeProduct({{ $product->id }})"
+                                            class="absolute -top-1 -right-1 p-1 text-zinc-400 hover:text-rose-600 transition cursor-pointer"
+                                            title="Remove">
                                             <flux:icon icon="x-mark" class="size-4" />
                                         </button>
 
-                                        <!-- Image -->
-                                        <div class="relative aspect-video w-full rounded-xl bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center overflow-hidden border border-zinc-100 dark:border-zinc-800">
+                                        <div class="aspect-video w-full rounded-xl bg-surface flex items-center justify-center overflow-hidden border border-border p-2">
                                             @php
                                                 $img = $product->primaryImage?->path ?? ($product->images->first()?->path ?? null);
                                                 $imgUrl = $img ? (str_starts_with($img, 'http') ? $img : asset('storage/' . $img)) : null;
                                             @endphp
                                             @if($imgUrl)
-                                                <img src="{{ $imgUrl }}" alt="{{ $product->name }}" class="h-20 object-contain p-2" />
+                                                <img src="{{ $imgUrl }}" alt="{{ $product->name }}" class="h-16 object-contain" />
                                             @else
-                                                <flux:icon icon="cube" class="size-6 text-zinc-300 dark:text-zinc-700" />
+                                                <flux:icon icon="cpu-chip" class="size-8 text-zinc-300" />
                                             @endif
                                         </div>
 
-                                        <!-- Details -->
                                         <div>
-                                            <flux:badge size="sm" color="blue" class="mb-1">{{ $product->brand?->name }}</flux:badge>
-                                            <h3 class="text-sm font-bold text-zinc-900 dark:text-white line-clamp-2 leading-snug">{{ $product->name }}</h3>
-                                            <div class="text-base font-extrabold text-zinc-950 dark:text-white mt-1">₹{{ number_format($product->sale_price, 2) }}</div>
+                                            <span class="text-[10px] font-bold text-primary uppercase tracking-wider block">{{ $product->brand?->name }}</span>
+                                            <a href="{{ route('shop.product.details', $product->slug) }}" wire:navigate class="font-bold text-zinc-900 hover:text-primary line-clamp-2 leading-tight">
+                                                {{ $product->name }}
+                                            </a>
+                                            <div class="text-base font-extrabold text-zinc-950 mt-1">₹{{ number_format($product->sale_price) }}</div>
                                         </div>
                                     </div>
                                 </th>
                             @endforeach
                             @for($i = count($this->comparedProducts); $i < 3; $i++)
-                                <th wire:key="placeholder-{{ $i }}" class="p-4 w-1/4 bg-zinc-50/20 dark:bg-zinc-950/10">
-                                    <div class="flex flex-col items-center justify-center py-10 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl text-center">
+                                <th wire:key="compare-empty-{{ $i }}" class="p-4 w-1/4 bg-surface-muted/20">
+                                    <div class="flex flex-col items-center justify-center py-10 border-2 border-dashed border-border rounded-xl text-center">
                                         <flux:icon icon="plus" class="size-5 text-zinc-300" />
-                                        <a href="{{ route('shop.products') }}" wire:navigate class="text-xs text-blue-500 hover:underline mt-1">Add product</a>
+                                        <a href="{{ route('shop.products') }}" wire:navigate class="text-xs text-primary font-semibold hover:underline mt-1">Add Product</a>
                                     </div>
                                 </th>
                             @endfor
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
-                        <!-- Category Row -->
-                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10 transition">
-                            <td class="p-4 font-semibold text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wider">Category</td>
+                    <tbody class="divide-y divide-border">
+                        <tr>
+                            <td class="p-4 font-bold text-zinc-400 text-[10px] uppercase tracking-wider bg-surface-muted/20">Category</td>
                             @foreach($this->comparedProducts as $product)
-                                <td class="p-4 text-zinc-900 dark:text-white font-medium">{{ $product->category?->name ?? '-' }}</td>
+                                <td class="p-4 font-semibold text-zinc-900">{{ $product->category?->name ?? '-' }}</td>
                             @endforeach
-                            @for($i = count($this->comparedProducts); $i < 3; $i++)
-                                <td class="p-4 bg-zinc-50/20 dark:bg-zinc-950/10"></td>
-                            @endfor
+                            @for($i = count($this->comparedProducts); $i < 3; $i++) <td class="p-4 bg-surface-muted/20"></td> @endfor
                         </tr>
 
-                        <!-- Brand Row -->
-                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10 transition">
-                            <td class="p-4 font-semibold text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wider">Brand</td>
-                            @foreach($this->comparedProducts as $product)
-                                <td class="p-4 text-zinc-900 dark:text-white font-medium">{{ $product->brand?->name ?? '-' }}</td>
-                            @endforeach
-                            @for($i = count($this->comparedProducts); $i < 3; $i++)
-                                <td class="p-4 bg-zinc-50/20 dark:bg-zinc-950/10"></td>
-                            @endfor
-                        </tr>
-
-                        <!-- Availability Row -->
-                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10 transition">
-                            <td class="p-4 font-semibold text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wider">Availability</td>
+                        <tr>
+                            <td class="p-4 font-bold text-zinc-400 text-[10px] uppercase tracking-wider bg-surface-muted/20">Availability</td>
                             @foreach($this->comparedProducts as $product)
                                 <td class="p-4">
-                                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold {{ $product->stock > 0 ? 'text-emerald-600' : 'text-rose-600' }}">
-                                        <span class="size-1.5 rounded-full {{ $product->stock > 0 ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
-                                        {{ $product->stock > 0 ? 'In Stock (' . $product->stock . ' units)' : 'Out of Stock' }}
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold {{ ($product->stock ?? 1) > 0 ? 'text-emerald-600' : 'text-rose-600' }}">
+                                        {{ ($product->stock ?? 1) > 0 ? 'In Stock' : 'Out of Stock' }}
                                     </span>
                                 </td>
                             @endforeach
-                            @for($i = count($this->comparedProducts); $i < 3; $i++)
-                                <td class="p-4 bg-zinc-50/20 dark:bg-zinc-950/10"></td>
-                            @endfor
+                            @for($i = count($this->comparedProducts); $i < 3; $i++) <td class="p-4 bg-surface-muted/20"></td> @endfor
                         </tr>
 
-                        <!-- Warranty Row -->
-                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10 transition">
-                            <td class="p-4 font-semibold text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wider">Warranty</td>
+                        <tr>
+                            <td class="p-4 font-bold text-zinc-400 text-[10px] uppercase tracking-wider bg-surface-muted/20">Warranty</td>
                             @foreach($this->comparedProducts as $product)
-                                <td class="p-4 text-zinc-700 dark:text-zinc-300">{{ $product->warranty ?? 'Standard Warranty' }}</td>
+                                <td class="p-4 text-zinc-700 font-medium">{{ $product->warranty ?? '3 Years Brand Warranty' }}</td>
                             @endforeach
-                            @for($i = count($this->comparedProducts); $i < 3; $i++)
-                                <td class="p-4 bg-zinc-50/20 dark:bg-zinc-950/10"></td>
-                            @endfor
+                            @for($i = count($this->comparedProducts); $i < 3; $i++) <td class="p-4 bg-surface-muted/20"></td> @endfor
                         </tr>
 
-                        <!-- Weight Row -->
-                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10 transition">
-                            <td class="p-4 font-semibold text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wider">Weight</td>
+                        <tr>
+                            <td class="p-4 font-bold text-zinc-400 text-[10px] uppercase tracking-wider bg-surface-muted/20">Technical Summary</td>
                             @foreach($this->comparedProducts as $product)
-                                <td class="p-4 text-zinc-700 dark:text-zinc-300">{{ $product->weight ? $product->weight . ' kg' : '-' }}</td>
+                                <td class="p-4 text-xs text-zinc-600 leading-relaxed">{{ $product->short_description ?? 'High performance IT product.' }}</td>
                             @endforeach
-                            @for($i = count($this->comparedProducts); $i < 3; $i++)
-                                <td class="p-4 bg-zinc-50/20 dark:bg-zinc-950/10"></td>
-                            @endfor
-                        </tr>
-
-                        <!-- Description Row -->
-                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10 transition">
-                            <td class="p-4 font-semibold text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wider">Summary</td>
-                            @foreach($this->comparedProducts as $product)
-                                <td class="p-4 text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed min-w-[200px]">{{ $product->short_description ?? 'High performance device.' }}</td>
-                            @endforeach
-                            @for($i = count($this->comparedProducts); $i < 3; $i++)
-                                <td class="p-4 bg-zinc-50/20 dark:bg-zinc-950/10"></td>
-                            @endfor
+                            @for($i = count($this->comparedProducts); $i < 3; $i++) <td class="p-4 bg-surface-muted/20"></td> @endfor
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     @endif
-</div>
+</main>

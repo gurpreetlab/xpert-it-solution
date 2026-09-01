@@ -15,6 +15,7 @@ use App\Livewire\Admin\Products\Edit as ProductEdit;
 use App\Livewire\Admin\Products\Index as ProductIndex;
 use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Shop\About;
+use App\Livewire\Shop\BulkOrders;
 // Customer
 use App\Livewire\Shop\Cart as ShopCart;
 use App\Livewire\Shop\Checkout;
@@ -36,6 +37,9 @@ Route::get('/products', ShopProducts::class)->name('shop.products');
 Route::get('/products/{slug}', ProductDetail::class)->name(
     'shop.product.details',
 );
+
+Route::get('/bulk-orders', BulkOrders::class)->name('shop.bulk-orders');
+Route::get('/request-quote', BulkOrders::class)->name('shop.request-quote');
 
 // Social Auth Routes (Google)
 Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
@@ -62,7 +66,6 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:super-admin'])
     ->prefix('super-admin')
     ->group(function () {
-        // Route::view("dashboard", "dashboard")->name("dashboard");
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
         Route::prefix('categories')->group(function () {

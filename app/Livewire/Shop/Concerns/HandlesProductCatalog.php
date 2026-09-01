@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Livewire\Attributes\Computed;
 
@@ -24,6 +25,12 @@ trait HandlesProductCatalog
 
     public string $sortBy = 'featured';
 
+    public string $priceRange = '';
+
+    public bool $inStockOnly = false;
+
+    public string $minRating = '';
+
     protected const array SORT_OPTIONS = [
         'featured' => 'Featured First',
         'price_asc' => 'Price: Low to High',
@@ -33,7 +40,7 @@ trait HandlesProductCatalog
 
     public function updating(string $property): void
     {
-        if (in_array($property, ['search', 'selectedCategoryId', 'selectedBrandId', 'sortBy'], true)) {
+        if (in_array($property, ['search', 'selectedCategoryId', 'selectedBrandId', 'sortBy', 'priceRange', 'inStockOnly', 'minRating'], true)) {
             $this->resetPage();
         }
 
@@ -47,7 +54,7 @@ trait HandlesProductCatalog
 
     public function clearFilters(): void
     {
-        $this->reset(['search', 'selectedCategoryId', 'selectedBrandId', 'sortBy']);
+        $this->reset(['search', 'selectedCategoryId', 'selectedBrandId', 'sortBy', 'priceRange', 'inStockOnly', 'minRating']);
         $this->resetPage();
     }
 
@@ -57,14 +64,12 @@ trait HandlesProductCatalog
         return $this->search !== ''
             || $this->selectedCategoryId !== ''
             || $this->selectedBrandId !== ''
+            || $this->priceRange !== ''
+            || $this->inStockOnly
+            || $this->minRating !== ''
             || $this->sortBy !== 'featured';
     }
 
-    /**
-     * Get the available sorting options.
-     *
-     * @return array<string, string>
-     */
     #[Computed]
     public function sortOptions(): array
     {
@@ -87,11 +92,11 @@ trait HandlesProductCatalog
             : $this->brands->firstWhere('id', (int) $this->selectedBrandId)?->name;
     }
 
-    /**
-     * DRY helper to construct base Scout builder queries with active state and category/brand filters.
-     *
-     * @return ScoutBuilder<Product>
-     */
+    protected function isMeilisearchActive(): bool
+    {
+        return config('scout.driver') === 'meilisearch' && ! empty(config('scout.meilisearch.host'));
+    }
+
     protected function getSearchBuilder(?string $categoryId = null, ?string $brandId = null): ScoutBuilder
     {
         $builder = Product::search($this->search);
@@ -110,76 +115,106 @@ trait HandlesProductCatalog
         return $builder;
     }
 
-    /**
-     * Fetch categories from Meilisearch with dynamic product counts using facet distribution (cached for blazing performance).
-     *
-     * @return Collection<int, Category>
-     */
     #[Computed]
     public function categories(): Collection
     {
-        $rawResults = Product::search('', function ($meilisearch, $query, $options) {
-            $options['facets'] = ['category_id'];
-            $options['filter'] = 'is_active = true';
+        if ($this->isMeilisearchActive()) {
+            try {
+                $rawResults = Product::search('', function ($meilisearch, $query, $options) {
+                    $options['facets'] = ['category_id'];
+                    $options['filter'] = 'is_active = true';
 
-            return $meilisearch->search($query, $options);
-        })->raw();
+                    return $meilisearch->search($query, $options);
+                })->raw();
 
-        $distribution = $rawResults['facetDistribution']['category_id'] ?? [];
-        $categoryIds = array_keys(array_filter($distribution, fn ($count) => $count > 0));
+                $distribution = $rawResults['facetDistribution']['category_id'] ?? [];
+                $categoryIds = array_keys(array_filter($distribution, fn ($count) => $count > 0));
 
-        return Category::whereIn('id', $categoryIds)
-            ->get()
-            ->each(function ($category) use ($distribution) {
-                $category->products_count = $distribution[$category->id] ?? 0;
-            });
+                return Category::whereIn('id', $categoryIds)
+                    ->get()
+                    ->each(function ($category) use ($distribution) {
+                        $category->products_count = $distribution[$category->id] ?? 0;
+                    });
+            } catch (\Throwable $e) {
+                Log::warning('Meilisearch category facet error, falling back to DB: ' . $e->getMessage());
+            }
+        }
+
+        return Category::withCount(['products' => function ($query) {
+            $query->where('is_active', true);
+        }])->get();
     }
 
-    /**
-     * Fetch brands dynamically from Meilisearch based on active category/search filters, with counts.
-     *
-     * @return Collection<int, Brand>
-     */
     #[Computed]
     public function brands(): Collection
     {
         $selectedCatId = $this->selectedCategoryId;
         $searchTerm = $this->search;
 
-        $rawResults = Product::search($searchTerm, function ($meilisearch, $query, $options) use ($selectedCatId) {
-            $filters = ['is_active = true'];
+        if ($this->isMeilisearchActive()) {
+            try {
+                $rawResults = Product::search($searchTerm, function ($meilisearch, $query, $options) use ($selectedCatId) {
+                    $filters = ['is_active = true'];
 
-            if ($selectedCatId !== '') {
-                $filters[] = "category_id = {$selectedCatId}";
+                    if ($selectedCatId !== '') {
+                        $filters[] = "category_id = {$selectedCatId}";
+                    }
+
+                    $options['facets'] = ['brand_id'];
+                    $options['filter'] = implode(' AND ', $filters);
+
+                    return $meilisearch->search($query, $options);
+                })->raw();
+
+                $distribution = $rawResults['facetDistribution']['brand_id'] ?? [];
+                $brandIds = array_keys(array_filter($distribution, fn ($count) => $count > 0));
+
+                return Brand::whereIn('id', $brandIds)
+                    ->get()
+                    ->each(function ($brand) use ($distribution) {
+                        $brand->products_count = $distribution[$brand->id] ?? 0;
+                    });
+            } catch (\Throwable $e) {
+                Log::warning('Meilisearch brand facet error, falling back to DB: ' . $e->getMessage());
             }
+        }
 
-            $options['facets'] = ['brand_id'];
-            $options['filter'] = implode(' AND ', $filters);
+        $query = Brand::query()->whereHas('products', function ($q) use ($selectedCatId, $searchTerm) {
+            $q->where('is_active', true);
+            if ($selectedCatId !== '') {
+                $q->where('category_id', (int) $selectedCatId);
+            }
+            if ($searchTerm !== '') {
+                $q->where('name', 'like', '%' . $searchTerm . '%');
+            }
+        });
 
-            return $meilisearch->search($query, $options);
-        })->raw();
-
-        $distribution = $rawResults['facetDistribution']['brand_id'] ?? [];
-        $brandIds = array_keys(array_filter($distribution, fn ($count) => $count > 0));
-
-        return Brand::whereIn('id', $brandIds)
-            ->get()
-            ->each(function ($brand) use ($distribution) {
-                $brand->products_count = $distribution[$brand->id] ?? 0;
-            });
+        return $query->withCount(['products' => function ($q) use ($selectedCatId) {
+            $q->where('is_active', true);
+            if ($selectedCatId !== '') {
+                $q->where('category_id', (int) $selectedCatId);
+            }
+        }])->get();
     }
 
     #[Computed]
     public function totalProductsCount(): int
     {
-        return Product::search('')->where('is_active', true)->raw()['estimatedTotalHits'] ?? 0;
+        if ($this->isMeilisearchActive()) {
+            try {
+                return Product::search('')->where('is_active', true)->raw()['estimatedTotalHits'] ?? 0;
+            } catch (\Throwable $e) {
+                // fallback
+            }
+        }
+
+        return Product::where('is_active', true)->count();
     }
 
     #[Computed]
-    // show selectedCategoryId products_count
     public function currentScopeProductsCount(): int
     {
-        return $this->getSearchBuilder()->raw()['estimatedTotalHits'] ?? 0;
+        return $this->products()->total();
     }
 
     #[Computed]
@@ -196,24 +231,51 @@ trait HandlesProductCatalog
     #[Computed]
     public function products(): LengthAwarePaginator
     {
-        $builder = $this->getSearchBuilder();
+        $query = Product::query()->where('is_active', true);
+
+        if ($this->search !== '') {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('sku', 'like', '%' . $this->search . '%')
+                  ->orWhere('short_description', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        if ($this->selectedCategoryId !== '') {
+            $query->where('category_id', (int) $this->selectedCategoryId);
+        }
+
+        if ($this->selectedBrandId !== '') {
+            $query->where('brand_id', (int) $this->selectedBrandId);
+        }
+
+        if ($this->inStockOnly) {
+            $query->where('stock', '>', 0);
+        }
+
+        if ($this->priceRange !== '') {
+            match ($this->priceRange) {
+                'under_5000' => $query->where('sale_price', '<', 5000),
+                '5000_15000' => $query->whereBetween('sale_price', [5000, 15000]),
+                '15000_50000' => $query->whereBetween('sale_price', [15000, 50000]),
+                'above_50000' => $query->where('sale_price', '>', 50000),
+                default => null,
+            };
+        }
 
         match ($this->sortBy) {
-            'price_asc' => $builder->orderBy('sale_price', 'asc'),
-            'price_desc' => $builder->orderBy('sale_price', 'desc'),
-            'newest' => $builder->orderBy('created_at', 'desc'),
-            'featured' => $builder->orderBy('is_featured', 'desc')->orderBy('name', 'asc'),
-            default => null,
+            'price_asc' => $query->orderBy('sale_price', 'asc'),
+            'price_desc' => $query->orderBy('sale_price', 'desc'),
+            'newest' => $query->orderBy('created_at', 'desc'),
+            'featured' => $query->orderBy('is_featured', 'desc')->orderBy('name', 'asc'),
+            default => $query->orderBy('created_at', 'desc'),
         };
 
-        return $builder
-            ->query(fn ($query) => $query->with(['category:id,name', 'brand:id,name,logo', 'primaryImage']))
+        return $query
+            ->with(['category:id,name', 'brand:id,name,logo', 'primaryImage', 'specifications', 'reviews'])
             ->paginate(12);
     }
 
-    /**
-     * Toggle a product in/out of the user's wishlist.
-     */
     public function toggleWishlist(int $productId): void
     {
         $added = \App\Support\WishlistManager::toggle($productId);
@@ -227,9 +289,6 @@ trait HandlesProductCatalog
         $this->dispatch('wishlist-updated');
     }
 
-    /**
-     * Toggle a product in/out of comparison.
-     */
     public function toggleComparison(int $productId): void
     {
         \App\Livewire\Shop\Compare::toggleComparisonStatic($productId);

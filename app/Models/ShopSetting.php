@@ -41,7 +41,7 @@ class ShopSetting extends Model
     {
         $attributes = Cache::rememberForever(self::CACHE_KEY, function () {
             // 1. Production safety check
-            if (!Schema::hasTable(new static()->getTable())) {
+            if (!Schema::hasTable((new static())->getTable())) {
                 return static::fromConfig()->getAttributes();
             }
 
@@ -106,7 +106,7 @@ class ShopSetting extends Model
             $signaturePath = preg_replace("#^/?storage/#", "", $signaturePath);
         }
 
-        return new static()->forceFill([
+        return (new static())->forceFill([
             "name" => $company["name"] ?? "",
             "gstin" => $company["gstin"] ?? "",
             "address_line1" => $company["address_line1"] ?? "",
