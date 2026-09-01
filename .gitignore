@@ -6,6 +6,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/debugbar
 /vendor
 .env
 .env.backup
@@ -27,8 +28,8 @@ yarn-error.log
 /.claude
 /.cursor
 /.agents
-/AGENTS.md
-/CLAUDE.md
+AGENTS.md
+CLAUDE.md
 /boost.json
 /data.ms
 /dumps
