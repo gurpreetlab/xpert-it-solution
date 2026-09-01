@@ -6,93 +6,14 @@
     <body class="min-h-screen bg-background text-zinc-900 antialiased selection:bg-primary selection:text-white transition-colors duration-200 pb-16 md:pb-0">
 
         <div class="w-full">
-            <!-- Header Navigation -->
-            <header class="sticky top-0 z-40 w-full border-b border-border bg-surface/90 backdrop-blur-md transition-colors duration-200">
-                <div class="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-                    <div class="flex items-center gap-6">
-                        <!-- Brand Logo & Name -->
-                        <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
-                            <img src="{{ asset('logo-xpert-it-solution.png') }}" alt="{{ shop()->name }}" class="h-9 w-auto object-contain" />
-                        </a>
-                    </div>
-
-                    <!-- Main Nav Links -->
-                    <nav class="hidden md:flex items-center gap-6 text-xs font-bold text-zinc-600">
-                        <a href="{{ route('home') }}" class="hover:text-primary transition" wire:navigate>Home</a>
-                        <a href="{{ route('shop.products') }}" class="hover:text-primary transition" wire:navigate>Catalog</a>
-                        <a href="{{ route('about') }}" class="hover:text-primary transition" wire:navigate>About Us</a>
-                        <a href="{{ route('contact') }}" class="hover:text-primary transition" wire:navigate>Contact</a>
-                    </nav>
-
-                    <!-- Utility Actions & Profile -->
-                    <div class="flex items-center gap-3">
-                        <livewire:shop.partials.wishlist-count />
-                        <livewire:shop._partials.cart-count />
-
-                        @if (Route::has('login'))
-                            @auth
-                                <flux:dropdown>
-                                    <flux:profile avatar="" name="{{ Auth::user()->name }}" class="cursor-pointer" />
-
-                                    <flux:navmenu>
-                                        @role('super-admin')
-                                            <flux:navmenu.item href="{{ route('dashboard') }}" icon="home">{{ __('Dashboard') }}</flux:navmenu.item>
-                                        @endrole
-
-                                        @role('customer')
-                                            <flux:navmenu.item href="{{ route('shop.orders') }}" icon="shopping-bag" wire:navigate>{{ __('My Orders') }}</flux:navmenu.item>
-                                            <flux:navmenu.item href="{{ route('shop.wishlist') }}" icon="heart" wire:navigate>{{ __('My Wishlist') }}</flux:navmenu.item>
-                                        @endrole
-
-                                        <flux:navmenu.item href="{{ route('profile.edit') }}" icon="user-circle">{{ __('Profile') }}</flux:navmenu.item>
-
-                                        <flux:menu.separator />
-
-                                        <form method="POST" action="{{ route('logout') }}" class="w-full">
-                                            @csrf
-                                            <flux:navmenu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full cursor-pointer">
-                                                {{ __('Log out') }}
-                                            </flux:navmenu.item>
-                                        </form>
-                                    </flux:navmenu>
-                                </flux:dropdown>
-                            @else
-                                <flux:button href="{{ route('login') }}" variant="ghost" size="sm" class="text-xs font-bold text-zinc-700 hover:bg-surface-muted border border-border" wire:navigate>
-                                    Log in
-                                </flux:button>
-                                @if (Route::has('register'))
-                                    <flux:button href="{{ route('register') }}" variant="filled" size="sm" class="text-xs font-bold bg-primary hover:bg-primary-hover text-white border-0" wire:navigate>
-                                        Register
-                                    </flux:button>
-                                @endif
-                            @endauth
-                        @endif
-                    </div>
-                </div>
-            </header>
+            <!-- Header Navigation Component -->
+            <x-navigation.header />
 
             <!-- Main Content Area -->
             {{ $slot }}
 
             <!-- Mobile Sticky Bottom Navigation -->
-            <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface/95 backdrop-blur-md border-t border-border flex items-center justify-around h-14 px-2 shadow-lg">
-                <a href="{{ route('home') }}" wire:navigate class="flex flex-col items-center justify-center text-zinc-600 hover:text-primary transition p-1">
-                    <flux:icon icon="home" class="size-4" />
-                    <span class="text-[9px] font-bold mt-0.5">Home</span>
-                </a>
-                <a href="{{ route('shop.products') }}" wire:navigate class="flex flex-col items-center justify-center text-zinc-600 hover:text-primary transition p-1">
-                    <flux:icon icon="squares-2x2" class="size-4" />
-                    <span class="text-[9px] font-bold mt-0.5">Catalog</span>
-                </a>
-                <a href="{{ route('shop.wishlist') }}" wire:navigate class="flex flex-col items-center justify-center text-zinc-600 hover:text-primary transition p-1">
-                    <flux:icon icon="heart" class="size-4" />
-                    <span class="text-[9px] font-bold mt-0.5">Wishlist</span>
-                </a>
-                <a href="{{ route('shop.orders') }}" wire:navigate class="flex flex-col items-center justify-center text-zinc-600 hover:text-primary transition p-1">
-                    <flux:icon icon="user" class="size-4" />
-                    <span class="text-[9px] font-bold mt-0.5">Account</span>
-                </a>
-            </nav>
+            <x-navigation.mobile-bottom-nav />
 
             <!-- Light Theme Footer -->
             <footer id="contact" class="bg-surface-muted text-zinc-600 border-t border-border py-12 mt-12 transition-colors duration-200">
