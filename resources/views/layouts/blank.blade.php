@@ -114,12 +114,12 @@
                 </a>
             </nav>
 
-            <!-- Footer -->
-            <footer id="contact" class="bg-zinc-950 text-zinc-400 border-t border-zinc-900 py-12 mt-12 transition-colors duration-200">
+            <!-- Light Theme Footer -->
+            <footer id="contact" class="bg-surface-muted text-zinc-600 border-t border-border py-12 mt-12 transition-colors duration-200">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-zinc-900">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-border">
                         <div class="space-y-3">
-                            <div class="flex items-center gap-2 text-white">
+                            <div class="flex items-center gap-2 text-zinc-900">
                                 <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-white font-black text-xs">
                                     IT
                                 </div>
@@ -128,36 +128,36 @@
                             <p class="text-xs leading-relaxed text-zinc-500">Premium IT Infrastructure, CCTV surveillance, enterprise storage, and networking hardware provider.</p>
                         </div>
                         <div>
-                            <h5 class="text-white text-xs font-bold uppercase tracking-wider mb-3">Shop Categories</h5>
+                            <h5 class="text-zinc-900 text-xs font-bold uppercase tracking-wider mb-3">Shop Categories</h5>
                             <ul class="space-y-2 text-xs">
-                                <li><a href="{{ route('shop.products') }}" class="hover:text-white transition" wire:navigate>Networking & Routers</a></li>
-                                <li><a href="{{ route('shop.products') }}" class="hover:text-white transition" wire:navigate>CCTV & Surveillance</a></li>
-                                <li><a href="{{ route('shop.products') }}" class="hover:text-white transition" wire:navigate>NVMe & Hard Drives</a></li>
-                                <li><a href="{{ route('shop.products') }}" class="hover:text-white transition" wire:navigate>Computer Peripherals</a></li>
+                                <li><a href="{{ route('shop.products') }}" class="hover:text-primary transition" wire:navigate>Networking & Routers</a></li>
+                                <li><a href="{{ route('shop.products') }}" class="hover:text-primary transition" wire:navigate>CCTV & Surveillance</a></li>
+                                <li><a href="{{ route('shop.products') }}" class="hover:text-primary transition" wire:navigate>NVMe & Hard Drives</a></li>
+                                <li><a href="{{ route('shop.products') }}" class="hover:text-primary transition" wire:navigate>Computer Peripherals</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h5 class="text-white text-xs font-bold uppercase tracking-wider mb-3">Corporate Services</h5>
+                            <h5 class="text-zinc-900 text-xs font-bold uppercase tracking-wider mb-3">Corporate Services</h5>
                             <ul class="space-y-2 text-xs">
-                                <li><a href="{{ route('shop.bulk-orders') }}" class="hover:text-white transition" wire:navigate>Bulk Orders & Quotes</a></li>
-                                <li><a href="{{ route('shop.privacy-policy') }}" class="hover:text-white transition" wire:navigate>Privacy Policy</a></li>
-                                <li><a href="{{ route('shop.terms-and-conditions') }}" class="hover:text-white transition" wire:navigate>Terms &amp; Conditions</a></li>
-                                <li><a href="{{ route('shop.shipping-policy') }}" class="hover:text-white transition" wire:navigate>Shipping & Warranty Policy</a></li>
+                                <li><a href="{{ route('shop.bulk-orders') }}" class="hover:text-primary transition" wire:navigate>Bulk Orders & Quotes</a></li>
+                                <li><a href="{{ route('shop.privacy-policy') }}" class="hover:text-primary transition" wire:navigate>Privacy Policy</a></li>
+                                <li><a href="{{ route('shop.terms-and-conditions') }}" class="hover:text-primary transition" wire:navigate>Terms &amp; Conditions</a></li>
+                                <li><a href="{{ route('shop.shipping-policy') }}" class="hover:text-primary transition" wire:navigate>Shipping & Warranty Policy</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h5 class="text-white text-xs font-bold uppercase tracking-wider mb-3">Get In Touch</h5>
-                            <ul class="space-y-2 text-xs text-zinc-400">
+                            <h5 class="text-zinc-900 text-xs font-bold uppercase tracking-wider mb-3">Get In Touch</h5>
+                            <ul class="space-y-2 text-xs text-zinc-600">
                                 <li class="flex items-center gap-2">
-                                    <flux:icon icon="envelope" class="size-4 shrink-0 text-zinc-500" />
+                                    <flux:icon icon="envelope" class="size-4 shrink-0 text-zinc-400" />
                                     <span>{{ shop()->email }}</span>
                                 </li>
                                 <li class="flex items-center gap-2">
-                                    <flux:icon icon="phone" class="size-4 shrink-0 text-zinc-500" />
+                                    <flux:icon icon="phone" class="size-4 shrink-0 text-zinc-400" />
                                     <span>+91 {{ shop()->phone }}</span>
                                 </li>
                                 <li class="flex items-center gap-2">
-                                    <flux:icon icon="map-pin" class="size-4 shrink-0 text-zinc-500" />
+                                    <flux:icon icon="map-pin" class="size-4 shrink-0 text-zinc-400" />
                                     <span>{{ shop()->address_line1 . ', ' . shop()->state }}</span>
                                 </li>
                             </ul>
@@ -165,7 +165,7 @@
                     </div>
                     <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500">
                         <span>&copy; {{ date('Y') }} Xpert IT Solution. All rights reserved.</span>
-                        <span class="mt-2 sm:mt-0 text-[11px]">100% Authentic IT Hardware & GST Invoices</span>
+                        <span class="mt-2 sm:mt-0 text-[11px] font-semibold text-zinc-600">100% Authentic IT Hardware & GST Invoices</span>
                     </div>
                 </div>
             </footer>
