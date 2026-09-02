@@ -118,6 +118,12 @@ trait HandlesProductCatalog
     #[Computed]
     public function categories(): Collection
     {
+        if (config('scout.driver') !== 'meilisearch') {
+            return Category::whereHas('products', fn ($q) => $q->where('is_active', true))
+                ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
+                ->get();
+        }
+
         $rawResults = Product::search('', function ($meilisearch, $query, $options) {
             $options['facets'] = ['category_id'];
             $options['filter'] = 'is_active = true';
@@ -146,6 +152,20 @@ trait HandlesProductCatalog
         $selectedCatId = $this->selectedCategoryId;
         $searchTerm = $this->search;
 
+        if (config('scout.driver') !== 'meilisearch') {
+            return Brand::whereHas('products', function ($q) use ($selectedCatId) {
+                $q->where('is_active', true);
+                if ($selectedCatId !== '') {
+                    $q->where('category_id', (int) $selectedCatId);
+                }
+            })->withCount(['products' => function ($q) use ($selectedCatId) {
+                $q->where('is_active', true);
+                if ($selectedCatId !== '') {
+                    $q->where('category_id', (int) $selectedCatId);
+                }
+            }])->get();
+        }
+
         $rawResults = Product::search($searchTerm, function ($meilisearch, $query, $options) use ($selectedCatId) {
             $filters = ['is_active = true'];
 
@@ -172,6 +192,10 @@ trait HandlesProductCatalog
     #[Computed]
     public function totalProductsCount(): int
     {
+        if (config('scout.driver') !== 'meilisearch') {
+            return Product::where('is_active', true)->count();
+        }
+
         return Product::search('')->where('is_active', true)->raw()['estimatedTotalHits'] ?? 0;
     }
 
@@ -179,6 +203,16 @@ trait HandlesProductCatalog
     // show selectedCategoryId products_count
     public function currentScopeProductsCount(): int
     {
+        if (config('scout.driver') !== 'meilisearch') {
+            $catId = $this->selectedCategoryId;
+            $bId = $this->selectedBrandId;
+            $q = Product::where('is_active', true);
+            if ($catId !== '') $q->where('category_id', (int)$catId);
+            if ($bId !== '') $q->where('brand_id', (int)$bId);
+            if ($this->search !== '') $q->where('name', 'like', '%'.$this->search.'%');
+            return $q->count();
+        }
+
         return $this->getSearchBuilder()->raw()['estimatedTotalHits'] ?? 0;
     }
 

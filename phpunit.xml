@@ -29,6 +29,8 @@
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="APP_KEY" value="base64:8QJd0Rz1yO04xYv5PZ8Nq2C6lU2xK+V4K50jY8bW0M0="/>
+        <env name="SCOUT_DRIVER" value="collection"/>
         <env name="SCOUT_AFTER_COMMIT" value="false"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>

@@ -15,6 +15,10 @@ test('returns a successful response for the home page', function () {
 
 function waitForMeilisearch(): void
 {
+    if (config('scout.driver') !== 'meilisearch') {
+        return;
+    }
+
     $client = app(\Meilisearch\Client::class);
     $query = new \Meilisearch\Contracts\TasksQuery();
     $query->setStatuses(['enqueued', 'processing']);
