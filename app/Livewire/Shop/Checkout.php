@@ -3,11 +3,13 @@
 namespace App\Livewire\Shop;
 
 use App\Models\Address;
+use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Notifications\OrderConfirmed;
+use App\Services\CartService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -67,8 +69,10 @@ class Checkout extends Component
 
     public function mount(): void
     {
+        $this->prepareCheckout(app(CartService::class));
+
         if ($this->cartItems->isEmpty()) {
-            $this->redirect(route('shop.cart'), navigate: true);
+            $this->redirect(route('cart.index'), navigate: true);
 
             return;
         }
@@ -81,6 +85,44 @@ class Checkout extends Component
         if ($this->addresses->isEmpty()) {
             $this->showAddressForm = true;
         }
+    }
+
+    public function prepareCheckout(CartService $cartService)
+    {
+        $cartSummary = $cartService->getCartSummary();
+        $userId = auth()->id();
+
+        if (empty($cartSummary['items']) || !$userId) {
+            return redirect()->back()->with('error', 'Cart is empty or unauthorized.');
+        }
+
+        DB::transaction(function () use ($userId, $cartSummary) {
+            // 1. Parent 'carts' table me record ensure karein[cite: 1]
+            $cart = auth()->user()->cart()->firstOrCreate();
+
+            // 2. Purani cart entries clear karein (Fresh Sync)
+            CartItem::where('cart_id', $cart->id)->delete();
+
+            // 3. Bulk Insert Payload prepare karein
+            $insertData = [];
+            $now = now();
+
+            foreach ($cartSummary['items'] as $item) {
+                $insertData[] = [
+                    'cart_id'    => $cart->id,                 // Foreign key to carts table[cite: 2]
+                    'product_id' => (int) $item['product_id'], //[cite: 2]
+                    'quantity'   => (int) $item['quantity'],   //[cite: 2]
+                    'sale_price' => (float) $item['price'],    // 'sale_price' as per migration[cite: 2]
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+
+            // 4. Single Query Bulk Insert into cart_items[cite: 2]
+            CartItem::insert($insertData);
+        });
+
+        return view('shop.checkout', compact('cartSummary'));
     }
 
     /** @return EloquentCollection<int, Address> */
@@ -110,7 +152,7 @@ class Checkout extends Component
     public function mrp(): float
     {
         return $this->cartItems->sum(
-            fn ($item) => ($item->product->mrp ?? 0) * $item->quantity,
+            fn($item) => ($item->product->mrp ?? 0) * $item->quantity,
         );
     }
 
@@ -118,7 +160,7 @@ class Checkout extends Component
     public function subtotal(): float
     {
         return $this->cartItems->sum(
-            fn ($item) => $item->sale_price * $item->quantity,
+            fn($item) => $item->sale_price * $item->quantity,
         );
     }
 
@@ -275,7 +317,7 @@ class Checkout extends Component
         }
 
         if ($this->cartItems->isEmpty()) {
-            $this->redirect(route('shop.cart'), navigate: true);
+            $this->redirect(route('cart.index'), navigate: true);
 
             return;
         }

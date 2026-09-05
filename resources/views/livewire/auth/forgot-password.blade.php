@@ -1,4 +1,4 @@
-<x-layouts::auth.split :title="__('Forgot password')">
+<x-layouts::auth.card :title="__('Forgot password')">
     <div class="flex flex-col gap-6">
         <x-auth-header :title="__('Forgot password')" :description="__('Enter your email to receive a password reset link')" />
 
@@ -15,8 +15,7 @@
                 type="email"
                 required
                 autofocus
-                placeholder="email@example.com"
-            />
+                placeholder="email@example.com" />
 
             <flux:button variant="primary" type="submit" class="w-full" data-test="email-password-reset-link-button">
                 {{ __('Email password reset link') }}
@@ -28,4 +27,4 @@
             <flux:link :href="route('login')" wire:navigate>{{ __('log in') }}</flux:link>
         </div>
     </div>
-</x-layouts::auth>
+    </x-layouts::auth>

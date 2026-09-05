@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasSlug;
+use App\Support\WishlistManager;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -73,6 +74,13 @@ class Product extends Model
         return (bool) $this->is_active;
     }
 
+    protected $appends = [
+        'discount_percentage',
+        'average_rating',
+        'reviews_count',
+        'is_in_wishlist',
+    ];
+
     /**
      * Eager-load relations during `scout:import` / bulk re-indexing.
      * Without this, toSearchableArray()'s $this->category / $this->brand
@@ -128,7 +136,9 @@ class Product extends Model
      */
     public function primaryImage(): HasOne
     {
-        return $this->hasOne(ProductImage::class)->where('is_primary', true);
+        return $this->hasOne(ProductImage::class)
+            ->orderByDesc('is_primary')
+            ->orderBy('id');
     }
 
     /**
@@ -180,5 +190,39 @@ class Product extends Model
     {
         return $this->belongsToMany(User::class, 'wishlist_items')
             ->withTimestamps();
+    }
+
+    /**
+     * Discount percentage calculation
+     */
+    public function getDiscountPercentageAttribute(): int
+    {
+        if ($this->mrp <= 0 || $this->mrp <= $this->sale_price) {
+            return 0;
+        }
+
+        return (int) round((($this->mrp - $this->sale_price) / $this->mrp) * 100);
+    }
+
+    /**
+     * Rating calculations
+     */
+    public function getAverageRatingAttribute(): float
+    {
+        // Agar relation preloaded / eager loaded hai to direct collection rely karein
+        return round($this->reviews->avg('rating') ?? 0, 1);
+    }
+
+    public function getReviewsCountAttribute(): int
+    {
+        return $this->reviews->count();
+    }
+
+    /**
+     * Check if the product is in the wishlist
+     */
+    public function getIsInWishlistAttribute(): bool
+    {
+        return WishlistManager::contains($this->id);
     }
 }

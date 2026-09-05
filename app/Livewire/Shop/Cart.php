@@ -32,7 +32,7 @@ class Cart extends Component
     public function subtotal(): float
     {
         return $this->cartItems->sum(
-            fn ($item) => $item->sale_price * $item->quantity,
+            fn($item) => $item->sale_price * $item->quantity,
         );
     }
 
@@ -147,6 +147,6 @@ class Cart extends Component
     #[Layout('layouts.blank')]
     public function render(): View
     {
-        return view('livewire.shop.cart');
+        return view('livewire.cart.index');
     }
 }

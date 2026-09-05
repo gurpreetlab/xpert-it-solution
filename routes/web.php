@@ -15,6 +15,7 @@ use App\Livewire\Admin\Products\Edit as ProductEdit;
 use App\Livewire\Admin\Products\Index as ProductIndex;
 use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Shop\About;
+
 // Customer
 use App\Livewire\Shop\Cart as ShopCart;
 use App\Livewire\Shop\Checkout;
@@ -29,7 +30,10 @@ use App\Livewire\Shop\Wishlist;
 use App\Http\Controllers\Auth\SocialLoginController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', Home::class)->name('home');
+use App\Http\Controllers\Shop\HomeController;
+use App\Http\Controllers\Shop\CartController;
+
+Route::get('/', HomeController::class)->name('home');
 Route::get('/about', About::class)->name('about');
 Route::get('/contact', Contact::class)->name('contact');
 Route::get('/products', ShopProducts::class)->name('shop.products');
@@ -37,14 +41,19 @@ Route::get('/products/{slug}', ProductDetail::class)->name(
     'shop.product.details',
 );
 
+// cart
+Route::get('/cart/summary', [CartController::class, 'getSummary'])->name('cart.summary');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
+Route::delete('/cart/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
+
 // Social Auth Routes (Google)
 Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 // Public Shopping Utility Routes (Accessible to guests & authenticated users)
-Route::get('/cart', ShopCart::class)->name('shop.cart');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::get('/wishlist', Wishlist::class)->name('shop.wishlist');
-Route::get('/compare', ShopCompare::class)->name('shop.compare');
 
 // Authenticated Customer Checkout & Order History Routes
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
@@ -127,4 +136,4 @@ Route::livewire('/privacy-policy', 'pages::shop.privacy-policy')->name('shop.pri
 Route::livewire('/terms-and-conditions', 'pages::shop.terms-and-conditions')->name('shop.terms-and-conditions');
 Route::livewire('/shipping-policy', 'pages::shop.shipping-policy')->name('shop.shipping-policy');
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

@@ -53,6 +53,7 @@ class Home extends Component
      */
     public function render(): View
     {
-        return view('livewire.shop.home');
+        // return view('livewire.shop.home');
+        return view('shop.home');
     }
 }
