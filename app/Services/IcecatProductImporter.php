@@ -86,7 +86,9 @@ class IcecatProductImporter
         // 1. Brand + product upsert — kept in its own short transaction.
         // Image downloads happen *outside* any transaction below: they're
         // network I/O and have no business holding a DB lock while they run.
-        $product = DB::transaction(function () use ($generalInfo, $icecatId, $category) {
+        $featureGroups = $productData['FeaturesGroups'] ?? [];
+
+        $product = DB::transaction(function () use ($generalInfo, $icecatId, $category, $featureGroups) {
             $brandId = null;
             $supplierName = $generalInfo['Brand'] ?? null;
             $icecatBrandId = $generalInfo['BrandID'] ?? null;
@@ -113,29 +115,37 @@ class IcecatProductImporter
             // only the name used in the granular call).
             $name = $generalInfo['Title'] ?? $generalInfo['ProductName'] ?? 'Unknown Product';
             $mpn = $generalInfo['BrandPartCode'] ?? null;
-            $gtin = $generalInfo['GTIN'][0] ?? null;
+            $gtin = $this->extractGtin($generalInfo);
+            $longDesc = $this->extractDescription($generalInfo);
+            $shortDesc = $this->extractShortDescription($generalInfo);
 
-            $longDesc = $generalInfo['Description']['LongDesc'] ?? null;
-            $shortDesc = $generalInfo['SummaryDescription']['ShortSummaryDescription']
-                ?? $generalInfo['Description']['MiddleDesc']
-                ?? null;
+            $product = Product::firstOrNew(['icecat_id' => $icecatId]);
 
-            return Product::updateOrCreate(
-                ['icecat_id' => $icecatId],
-                [
-                    'category_id' => $category->id,
-                    'brand_id' => $brandId,
-                    'name' => $name,
-                    'slug' => Str::slug($name.'-'.($mpn ?: $icecatId)),
-                    'sku' => $mpn ?: ('ICECAT-'.$icecatId),
-                    'mpn' => $mpn,
-                    'gtin' => $gtin,
-                    'short_description' => $shortDesc,
-                    'description' => $longDesc,
-                    'icecat_synced_at' => now(),
-                    'is_active' => true,
-                ]
-            );
+            $product->fill(array_filter([
+                'category_id' => $category->id,
+                'brand_id' => $brandId,
+                'name' => $name,
+                'slug' => Str::slug($name.'-'.($mpn ?: $icecatId)),
+                'sku' => $mpn ?: ('ICECAT-'.$icecatId),
+                'mpn' => $mpn,
+                'gtin' => $gtin,
+                'short_description' => $shortDesc,
+                'description' => $longDesc,
+                'weight' => $this->extractWeightInKg($featureGroups),
+                'warranty' => $this->extractWarranty($featureGroups),
+                'icecat_synced_at' => now(),
+            ], fn ($value): bool => $value !== null));
+
+            // Icecat carries no pricing, so a brand-new product would go live
+            // at ₹0. New imports start as drafts; re-syncs keep the admin's
+            // existing visibility choice.
+            if (! $product->exists) {
+                $product->is_active = false;
+            }
+
+            $product->save();
+
+            return $product;
         });
 
         // 2. Images - "Gallery" is a SIBLING of "GeneralInfo" at the top
@@ -156,37 +166,194 @@ class IcecatProductImporter
         // 3. Specifications - the feature's name/id live under the
         //    nested "Feature" object, and the group name under
         //    "FeatureGroup" - not directly on the feature/group.
-        $featureGroups = $productData['FeaturesGroups'] ?? [];
-        if (! empty($featureGroups)) {
-            $specInserts = [];
-            foreach ($featureGroups as $group) {
-                $groupName = $group['FeatureGroup']['Name']['Value'] ?? 'General';
+        $this->replaceSpecifications($featureGroups, $product);
 
-                foreach ($group['Features'] ?? [] as $feature) {
-                    $specInserts[] = [
-                        'product_id' => $product->id,
-                        'group_name' => $groupName,
-                        'key' => $feature['Feature']['Name']['Value'] ?? 'Feature',
-                        'value' => $feature['PresentationValue'] ?? $feature['Value'] ?? '',
-                        'unit' => $feature['Feature']['Measure']['Signs']['_'] ?? null,
-                        'icecat_feature_id' => $feature['Feature']['ID'] ?? null,
-                        'sort_order' => (int) ($feature['SortNo'] ?? 0),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
+        return true;
+    }
+
+    /**
+     * Replace a product's specifications with Icecat's feature list.
+     *
+     * Feature names/ids live under the nested "Feature" object and the
+     * group name under "FeatureGroup" — not directly on the feature/group.
+     *
+     * @param  array<int, array<string, mixed>>  $featureGroups
+     */
+    protected function replaceSpecifications(array $featureGroups, Product $product): void
+    {
+        $specInserts = [];
+
+        foreach ($featureGroups as $group) {
+            $groupName = $group['FeatureGroup']['Name']['Value'] ?? 'General';
+
+            foreach ($group['Features'] ?? [] as $feature) {
+                $specInserts[] = [
+                    'product_id' => $product->id,
+                    'group_name' => $groupName,
+                    'key' => $feature['Feature']['Name']['Value'] ?? 'Feature',
+                    'value' => $feature['PresentationValue'] ?? $feature['Value'] ?? '',
+                    'unit' => $feature['Feature']['Measure']['Signs']['_'] ?? null,
+                    'icecat_feature_id' => $feature['Feature']['ID'] ?? null,
+                    'sort_order' => (int) ($feature['SortNo'] ?? 0),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        if ($specInserts === []) {
+            return;
+        }
+
+        ProductSpecification::where('product_id', $product->id)->delete();
+
+        // Chunk inserts to handle large specification arrays.
+        foreach (array_chunk($specInserts, 100) as $chunk) {
+            ProductSpecification::insert($chunk);
+        }
+    }
+
+    /**
+     * First barcode Icecat lists for the product.
+     *
+     * @param  array<string, mixed>  $generalInfo
+     */
+    protected function extractGtin(array $generalInfo): ?string
+    {
+        $gtin = trim((string) ($generalInfo['GTIN'][0] ?? ''));
+
+        return $gtin !== '' ? $gtin : null;
+    }
+
+    /**
+     * Full description, falling back to Icecat's middle description and then
+     * its long marketing summary when the manufacturer text is empty.
+     *
+     * @param  array<string, mixed>  $generalInfo
+     */
+    protected function extractDescription(array $generalInfo): ?string
+    {
+        return $this->firstFilled([
+            $generalInfo['Description']['LongDesc'] ?? null,
+            $generalInfo['Description']['MiddleDesc'] ?? null,
+            $generalInfo['SummaryDescription']['LongSummaryDescription'] ?? null,
+        ]);
+    }
+
+    /**
+     * One-line summary for listings.
+     *
+     * @param  array<string, mixed>  $generalInfo
+     */
+    protected function extractShortDescription(array $generalInfo): ?string
+    {
+        return $this->firstFilled([
+            $generalInfo['SummaryDescription']['ShortSummaryDescription'] ?? null,
+            $generalInfo['Description']['MiddleDesc'] ?? null,
+        ]);
+    }
+
+    /**
+     * @param  list<mixed>  $values
+     */
+    protected function firstFilled(array $values): ?string
+    {
+        foreach ($values as $value) {
+            $value = trim((string) $value);
+
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Product weight in kilograms from Icecat's "Weight" feature, falling
+     * back to "Package weight". Icecat reports the raw value in the unit
+     * given by the feature's measure sign (usually grams).
+     *
+     * @param  array<int, array<string, mixed>>  $featureGroups
+     */
+    protected function extractWeightInKg(array $featureGroups): ?float
+    {
+        foreach (['Weight', 'Package weight', 'Package net weight'] as $featureName) {
+            $feature = $this->findFeature($featureGroups, $featureName);
+
+            if ($feature === null || ! is_numeric($feature['Value'] ?? null)) {
+                continue;
             }
 
-            if (! empty($specInserts)) {
-                ProductSpecification::where('product_id', $product->id)->delete();
-                // Chunk inserts to handle large specification arrays.
-                foreach (array_chunk($specInserts, 100) as $chunk) {
-                    ProductSpecification::insert($chunk);
+            $value = (float) $feature['Value'];
+            $unit = strtolower((string) ($feature['Feature']['Measure']['Signs']['_'] ?? ''));
+
+            $kilograms = match ($unit) {
+                'g' => $value / 1000,
+                'kg' => $value,
+                default => null,
+            };
+
+            if ($kilograms !== null && $kilograms > 0) {
+                return round($kilograms, 3);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Human-readable warranty period (e.g. "3 year(s)") when Icecat lists one.
+     *
+     * @param  array<int, array<string, mixed>>  $featureGroups
+     */
+    protected function extractWarranty(array $featureGroups): ?string
+    {
+        $feature = $this->findFeature($featureGroups, 'Warranty period');
+        $warranty = trim((string) ($feature['PresentationValue'] ?? ''));
+
+        if ($warranty !== '') {
+            return $warranty;
+        }
+
+        $text = (string) ($this->findFeature($featureGroups, 'Manufacturer warranty')['PresentationValue'] ?? '');
+
+        return $this->singleWarrantyPeriod($text);
+    }
+
+    /**
+     * Extract "N year(s)" from free-text manufacturer warranty wording, but
+     * only when exactly one distinct year count is mentioned — wording like
+     * "1-year and 3-year ... depending on country" is left for a human.
+     */
+    protected function singleWarrantyPeriod(string $text): ?string
+    {
+        if (preg_match_all('/\b(\d+)[\s-]+years?\b/i', $text, $matches) === 0) {
+            return null;
+        }
+
+        $years = array_unique($matches[1]);
+
+        return count($years) === 1 ? reset($years).' year(s)' : null;
+    }
+
+    /**
+     * Find a feature by its English name across all feature groups.
+     *
+     * @param  array<int, array<string, mixed>>  $featureGroups
+     * @return array<string, mixed>|null
+     */
+    protected function findFeature(array $featureGroups, string $name): ?array
+    {
+        foreach ($featureGroups as $group) {
+            foreach ($group['Features'] ?? [] as $feature) {
+                if (strcasecmp((string) ($feature['Feature']['Name']['Value'] ?? ''), $name) === 0) {
+                    return $feature;
                 }
             }
         }
 
-        return true;
+        return null;
     }
 
     /**
@@ -203,20 +370,31 @@ class IcecatProductImporter
     {
         $candidates = [];
         foreach ($gallery as $idx => $img) {
-            $url = $img['Pic'] ?? $img['HighPic'] ?? '';
-            if ($url === '') {
+            // 500x500 is plenty for the storefront; the full-size originals
+            // are often several MB each and make bulk imports slow and huge.
+            // Icecat sends missing sizes as empty strings, not absent keys.
+            $url = $this->firstFilled([$img['Pic500x500'] ?? null, $img['Pic'] ?? null, $img['HighPic'] ?? null]);
+            if ($url === null) {
                 continue;
             }
 
             $candidates[] = [
                 'url' => $url,
                 'is_main' => ($img['IsMain'] ?? 'N') === 'Y',
-                'sort_order' => (int) ($img['No'] ?? $idx),
+                'position' => (int) ($img['No'] ?? $idx),
             ];
         }
 
         if (empty($candidates)) {
             return [];
+        }
+
+        // Main image first, then Icecat's own order, capped to keep storage sane.
+        usort($candidates, fn (array $a, array $b): int => [$b['is_main'], $a['position']] <=> [$a['is_main'], $b['position']]);
+        $candidates = array_slice($candidates, 0, max(1, (int) config('icecat.max_images', 8)));
+
+        foreach ($candidates as $index => $candidate) {
+            $candidates[$index]['sort_order'] = $index;
         }
 
         /** @var array<int, Response|\Throwable> $responses */
