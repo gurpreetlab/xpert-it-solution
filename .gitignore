@@ -33,3 +33,6 @@ CLAUDE.md
 /boost.json
 /data.ms
 /dumps
+
+# Test files are kept local only (never pushed)
+/tests
