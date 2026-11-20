@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Concerns\HasSlug;
+use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -37,10 +39,11 @@ use Laravel\Scout\Searchable;
  * @property-read ProductImage|null $primaryImage
  * @property-read Collection<int, ProductImage> $images
  */
-#[Fillable(['category_id', 'brand_id', 'type', 'name', 'slug', 'sku', 'mpn', 'gtin', 'hsn_code', 'icecat_id', 'icecat_synced_at', 'mrp', 'purchase_price', 'sale_price', 'stock', 'short_description', 'description', 'weight', 'warranty', 'is_featured', 'is_active'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'mpn', 'gtin', 'hsn_code', 'icecat_id', 'icecat_synced_at', 'mrp', 'purchase_price', 'sale_price', 'stock', 'short_description', 'description', 'weight', 'warranty', 'is_featured', 'is_active'])]
 class Product extends Model
 {
-    use HasSlug, Searchable, SoftDeletes;
+    /** @use HasFactory<ProductFactory> */
+    use HasFactory, HasSlug, Searchable, SoftDeletes;
 
     /**
      * @return array<string, mixed>

@@ -30,7 +30,10 @@ class ProcessIcecatImportBatch implements ShouldQueue
     {
         $batch = IcecatImportBatch::find($this->batchId);
 
-        if (! $batch) {
+        // Only a pending batch is processed. If the queue releases this job
+        // again (e.g. it outran the connection's retry_after), the copy must
+        // not re-run a batch that is already in progress or finished.
+        if (! $batch || $batch->status !== 'pending') {
             return;
         }
 

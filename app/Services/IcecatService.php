@@ -31,9 +31,10 @@ class IcecatService
             return null;
         }
 
-        $isGtin = ctype_digit($searchTerm);
+        $icecatId = $this->parseIcecatId($searchTerm);
+        $isGtin = $icecatId === null && ctype_digit($searchTerm);
 
-        if (! $isGtin && $brand === '') {
+        if ($icecatId === null && ! $isGtin && $brand === '') {
             // Icecat can never resolve a bare product code without a brand -
             // don't waste a request finding that out.
             Log::warning("Icecat import: skipped '{$searchTerm}' - a brand is required when searching by product code.");
@@ -49,7 +50,9 @@ class IcecatService
             // for *partial* responses, not language selection.
         ];
 
-        if ($isGtin) {
+        if ($icecatId !== null) {
+            $query['icecat_id'] = $icecatId;
+        } elseif ($isGtin) {
             $query['GTIN'] = $searchTerm;
         } else {
             $query['ProductCode'] = $searchTerm;
@@ -68,5 +71,18 @@ class IcecatService
         }
 
         return $data['data'];
+    }
+
+    /**
+     * Extract the numeric ID from an "icecat:<id>" search term — the exact,
+     * brand-free lookup used by the bulk index importer.
+     */
+    protected function parseIcecatId(string $searchTerm): ?string
+    {
+        if (preg_match('/^icecat:(\d+)$/i', $searchTerm, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return null;
     }
 }

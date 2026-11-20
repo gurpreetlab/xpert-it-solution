@@ -12,4 +12,9 @@ return [
     */
 
     'username' => env('ICECAT_USERNAME', 'xpertitsolution6'),
+
+    /*
+    | Maximum gallery images stored per imported product (500x500 versions).
+    */
+    'max_images' => (int) env('ICECAT_MAX_IMAGES', 8),
 ];
